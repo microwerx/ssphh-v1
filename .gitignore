@@ -272,6 +272,9 @@ __pycache__/
 !*.frag
 !*.renderconfig
 /fluxions/imgui-master
+!*.vcxproj
+!*.vcxproj.filters
+!*.sln
 
 # Prerequisites
 *.d
