@@ -275,6 +275,7 @@ __pycache__/
 !*.vcxproj
 !*.vcxproj.filters
 !*.sln
+!Makefile
 
 # Prerequisites
 *.d
