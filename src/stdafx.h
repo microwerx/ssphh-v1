@@ -22,12 +22,16 @@
 // are changed infrequently
 //
 
-#pragma once
+#ifndef STDAFX_H
+#define STDAFX_H
 
 //#include "targetver.h"
 
 #include <stdio.h>
+
+#ifdef WIN32
 #include <tchar.h>
+#endif
 
 // TODO: reference additional headers your program requires here
 #include <algorithm>
@@ -50,3 +54,5 @@
 #include <thread>
 
 #include <fluxions.hpp>
+
+#endif // STDAFX_H

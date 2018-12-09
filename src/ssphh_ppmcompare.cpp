@@ -17,12 +17,15 @@
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 #include "stdafx.h"
+#ifdef __unix__
+#include <unistd.h>
+#endif
 #include <ssphh_ppmcompare.hpp>
 
 using namespace std;
 using namespace Fluxions;
 
-IntensityStat& IntensityStat::operator+=(const Color3f& color)
+IntensityStat &IntensityStat::operator+=(const Color3f &color)
 {
     sumColor += color;
     minColor = Color3d::min(color, minColor);
@@ -75,26 +78,27 @@ void PPMCompare::SetConversion(ColorSpaceType im1type, ColorSpaceType im2type)
     imageColorSpaces[1] = im2type;
 }
 
-void PPMCompare::Compare(Image3f& image1, Image3f& image2)
+void PPMCompare::Compare(Image3f &image1, Image3f &image2)
 {
     double t0 = hflog.getSecondsElapsed();
 
-    if (image1.width() <= 0 || image1.height() <= 0 || image1.width() > 8192 || image1.height() > 8192 || image1.width() != image2.width() || image1.height() != image2.height()) {
+    if (image1.width() <= 0 || image1.height() <= 0 || image1.width() > 8192 || image1.height() > 8192 || image1.width() != image2.width() || image1.height() != image2.height())
+    {
         hflog.errorfn(__FUNCTION__, "image sizes do not match or exceed the dimensions of 8192x8192");
         return;
     }
 
-    vector<Image3f*> images = {
+    vector<Image3f *> images = {
         &image1stat.image,
         &image2stat.image,
         &diffstat.image,
         &diffbwstat.image,
-        &absdiffstat.image
-    };
+        &absdiffstat.image};
 
     int width = image1.width();
     int height = image1.height();
-    for (auto& image : images) {
+    for (auto &image : images)
+    {
         image->resize(width, height);
     }
 
@@ -103,7 +107,7 @@ void PPMCompare::Compare(Image3f& image1, Image3f& image2)
     blockstat.image.resize(bcwidth, bcheight);
     blockbwstat.image.resize(bcwidth, bcheight);
     blockcounts.resize(blockstat.image.width() * blockstat.image.height(),
-        BlockCountTuple(0.0f, Color3d(0.0), Color3f(65535.0f), Color3f(-65535.0f), 0.0f, 0.0f, 0.0f));
+                       BlockCountTuple(0.0f, Color3d(0.0), Color3f(65535.0f), Color3f(-65535.0f), 0.0f, 0.0f, 0.0f));
     const int CountIndex = 0;
     const int AverageIndex = 1;
     const int MinIndex = 2;
@@ -112,14 +116,18 @@ void PPMCompare::Compare(Image3f& image1, Image3f& image2)
     const int MinIIndex = 5;
     const int MaxIIndex = 6;
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
             Color3f pixel1 = image1.getPixel(x, y);
             Color3f pixel2 = image2.getPixel(x, y);
-            if (imageColorSpaces[0] == ColorSpaceType::SRGB) {
+            if (imageColorSpaces[0] == ColorSpaceType::SRGB)
+            {
                 pixel1 = SRGBtoXYZ(pixel1);
             }
-            if (imageColorSpaces[1] == ColorSpaceType::SRGB) {
+            if (imageColorSpaces[1] == ColorSpaceType::SRGB)
+            {
                 pixel2 = SRGBtoXYZ(pixel2);
             }
 
@@ -153,13 +161,18 @@ void PPMCompare::Compare(Image3f& image1, Image3f& image2)
     diffbwstat.Finalize();
     absdiffstat.Finalize();
 
-    for (int j = 0; j < bcheight; j++) {
-        for (int i = 0; i < bcwidth; i++) {
+    for (int j = 0; j < bcheight; j++)
+    {
+        for (int i = 0; i < bcwidth; i++)
+        {
             size_t addr = blockstat.image.addr(i, j);
             float count = get<CountIndex>(blockcounts[addr]);
-            if (count > 0.0) {
+            if (count > 0.0)
+            {
                 get<AverageIndex>(blockcounts[addr]) /= count;
-            } else {
+            }
+            else
+            {
                 get<AverageIndex>(blockcounts[addr]) *= 0.0f;
                 get<MinIndex>(blockcounts[addr]) *= 0.0f;
                 get<MaxIndex>(blockcounts[addr]) *= 0.0f;
@@ -190,7 +203,7 @@ void PPMCompare::Compare(Image3f& image1, Image3f& image2)
     compareTime = hflog.getSecondsElapsed() - t0;
 }
 
-void PPMCompare::SaveResults(const string& statsName, const string& pathtracerName, bool genDiffs, bool ignoreCache)
+void PPMCompare::SaveResults(const string &statsName, const string &pathtracerName, bool genDiffs, bool ignoreCache)
 {
     string dtg = hflog.makeDTG();
 
@@ -204,8 +217,10 @@ void PPMCompare::SaveResults(const string& statsName, const string& pathtracerNa
     const int AvgIIndex = 4;
     const int MinIIndex = 5;
     const int MaxIIndex = 6;
-    for (int j = 0; j < blockstat.image.height(); j++) {
-        for (int i = 0; i < blockstat.image.width(); i++) {
+    for (int j = 0; j < blockstat.image.height(); j++)
+    {
+        for (int i = 0; i < blockstat.image.width(); i++)
+        {
             size_t addr = blockstat.image.addr(i, j);
             float averageI = get<AvgIIndex>(blockcounts[addr]);
             float mindiffI = get<MinIIndex>(blockcounts[addr]);
@@ -226,18 +241,19 @@ void PPMCompare::SaveResults(const string& statsName, const string& pathtracerNa
     }
     fout.close();
 
-    if (mrd >= 0 && pl >= 0 && md >= 0) {
+    if (mrd >= 0 && pl >= 0 && md >= 0)
+    {
         ofstream fout(statsName + "_stats.csv", ignoreCache ? ios::out : ios::app);
         if (ignoreCache)
             fout << "name,type,dtg,ks,mrd,pl,md,sumI,xbarI,minI,maxI,rbarI,lclI,uclI" << endl;
 
-        vector<pair<const char*, IntensityStat*>> pstats = {
-            { "IMAGE1", &image1stat },
-            { "IMAGE2", &image2stat },
-            { "DIFFIM", &absdiffstat }
-        };
+        vector<pair<const char *, IntensityStat *>> pstats = {
+            {"IMAGE1", &image1stat},
+            {"IMAGE2", &image2stat},
+            {"DIFFIM", &absdiffstat}};
 
-        for (auto& pstat : pstats) {
+        for (auto &pstat : pstats)
+        {
             fout << statsName << ",";
             fout << pstat.first << ",";
             fout << dtg << ",";
@@ -283,7 +299,8 @@ void PPMCompare::SaveResults(const string& statsName, const string& pathtracerNa
     blockbwimage.savePPMi(files["diff04"], 255.0f, 0, bciMaxValueBW);
 
     // convert to PNG
-    for (auto& f : files) {
+    for (auto &f : files)
+    {
         string png = f.second;
         png.replace(png.end() - 3, png.end(), "png");
 
@@ -294,6 +311,10 @@ void PPMCompare::SaveResults(const string& statsName, const string& pathtracerNa
         string cmdline = string("magick ") + f.second + " " + png;
         hflog.infofn(__FUNCTION__, "running ", cmdline.c_str());
         system(cmdline.c_str());
+#ifdef WIN32
         DeleteFileA(f.second.c_str());
+#elif __unix__
+        unlink(f.second.c_str());
+#endif
     }
 }

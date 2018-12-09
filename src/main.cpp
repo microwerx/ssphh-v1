@@ -18,7 +18,6 @@
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 
-
 #include "stdafx.h"
 
 #ifdef WIN32
@@ -80,13 +79,11 @@
 using namespace std;
 //using namespace SSPHH;
 
-
 extern void do_tests();
 
 void PrintString9x15(float x, float y, int justification, const char *format, ...);
 void PrintBitmapStringJustified(float x, float y, int justification, void *font, const char *format, ...);
 void PrintStrokeStringJustified(float x, float y, int justification, void *font, const char *format, ...);
-
 
 #define GRAPP2017 0
 
@@ -97,7 +94,7 @@ int g_screenWidth = 1800;
 int g_screenHeight = 1200;
 #else
 const char *g_windowTitle = "Scalable Spherical Harmonics Hierarchies (SSPHH)";
-int g_displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE | GLUT_SRGB;// | GLUT_BORDERLESS;
+int g_displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE | GLUT_SRGB; // | GLUT_BORDERLESS;
 int g_screenWidth = 1280;
 int g_screenHeight = 720;
 #endif
@@ -129,8 +126,8 @@ double g_renderInterval = 0.01666667f;
 double g_Fov = 45.0;
 double g_zNear = 0.01;
 double g_zFar = 100.0;
-int g_keyMap[256] = { 0 };
-int g_specialKeyMap[256] = { 0 };
+int g_keyMap[256] = {0};
+int g_specialKeyMap[256] = {0};
 vector<string> g_args;
 
 using namespace Viperfish;
@@ -152,8 +149,7 @@ void OnRenderOverlay();
 void Set2DViewport();
 void Set3DViewport();
 
-
-void APIENTRY glutTemplateDebugFunc(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam);
+void APIENTRY glutTemplateDebugFunc(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const GLvoid *userParam);
 
 void glutCreateAffinity();
 
@@ -178,18 +174,19 @@ void menustatus(int state, int x, int y);
 void windowstatus(int state);
 void joystick(unsigned int buttonMask, int x, int y, int z);
 
-namespace Fluxions {
-	extern int test_fluxions_simple_property(int argc, char **argv);
+namespace Fluxions
+{
+extern int test_fluxions_simple_property(int argc, char **argv);
 }
 
-
-namespace KASL {
-	extern int test_PythonInterpreter(int argc, char **argv);
+namespace KASL
+{
+extern int test_PythonInterpreter(int argc, char **argv);
 }
-
 
 void glutCreateAffinity()
 {
+#if (0)
 	glewInit();
 	const int MAX_GPUS = 4;
 	GPU_DEVICE gpuDevice;
@@ -210,6 +207,7 @@ void glutCreateAffinity()
 		hflog.info("%s(): WGL_NV_gpu_affinity supports %d Device: %s Name: %s", __FUNCTION__, i, gpuDevice.DeviceName, gpuDevice.DeviceString);
 		i++;
 	}
+#endif
 }
 
 int main(int argc, char **argv)
@@ -222,14 +220,17 @@ int main(int argc, char **argv)
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	bool showVersion = false;
-	for (int i = 0; i < argc; i++) {
+	for (int i = 0; i < argc; i++)
+	{
 		string option = argv[i];
-		if (option == "-v" || option == "--version") {
+		if (option == "-v" || option == "--version")
+		{
 			showVersion = true;
 		}
 	}
 
-	if (showVersion) {
+	if (showVersion)
+	{
 		printf("SSPHH by Jonathan Metzgar\nCopyright (C) 2017 Jonathan Metzgar\n\n");
 		printf("This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or\n(at your option) any later version.\n\n");
 		printf("This program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\n");
@@ -267,10 +268,14 @@ int main(int argc, char **argv)
 	glutEntryFunc(entry);
 	glutVisibilityFunc(visibility);
 	glutIdleFunc(idle);
-	if (g_timer1millis != 0) glutTimerFunc(g_timer1millis, timer1, g_timer1value);
-	if (g_timer2millis != 0) glutTimerFunc(g_timer2millis, timer2, g_timer2value);
-	if (g_timer3millis != 0) glutTimerFunc(g_timer3millis, timer3, g_timer3value);
-	if (g_timer4millis != 0) glutTimerFunc(g_timer4millis, timer4, g_timer4value);
+	if (g_timer1millis != 0)
+		glutTimerFunc(g_timer1millis, timer1, g_timer1value);
+	if (g_timer2millis != 0)
+		glutTimerFunc(g_timer2millis, timer2, g_timer2value);
+	if (g_timer3millis != 0)
+		glutTimerFunc(g_timer3millis, timer3, g_timer3value);
+	if (g_timer4millis != 0)
+		glutTimerFunc(g_timer4millis, timer4, g_timer4value);
 	glutMenuStateFunc(menu);
 	glutMenuStatusFunc(menustatus);
 	glutWindowStatusFunc(windowstatus);
@@ -287,7 +292,6 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-
 // ParseCommandLine()
 // This function is called prior to the OnInit() initialization call of the
 // application.
@@ -299,13 +303,11 @@ void ParseCommandLine()
 	}
 }
 
-
 // InitMenu()
 void InitMenu()
 {
 	// Initialize menu entries here
 }
-
 
 // OnInit()
 // This function is called prior to the main loop of the application.
@@ -327,8 +329,10 @@ void OnInit()
 	const char *extensionsString = (char *)glGetString(GL_EXTENSIONS);
 
 	bool showglextension = false;
-	for (auto arg = g_args.begin(); arg != g_args.end(); arg++) {
-		if (*arg == "--glextensions") {
+	for (auto arg = g_args.begin(); arg != g_args.end(); arg++)
+	{
+		if (*arg == "--glextensions")
+		{
 			showglextension = true;
 		}
 	}
@@ -336,7 +340,8 @@ void OnInit()
 	printf("GL_RENDERER: %s\n", rendererString);
 	printf("GL_VERSION:  %s\n", versionString);
 	printf("GL_VENDOR:   %s\n", vendorString);
-	if (showglextension) {
+	if (showglextension)
+	{
 		printf("GL_EXTENSIONS: %s\n", extensionsString);
 	}
 
@@ -360,15 +365,16 @@ void OnInit()
 	imguiPtr = ImGuiWidget::MakeShared();
 	vfApp = Widget::MakeShared();
 
-	imguiPtr->decorate((Widget::SharedPtr)ssphhPtr);
-	vfApp->decorate((Widget::SharedPtr)imguiPtr);
+	Widget::SharedPtr wssphhPtr = ssphhPtr;
+	Widget::SharedPtr wimguiPtr = imguiPtr;
+	imguiPtr->decorate(wssphhPtr);
+	vfApp->decorate(wimguiPtr);
 
 	//ssphhPtr->Init(g_args);
 	//ssphhPtr->OnInit(g_args);
 	vfApp->Init(g_args);
 	//vfApp->OnInit(g_args);
 }
-
 
 void OnKill()
 {
@@ -377,7 +383,6 @@ void OnKill()
 	//IMG_Quit();
 	//SDL_Quit();
 }
-
 
 // OnUpdate(deltaTime)
 // This function is called during the main loop of the application.
@@ -402,7 +407,6 @@ void OnUpdate(double deltaTime)
 	vfApp->OnUpdate(deltaTime);
 }
 
-
 void OnRender()
 {
 	// RenderOpenGL11TestScene();
@@ -410,7 +414,6 @@ void OnRender()
 	// ssphh.OnRender();
 	vfApp->OnRender();
 }
-
 
 void OnRenderOverlay()
 {
@@ -420,7 +423,6 @@ void OnRenderOverlay()
 	vfApp->OnRenderOverlay();
 }
 
-
 void Set2DViewport()
 {
 	glMatrixMode(GL_PROJECTION);
@@ -429,7 +431,6 @@ void Set2DViewport()
 	glMatrixMode(GL_MODELVIEW);
 }
 
-
 void Set3DViewport()
 {
 	glMatrixMode(GL_PROJECTION);
@@ -437,7 +438,6 @@ void Set3DViewport()
 	gluPerspective(g_Fov, g_aspectRatio, g_zNear, g_zFar);
 	glMatrixMode(GL_MODELVIEW);
 }
-
 
 void display()
 {
@@ -463,7 +463,6 @@ void display()
 		g_errorCount = 0;
 }
 
-
 void reshape(int width, int height)
 {
 	g_aspectRatio = (double)width / (double)height;
@@ -474,7 +473,6 @@ void reshape(int width, int height)
 	// ssphh.OnReshape(width, height);
 	vfApp->OnReshape(width, height);
 }
-
 
 void keyboard(unsigned char key, int x, int y)
 {
@@ -492,7 +490,6 @@ void keyboard(unsigned char key, int x, int y)
 	//	g_distance -= 1;
 }
 
-
 void keyboardup(unsigned char key, int x, int y)
 {
 	g_keyMap[key] = 0;
@@ -501,7 +498,6 @@ void keyboardup(unsigned char key, int x, int y)
 	// ssphh.OnKeyUp(keyName, glutGetModifiers());
 	vfApp->OnKeyUp(keyName, glutGetModifiers());
 }
-
 
 void special(int key, int x, int y)
 {
@@ -512,7 +508,6 @@ void special(int key, int x, int y)
 	vfApp->OnKeyDown(keyName, glutGetModifiers());
 }
 
-
 void specialup(int key, int x, int y)
 {
 	g_specialKeyMap[key] = 0;
@@ -521,7 +516,6 @@ void specialup(int key, int x, int y)
 	// ssphh.OnKeyUp(keyName, glutGetModifiers());
 	vfApp->OnKeyUp(keyName, glutGetModifiers());
 }
-
 
 void mouse(int button, int state, int x, int y)
 {
@@ -549,7 +543,6 @@ void mouse(int button, int state, int x, int y)
 		vfApp->OnMouseButtonUp(button);
 }
 
-
 void motion(int x, int y)
 {
 	g_mouseDX = x - g_mouseX;
@@ -572,7 +565,6 @@ void passive(int x, int y)
 	vfApp->OnMouseMove(x, y);
 }
 
-
 void entry(int state)
 {
 	if (state == GLUT_ENTERED)
@@ -583,7 +575,6 @@ void entry(int state)
 		vfApp->OnMouseLeave();
 }
 
-
 void visibility(int state)
 {
 	if (state == GLUT_VISIBLE)
@@ -593,7 +584,6 @@ void visibility(int state)
 		// ssphh.OnWindowHidden();
 		vfApp->OnWindowHidden();
 }
-
 
 void idle()
 {
@@ -634,36 +624,29 @@ void idle()
 	}
 }
 
-
 void timer1(int value)
 {
 }
-
 
 void timer2(int value)
 {
 }
 
-
 void timer3(int value)
 {
 }
-
 
 void timer4(int value)
 {
 }
 
-
 void menu(int state)
 {
 }
 
-
 void menustatus(int state, int x, int y)
 {
 }
-
 
 void windowstatus(int state)
 {
@@ -680,7 +663,6 @@ void windowstatus(int state)
 	}
 }
 
-
 void joystick(unsigned int buttonMask, int x, int y, int z)
 {
 	g_joystickButtonMask = buttonMask;
@@ -689,9 +671,7 @@ void joystick(unsigned int buttonMask, int x, int y, int z)
 	g_joystickZ = z;
 }
 
-
 // -- EXTRA FUNCTIONS ------------------------------------------------
-
 
 void PrintString9x15(float x, float y, int justification, const char *format, ...)
 {
@@ -708,7 +688,6 @@ void PrintString9x15(float x, float y, int justification, const char *format, ..
 
 	PrintBitmapStringJustified(x, y, justification, GLUT_BITMAP_9_BY_15, buffer);
 }
-
 
 void PrintBitmapStringJustified(float x, float y, int justification, void *font, const char *format, ...)
 {
@@ -744,7 +723,6 @@ void PrintBitmapStringJustified(float x, float y, int justification, void *font,
 	glutBitmapString(font, buffer);
 }
 
-
 void PrintStrokeStringJustified(float x, float y, int justification, void *font, const char *format, ...)
 {
 	char buffer[2048];
@@ -779,10 +757,10 @@ void PrintStrokeStringJustified(float x, float y, int justification, void *font,
 	glutStrokeString(font, buffer);
 }
 
-
-void APIENTRY glutTemplateDebugFunc(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const GLvoid* userParam)
+void APIENTRY glutTemplateDebugFunc(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const GLvoid *userParam)
 {
-	if (id == 131185) return;
+	if (id == 131185)
+		return;
 
 	ostringstream ostr;
 	ostr << "(" << g_CurrentDebugMessage << ") ";
@@ -793,38 +771,82 @@ void APIENTRY glutTemplateDebugFunc(GLenum source, GLenum type, GLuint id, GLenu
 	ostr << " severity: ";
 	switch (severity)
 	{
-	case GL_DEBUG_SEVERITY_LOW: ostr << "LOW"; break;
-	case GL_DEBUG_SEVERITY_MEDIUM: ostr << "MEDIUM"; break;
-	case GL_DEBUG_SEVERITY_HIGH: ostr << "HIGH"; break;
-	case GL_DEBUG_SEVERITY_NOTIFICATION: ostr << "NOTIFICATION"; break;
-	default: ostr << severity; break;
+	case GL_DEBUG_SEVERITY_LOW:
+		ostr << "LOW";
+		break;
+	case GL_DEBUG_SEVERITY_MEDIUM:
+		ostr << "MEDIUM";
+		break;
+	case GL_DEBUG_SEVERITY_HIGH:
+		ostr << "HIGH";
+		break;
+	case GL_DEBUG_SEVERITY_NOTIFICATION:
+		ostr << "NOTIFICATION";
+		break;
+	default:
+		ostr << severity;
+		break;
 	}
 
 	ostr << " source: ";
 	switch (source)
 	{
-	case GL_DEBUG_SOURCE_API: ostr << "API"; break;
-	case GL_DEBUG_SOURCE_APPLICATION: ostr << "APPLICATION"; break;
-	case GL_DEBUG_SOURCE_OTHER: ostr << "OTHER"; break;
-	case GL_DEBUG_SOURCE_SHADER_COMPILER: ostr << "SHADER COMPILER"; break;
-	case GL_DEBUG_SOURCE_THIRD_PARTY: ostr << "THIRD PARTY"; break;
-	case GL_DEBUG_SOURCE_WINDOW_SYSTEM: ostr << "WINDOW SYSTEM"; break;
-	default: ostr << type;  break;
+	case GL_DEBUG_SOURCE_API:
+		ostr << "API";
+		break;
+	case GL_DEBUG_SOURCE_APPLICATION:
+		ostr << "APPLICATION";
+		break;
+	case GL_DEBUG_SOURCE_OTHER:
+		ostr << "OTHER";
+		break;
+	case GL_DEBUG_SOURCE_SHADER_COMPILER:
+		ostr << "SHADER COMPILER";
+		break;
+	case GL_DEBUG_SOURCE_THIRD_PARTY:
+		ostr << "THIRD PARTY";
+		break;
+	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+		ostr << "WINDOW SYSTEM";
+		break;
+	default:
+		ostr << type;
+		break;
 	}
 
 	ostr << " type: ";
 	switch (type)
 	{
-	case GL_DEBUG_TYPE_ERROR: ostr << "ERROR"; break;
-	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: ostr << "DEPRECATED BEHAVIOR"; break;
-	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: ostr << "UNDEFINED BEHAVIOR"; break;
-	case GL_DEBUG_TYPE_PORTABILITY: ostr << "PORTABILITY"; break;
-	case GL_DEBUG_TYPE_PERFORMANCE: ostr << "PERFORMANCE"; break;
-	case GL_DEBUG_TYPE_MARKER: ostr << "MARKER"; break;
-	case GL_DEBUG_TYPE_PUSH_GROUP: ostr << "PUSH GROUP"; break;
-	case GL_DEBUG_TYPE_POP_GROUP: ostr << "POP GROUP"; break;
-	case GL_DEBUG_TYPE_OTHER: ostr << "OTHER"; break;
-	default: ostr << type; break;
+	case GL_DEBUG_TYPE_ERROR:
+		ostr << "ERROR";
+		break;
+	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+		ostr << "DEPRECATED BEHAVIOR";
+		break;
+	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+		ostr << "UNDEFINED BEHAVIOR";
+		break;
+	case GL_DEBUG_TYPE_PORTABILITY:
+		ostr << "PORTABILITY";
+		break;
+	case GL_DEBUG_TYPE_PERFORMANCE:
+		ostr << "PERFORMANCE";
+		break;
+	case GL_DEBUG_TYPE_MARKER:
+		ostr << "MARKER";
+		break;
+	case GL_DEBUG_TYPE_PUSH_GROUP:
+		ostr << "PUSH GROUP";
+		break;
+	case GL_DEBUG_TYPE_POP_GROUP:
+		ostr << "POP GROUP";
+		break;
+	case GL_DEBUG_TYPE_OTHER:
+		ostr << "OTHER";
+		break;
+	default:
+		ostr << type;
+		break;
 	}
 
 	hflog.info("%s", ostr.str().c_str());
@@ -836,7 +858,6 @@ void APIENTRY glutTemplateDebugFunc(GLenum source, GLenum type, GLuint id, GLenu
 		hflog.info("> %s", line.c_str());
 	}
 }
-
 
 void RenderCheckerboard()
 {
@@ -853,7 +874,6 @@ void RenderCheckerboard()
 		}
 	}
 }
-
 
 void RenderOpenGL11TestScene()
 {

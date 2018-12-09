@@ -3,11 +3,13 @@
 # development packages
 # global
 
-DEP_INCDIR = dep/include
-DEP_SRCDIR = dep/src
+DEP_INCDIR = ../fluxions/dep/include
+DEP_SRCDIR = ../fluxions/dep/src
 SRCDIR = src
 INCDIR = include
 OBJDIR = build
+FLUXIONS_INCDIR = ../fluxions/include
+FLUXIONS_LIBDIR = ../fluxions/build
 DEPCXXSOURCES = $(wildcard $(DEP_SRCDIR)/*.cpp)
 DEPCSOURCES = $(wildcard $(DEP_SRCDIR)/*.c)
 CXXSOURCES = $(wildcard $(SRCDIR)/*.cpp)
@@ -26,8 +28,9 @@ GCH = $(SRCDIR)/stdafx.h.gch
 CC = gcc
 CCFLAGS = -Wall -I$(INCDIR) -I$(DEP_INCDIR) `python3-config --includes`
 CXX = g++
-CXXFLAGS = -std=c++14 -g -Wall -I$(INCDIR) -I$(DEP_INCDIR) `python3-config --includes`
-LDFLAGS = -LGLEW -LGL -LGLU -Lglut
+CXXFLAGS = -std=c++14 -g -Wall -I$(INCDIR) -I$(DEP_INCDIR) -I$(FLUXIONS_INCDIR) `python3-config --includes`
+LDFLAGS = `pkg-config --libs glew` -Lfreeglut -Lfluxions -lstdc++ ../fluxions/build/libfluxions.a
+LDFLAGS = -L../fluxions/build -lfluxions -lglut -lGLEW -lGLU -lGL -lcurl -lczmq -lzmq -lSDL2_image -lSDL2 -lpthread -lstdc++
 
 .PHONY: all clean precompiled
 
@@ -44,7 +47,7 @@ cobjects: $(DEPCOBJECTS)
 	echo $(DEPOBJECTS)
 
 $(TARGET): $(OBJECTS)
-	$(LD) -o $@ $(OBJECTS) $(LDFLAGS)
+	$(CXX) -o $@ $(OBJECTS) $(LDFLAGS)
 
 $(GCH): $(SRCDIR)/stdafx.h $(HEADERS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
