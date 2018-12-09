@@ -20,7 +20,7 @@ SRCOBJECTS = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(CXXSOURCES)) $(patsubst 
 DEPOBJECTS = $(patsubst $(DEP_SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(DEPCXXSOURCES)) $(patsubst $(DEP_SRCDIR)/%.c,$(OBJDIR)/%.o,$(DEPCSOURCES))
 # DEPCOBJECTS= $(patsubst $(DEP_SRCDIR)/%.c,$(OBJDIR)/%.o,$(DEPCSOURCES))
 OBJECTS = $(SRCOBJECTS) $(DEPOBJECTS)
-TARGET = build/libfluxions.a
+TARGET = build/ssphh
 GCH = $(SRCDIR)/stdafx.h.gch
 
 CC = gcc
@@ -44,7 +44,7 @@ cobjects: $(DEPCOBJECTS)
 	echo $(DEPOBJECTS)
 
 $(TARGET): $(OBJECTS)
-	$(AR) cr $@ $(OBJECTS) 
+	$(LD) -o $@ $(OBJECTS) $(LDFLAGS)
 
 $(GCH): $(SRCDIR)/stdafx.h $(HEADERS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
