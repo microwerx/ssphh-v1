@@ -275,6 +275,7 @@ __pycache__/
 !*.sln
 !Makefile
 !*.json
+!.vscode
 
 # Prerequisites
 *.d
