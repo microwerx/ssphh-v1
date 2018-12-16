@@ -276,6 +276,7 @@ __pycache__/
 !Makefile
 !*.json
 !.vscode
+!build/.keep
 
 # Prerequisites
 *.d
