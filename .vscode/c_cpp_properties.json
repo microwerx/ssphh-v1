@@ -7,6 +7,8 @@
                 "${workspaceFolder}/include",
                 "${workspaceFolder}/dep/include",
                 "/usr/include/python3.6m",
+                "/usr/local/opt",
+                "/usr/local/Cellar/python/3.7.1/Frameworks/Python.framework/Versions/3.7/include/python3.7m",
                 "${workspaceFolder}/../fluxions/include",
                 "${workspaceFolder}/../fluxions/dep/include"
             ],

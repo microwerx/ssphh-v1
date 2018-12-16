@@ -255,7 +255,7 @@ int main(int argc, char **argv)
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	//glutInitContextFlags(GLUT_DEBUG);
 	glutCreateWindow(g_windowTitle);
-	glutCreateAffinity();
+	// glutCreateAffinity();
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
@@ -281,12 +281,20 @@ int main(int argc, char **argv)
 	glutWindowStatusFunc(windowstatus);
 	glutJoystickFunc(joystick, g_joystickPollInterval);
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
-	ParseCommandLine();
-	InitMenu();
-	OnInit();
-	glutMainLoop();
-	OnKill();
 
+	try
+	{
+		ParseCommandLine();
+		InitMenu();
+		OnInit();
+		glutMainLoop();
+		OnKill();
+	}
+	catch (...)
+	{
+		hflog.error("%s(): Caught an unhandled exception", __FUNCTION__);
+	}
+	
 	curl_global_cleanup();
 
 	return 0;
