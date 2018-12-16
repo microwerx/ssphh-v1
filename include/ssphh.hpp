@@ -331,7 +331,7 @@ private:
         bool renderCoronaSCN = false;
         bool renderCoronaCubeMapSCN = false;
 
-        bool sphl_checkboxes[32][4] = { false };
+        bool sphl_checkboxes[32][4] = { {false} };
 
         double lastRenderConfigLoadTime = 0.0;
         double lastScenegraphLoadTime = 0.0;

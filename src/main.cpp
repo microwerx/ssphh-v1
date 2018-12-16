@@ -315,13 +315,18 @@ void InitMenu()
 //
 void OnInit()
 {
+	hflog.info("%s(): Initializing OpenGL");
 	glewInit();
 
 #ifdef USE_MULTISAMPLING
 	glEnable(GL_MULTISAMPLE);
 #endif
-	glDebugMessageCallback((GLDEBUGPROC)glutTemplateDebugFunc, NULL);
-	glEnable(GL_DEBUG_OUTPUT);
+	std::cerr << std::hex << glDebugMessageCallback << std::endl;
+	if (glDebugMessageCallback)
+	{
+		glDebugMessageCallback((GLDEBUGPROC)glutTemplateDebugFunc, NULL);
+		glEnable(GL_DEBUG_OUTPUT);
+	}
 
 	const char *versionString = (char *)glGetString(GL_VERSION);
 	const char *vendorString = (char *)glGetString(GL_VENDOR);
@@ -356,6 +361,7 @@ void OnInit()
 #endif
 
 #ifndef FLUXIONS_NO_SDL
+	hflog.info("%s(): Initializing SDL", __FUNCTION__);
 	SDL_Init(SDL_INIT_EVERYTHING);
 	IMG_Init(IMG_INIT_JPG || IMG_INIT_PNG);
 #endif
