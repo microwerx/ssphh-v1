@@ -220,14 +220,32 @@ int main(int argc, char **argv)
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	bool showVersion = false;
+	std::map<string, string> argv_options;
 	for (int i = 0; i < argc; i++)
 	{
 		string option = argv[i];
+		std::regex dashequals("^[-]+(\w+)(|=(\w+))");
+		std::sregex_token_iterator it(option.begin(),
+									  option.end(),
+									  dashequals,
+									  -1);
+		std::sregex_token_iterator end;
+		size_t count = 0;
+
+		for (; it != end; it++) {
+			if (it->length() == 0) continue;
+			if (count == 0) {
+				argv_options.emplace(*it)
+			}
+			std::cout << "token " << count++ << " " << *it << std::endl;
+		}
 		if (option == "-v" || option == "--version")
 		{
 			showVersion = true;
 		}
 	}
+
+	return 0;
 
 	if (showVersion)
 	{
