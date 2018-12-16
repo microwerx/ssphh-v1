@@ -31,6 +31,10 @@ static const int AllDegrees = -1;
 static float x = 64.0f;
 static float w = 384.0f;
 
+#ifdef __APPLE__
+#define __unix__
+#endif
+
 #ifdef __unix__
 auto DeleteFile = unlink;
 #endif
@@ -1859,7 +1863,8 @@ void SSPHH_Application::imguiCoronaDeleteCache()
 		DeleteFile((base_filename + "_01_Sprime.json").c_str());
 		DeleteFile((base_filename + "_02_self.json").c_str());
 		DeleteFile((base_filename + "_03_neighbor.json").c_str());
-#elif __unix__
+#endif
+#ifdef __unix__
 		unlink((base_filename + ".scn").c_str());
 		unlink((base_filename + ".exr").c_str());
 		unlink((base_filename + ".ppm").c_str());
