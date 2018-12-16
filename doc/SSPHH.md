@@ -4,7 +4,7 @@
 
 ## Command line options
 
-- [ ] `-v` verbose
+- [ ] `-v` or `--verbose` verbose
 - [ ] `--broker` start as a broker
 - [ ] `--worker` start as a worker
 - [ ] `--client` start as a client
