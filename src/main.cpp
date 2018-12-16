@@ -294,7 +294,7 @@ int main(int argc, char **argv)
 	{
 		hflog.error("%s(): Caught an unhandled exception", __FUNCTION__);
 	}
-	
+
 	curl_global_cleanup();
 
 	return 0;
@@ -323,7 +323,7 @@ void InitMenu()
 //
 void OnInit()
 {
-	hflog.info("%s(): Initializing OpenGL");
+	hflog.info("%s(): Initializing OpenGL", __FUNCTION__);
 	glewInit();
 
 #ifdef USE_MULTISAMPLING
@@ -350,18 +350,18 @@ void OnInit()
 		}
 	}
 
-	printf("GL_RENDERER: %s\n", rendererString);
-	printf("GL_VERSION:  %s\n", versionString);
-	printf("GL_VENDOR:   %s\n", vendorString);
+	hflog.info("GL_RENDERER: %s\n", rendererString);
+	hflog.info("GL_VERSION:  %s\n", versionString);
+	hflog.info("GL_VENDOR:   %s\n", vendorString);
 	if (showglextension)
 	{
-		printf("GL_EXTENSIONS: %s\n", extensionsString);
+		hflog.info("GL_EXTENSIONS: %s\n", extensionsString);
 	}
 
 	GLint maxUniformBufferBindings;
 
 	glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &maxUniformBufferBindings);
-	printf("GL_MAX_UNIFORM_BUFFER_BINDINGS: %d\n", maxUniformBufferBindings);
+	hflog.info("GL_MAX_UNIFORM_BUFFER_BINDINGS: %d\n", maxUniformBufferBindings);
 
 	glHint(GL_FRAGMENT_SHADER_DERIVATIVE_HINT_ARB, GL_NICEST);
 #ifdef GL_FRAGMENT_SHADER_DERIVATIVE_HINT_OES
@@ -374,6 +374,7 @@ void OnInit()
 	IMG_Init(IMG_INIT_JPG || IMG_INIT_PNG);
 #endif
 
+	hflog.info("%s(): Initializing SSPHH");
 	//InitSSPHH();
 	ssphhPtr = MakeShared<SSPHH_Application>();
 	imguiPtr = ImGuiWidget::MakeShared();
@@ -384,6 +385,7 @@ void OnInit()
 	imguiPtr->decorate(wssphhPtr);
 	vfApp->decorate(wimguiPtr);
 
+	hflog.info("%s(): Initializing application", __FUNCTION__);
 	//ssphhPtr->Init(g_args);
 	//ssphhPtr->OnInit(g_args);
 	vfApp->Init(g_args);
