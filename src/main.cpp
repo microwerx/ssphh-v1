@@ -210,6 +210,47 @@ void glutCreateAffinity()
 #endif
 }
 
+std::map<std::string, std::string> MakeOptionsFromArgs(int argc, const char **argv)
+{
+	std::map<std::string, std::string> argv_options;
+	for (int i = 0; i < argc; i++)
+	{
+		string option = argv[i];
+		hflog.info("%s(): Processing '%s'", __FUNCTION__, option.c_str());
+		std::regex dashequals("(^-+|=)",
+							  std::regex_constants::ECMAScript);
+		std::sregex_token_iterator it(option.begin(),
+									  option.end(),
+									  dashequals,
+									  -1);
+		std::sregex_token_iterator end;
+		size_t count = 0;
+
+		string key = "";
+		string value = "";
+		for (; it != end; it++)
+		{
+			if (count == 1)
+			{
+				key = *it;
+			}
+			else if (count == 2)
+			{
+				value = *it;
+			}
+			string token = *it;
+			hflog.info("%s(): token %d '%s'", __FUNCTION__, count, token.c_str());
+			count++;
+		}
+		if (key.length() > 0)
+		{
+			argv_options.emplace(std::make_pair(key, value));
+			hflog.info("%s(): argv adding key '%s' = '%s'", __FUNCTION__, key.c_str(), value.c_str());
+		}
+	}
+	return argv_options;
+}
+
 int main(int argc, char **argv)
 {
 	do_tests();
@@ -220,32 +261,11 @@ int main(int argc, char **argv)
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	bool showVersion = false;
-	std::map<string, string> argv_options;
-	for (int i = 0; i < argc; i++)
+	map<string, string> options = MakeOptionsFromArgs(argc, (const char **)argv);
+	if (options.count("version"))
 	{
-		string option = argv[i];
-		std::regex dashequals("^[-]+(\w+)(|=(\w+))");
-		std::sregex_token_iterator it(option.begin(),
-									  option.end(),
-									  dashequals,
-									  -1);
-		std::sregex_token_iterator end;
-		size_t count = 0;
-
-		for (; it != end; it++) {
-			if (it->length() == 0) continue;
-			if (count == 0) {
-				argv_options.emplace(*it)
-			}
-			std::cout << "token " << count++ << " " << *it << std::endl;
-		}
-		if (option == "-v" || option == "--version")
-		{
-			showVersion = true;
-		}
+		showVersion = true;
 	}
-
-	return 0;
 
 	if (showVersion)
 	{
@@ -352,6 +372,10 @@ void OnInit()
 	{
 		glDebugMessageCallback((GLDEBUGPROC)glutTemplateDebugFunc, NULL);
 		glEnable(GL_DEBUG_OUTPUT);
+	}
+	else
+	{
+		hflog.warningfn(__FUNCTION__, "No glDebugMessageCallback");
 	}
 
 	const char *versionString = (char *)glGetString(GL_VERSION);
