@@ -427,7 +427,9 @@ void Set2DViewport()
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluOrtho2D(0, g_screenWidth, g_screenHeight, 0);
+	Matrix4f ortho2d;
+	ortho2d.Ortho2D(0, g_screenWidth, g_screenHeight, 0);
+	glMultMatrixf(ortho2d.const_ptr());
 	glMatrixMode(GL_MODELVIEW);
 }
 
@@ -435,7 +437,9 @@ void Set3DViewport()
 {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(g_Fov, g_aspectRatio, g_zNear, g_zFar);
+	Matrix4f perspective;
+	perspective.PerspectiveY(g_Fov, g_aspectRatio, g_zNear, g_zFar);
+	glMultMatrixf(perspective.const_ptr());
 	glMatrixMode(GL_MODELVIEW);
 }
 

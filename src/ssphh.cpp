@@ -1451,7 +1451,10 @@ void SSPHH_Application::RenderFixedFunctionGL()
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(ssg.camera.fov, aspect, 0.01, 200.0);
+    // gluPerspective(ssg.camera.fov, aspect, 0.01, 200.0);
+    Matrix4f perspective;
+    perspective.PerspectiveY(ssg.camera.fov, aspect, 0.01f, 200.0f);
+    glMultMatrixf(perspective.const_ptr());
     glMultMatrixf((Interface.preCameraMatrix).AsInverse().const_ptr());
     //glMultMatrixf((ssg.camera.viewMatrix).const_ptr());
 
