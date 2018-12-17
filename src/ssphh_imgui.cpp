@@ -450,6 +450,7 @@ void SSPHH_Application::imguiShowToolWindow()
 	if (ImGui::SmallButton("Disable Debug Viz"))
 		counter = -1;
 	if (ImGui::Button("Show SPHs"))
+	{
 		if (counter != 0)
 		{
 			counter = 0;
@@ -458,27 +459,41 @@ void SSPHH_Application::imguiShowToolWindow()
 		{
 			counter = -1;
 		}
+	}
 	if (ImGui::Button("Show Sun Shadow Map"))
+	{
 		if (counter != 1)
+		{
 			counter = 1;
+		}
 		else
 		{
 			counter = -1;
 		}
+	}
 	if (ImGui::Button("Show Sphere Cube Map"))
+	{
+
 		if (counter != 2)
+		{
 			counter = 2;
+		}
 		else
 		{
 			counter = -1;
 		}
+	}
 	if (ImGui::Button("Show Enviro Cube Map"))
+	{
 		if (counter != 3)
+		{
 			counter = 3;
+		}
 		else
 		{
 			counter = -1;
 		}
+	}
 
 	ImGui::Separator();
 
@@ -512,7 +527,7 @@ void SSPHH_Application::imguiShowToolWindow()
 		}
 		ImGui::Text("GL_RENDERER: %s", Interface.tools.gl_renderer.c_str());
 		ImGui::Text("GL_VERSION:  %s", Interface.tools.gl_version.c_str());
-		ImGui::Text("GL_EXTENSIONS: %d", Interface.tools.gl_extensions.size());
+		ImGui::Text("GL_EXTENSIONS: %d", (int)Interface.tools.gl_extensions.size());
 		if (!Interface.tools.gl_extensions.empty())
 		{
 			//ImGui::SetNext
@@ -579,10 +594,10 @@ void SSPHH_Application::imguiShowRenderConfigWindow()
 
 	ImGui::Separator();
 
-	for (int i = 0; i < sphls.size(); i++)
+	for (size_t i = 0; i < sphls.size(); i++)
 	{
 		const GLuint *texid = sphls[i].lightProbeTexIds;
-		ImGui::Text("sphls[%d] light probes %d -- %d -- %d", i, texid[0], texid[1], texid[2]);
+		ImGui::Text("sphls[%d] light probes %d -- %d -- %d", (int)i, texid[0], texid[1], texid[2]);
 	}
 
 	ImGui::End();
@@ -822,9 +837,9 @@ void SSPHH_Application::imguiShowScenegraphEditor()
 				ImGui::Checkbox(label.str().c_str(), &Interface.ssg.geometryCollapsed[i].second);
 				if (Interface.ssg.geometryCollapsed[i].second)
 				{
-					ImGui::Text("name: %s", g.second.objectName.c_str());
+					ImGui::Text("name:     %s", g.second.objectName.c_str());
 					ImGui::Text("filename: %s", g.second.fpi.fname.c_str());
-					ImGui::Text("mtllib: ", g.second.mtllibName.c_str());
+					ImGui::Text("mtllib:   %s", g.second.mtllibName.c_str());
 					BoundingBoxf bbox = g.second.bbox;
 					Vector3f sceneMin = bbox.minBounds;
 					Vector3f sceneMax = bbox.maxBounds;
@@ -961,7 +976,7 @@ void SSPHH_Application::imguiShowSphlEditor()
 		ImGui::SetNextWindowPos(ImVec2(screenWidth - 600, screenHeight - 300));
 		x += w;
 		ImGui::Begin("SSPL Editor");
-		ImGui::Text("%d SSPLs", ssg.ssphhLights.size());
+		ImGui::Text("%d SSPLs", (int)ssg.ssphhLights.size());
 		if (ImGui::Button("Add SSPL"))
 		{
 			imguiSphlAdd();
@@ -974,7 +989,11 @@ void SSPHH_Application::imguiShowSphlEditor()
 			ostringstream id;
 			id << "MS" << setfill('0') << setw(2) << i << " '" << sspl.name << "'";
 			const void *ptr = &sspl;
-			va_list args = NULL;
+#ifdef WIN32
+			va_list args = nullptr;
+#elif __unix__
+			// va_list args = va_list();
+#endif
 			const char *colors[4] = {"R", "G", "B", "Mono"};
 			const ImVec4 mscolors[4] = {
 				{1.0f, 0.0f, 0.0f, 1.0f},
@@ -984,7 +1003,8 @@ void SSPHH_Application::imguiShowSphlEditor()
 			float minValue = -5.0f;
 			float maxValue = 5.0f;
 			ImGui::PushID(i);
-			if (ImGui::TreeNodeV(ptr, id.str().c_str(), args))
+			// if (ImGui::TreeNodeV(ptr, id.str().c_str(), args))
+			if (ImGui::TreeNode(ptr, "%s", id.str().c_str()))
 			{
 				ImGui::SameLine();
 				ImGui::Checkbox("", &sspl.enabled);
@@ -1071,10 +1091,11 @@ void SSPHH_Application::imguiShowSphlEditor()
 					ostringstream label;
 					label << "Multispectral " << colors[j];
 					ptr = &sspl.msph[j];
-					if (ImGui::TreeNodeV(ptr, label.str().c_str(), args))
+					if (ImGui::TreeNode(ptr, "%s", label.str().c_str()))
+					// if (ImGui::TreeNodeV(ptr, label.str().c_str(), args))
 					{
 						ImGui::SameLine();
-						ImGui::TextColored(mscolors[j], label.str().c_str());
+						ImGui::TextColored(mscolors[j], "%s", label.str().c_str());
 						ImGui::PushID(j);
 						ImGui::SameLine();
 						if (ImGui::SmallButton("min"))
@@ -1224,7 +1245,7 @@ void SSPHH_Application::imguiShowSphlEditor()
 					else
 					{
 						ImGui::SameLine();
-						ImGui::TextColored(mscolors[j], label.str().c_str());
+						ImGui::TextColored(mscolors[j], "%s", label.str().c_str());
 						ImGui::PushID(j);
 						ImGui::SameLine();
 						if (ImGui::SmallButton("min"))
@@ -1382,7 +1403,7 @@ void SSPHH_Application::imguiShowMaterialEditor()
 				mtllib_collapsed = &Interface.mtls.mtllibsCollapsed[mtllib_key];
 				if (mtllib_collapsed == nullptr)
 					continue;
-				ImGui::TextColored(Colors.Red, "MtlLib %i", mtllib.first, mtllib.second.fpi.fullfname.c_str());
+				ImGui::TextColored(Colors.Red, "MtlLib %i %s", mtllib.first, mtllib.second.fpi.fullfname.c_str());
 				ImGui::SameLine();
 				ImGui::Checkbox(mtllib_key.c_str(), mtllib_collapsed);
 				if (*mtllib_collapsed)
@@ -1423,8 +1444,8 @@ void SSPHH_Application::imguiShowMaterialEditor()
 							auto pmtl = Interface.mtls.mtls_ptrs[mtllib_mtl_key];
 							NEWLINE_SEPARATOR
 							const float stepSize = 0.01f;
-							const float minSize = -5.0f;
-							const float maxSize = 5.0f;
+							// const float minSize = -5.0f;
+							// const float maxSize = 5.0f;
 #define JOIN(x) (x + ("##" + mtllib_mtl_key)).c_str()
 							ImGui::DragFloat(JOIN("PBk"), pmtl.PBk, stepSize, 0.0f, 10.0f);
 							ImGui::DragFloat(JOIN("PBior"), pmtl.PBior, stepSize, 0.0f, 2.5f);
@@ -1560,7 +1581,8 @@ void SSPHH_Application::imguiCoronaControls()
 
 	// 0x43524e41 = CRNA
 	ImGui::PushID(0x43524e41);
-	ImGui::LabelText("Corona", "");
+	// ImGui::LabelText("Corona", "");
+	ImGui::Text("Corona");
 	if (ImGui::Button("Generate SCN"))
 	{
 		imguiCoronaGenerateSCN();
@@ -1580,7 +1602,7 @@ void SSPHH_Application::imguiCoronaGenerateSCN()
 	// run corona to generate export_corona_cubemap.png      (64x64)
 	// run corona to generate export_corona_ground_truth.png (1280x720)
 	coronaScene.ClearCache();
-	for (int i = 0; i < 16; i++)
+	for (size_t i = 0; i < 16; i++)
 	{
 		if (i >= sphls.size())
 			break;
@@ -2370,7 +2392,7 @@ void SSPHH_Application::imguiShowSSPHHWindow()
 	ImGui::SameLine();
 	if (ImGui::SmallButton("Dump Hier"))
 	{
-		for (int i = 0; i < ssg.ssphhLights.size(); i++)
+		for (size_t i = 0; i < ssg.ssphhLights.size(); i++)
 		{
 			auto &sphl = ssg.ssphhLights[i];
 			sphl.SetHierarchyDescription();
@@ -2489,7 +2511,7 @@ void SSPHH_Application::imguiShowSSPHHWindow()
 	ImGui::Separator();
 
 	// show sorted list of hierarchies
-	for (int i = 0; i < ssg.ssphhLights.size(); i++)
+	for (size_t i = 0; i < ssg.ssphhLights.size(); i++)
 	{
 		ImGui::Text("%s", ssg.ssphhLights[i].hier_description.c_str());
 	}

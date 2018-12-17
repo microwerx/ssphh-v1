@@ -29,7 +29,6 @@ CC = gcc
 CCFLAGS = -Wall -I$(INCDIR) -I$(DEP_INCDIR) `python3-config --includes`
 CXX = g++
 CXXFLAGS = -std=c++14 -g -Wall -I$(INCDIR) -I$(DEP_INCDIR) -I$(FLUXIONS_INCDIR) `python3-config --includes`
-LDFLAGS = `pkg-config --libs glew` -Lfreeglut -Lfluxions -lstdc++ ../fluxions/build/libfluxions.a
 LDFLAGS = -L../fluxions/build -lfluxions -lglut -lGLEW -lGL -lcurl -lczmq -lzmq -lSDL2_image -lSDL2 -lSDL2main -lpthread -lstdc++
 
 .PHONY: all clean precompiled

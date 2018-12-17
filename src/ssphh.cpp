@@ -45,7 +45,7 @@ void KillSSPHH()
 extern void PrintString9x15(float x, float y, int justification, const char *format, ...);
 
 SSPHH_Application::SSPHH_Application()
-    : PBSkyCubeMap(GL_TEXTURE_CUBE_MAP), Widget("ssphhapplication")
+    : Widget("ssphhapplication"), PBSkyCubeMap(GL_TEXTURE_CUBE_MAP)
 {
     sceneFilename = "resources/scenes/test_texture_scene/test_gallery3_scene.scn";
 }
@@ -219,7 +219,7 @@ void SSPHH_Application::ParseCommandArguments(const vector<string> &args)
 
     size_t count = args.size();
     int i = 1;
-    for (int j = 1; j < count; j++)
+    for (size_t j = 1; j < count; j++)
     {
         bool nextArgExists = j < count - 1;
         if ((args[j] == "-scene") && nextArgExists)
@@ -284,8 +284,6 @@ void SSPHH_Application::InitUnicornfish()
 
 void SSPHH_Application::KillUnicornfish()
 {
-    InterfaceInfo::UNICORNFISHWINDOW &uf = Interface.uf;
-
     ssphhUf.Stop();
     ssphhUf.Join();
 }
@@ -936,7 +934,9 @@ void SSPHH_Application::DoInterfaceUpdate(double deltaTime)
     double mdx = mouse.buttons[0] ? mouse.dragStates[0].currentDelta.x : 0.0;
     double mdy = mouse.buttons[0] ? mouse.dragStates[0].currentDelta.y : 0.0;
 
-    double scale = -180.0 / Vector2f((float)renderer2.GetDeferredRect().w, (float)renderer2.GetDeferredRect().h).length();
+    Vector2f dimensions = Vector2f((float)renderer2.GetDeferredRect().w, (float)renderer2.GetDeferredRect().h);
+    double rectLength = dimensions.length();
+    double scale = -180.0 / rectLength;
     mdx *= scale;
     mdy *= scale;
 
@@ -1116,8 +1116,8 @@ void SSPHH_Application::OnRenderOverlay()
 
     if (Interface.showDeferredHUD)
     {
-        Vector2i split = renderer2.GetDeferredSplitPoint();
-        Recti rect = renderer2.GetDeferredRect();
+        // Vector2i split = renderer2.GetDeferredSplitPoint();
+        // Recti rect = renderer2.GetDeferredRect();
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
