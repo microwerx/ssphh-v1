@@ -94,7 +94,7 @@ int g_screenWidth = 1800;
 int g_screenHeight = 1200;
 #else
 const char *g_windowTitle = "Scalable Spherical Harmonics Hierarchies (SSPHH)";
-int g_displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE | GLUT_SRGB; // | GLUT_BORDERLESS;
+int g_displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH | GLUT_SRGB; // | GLUT_BORDERLESS;
 int g_screenWidth = 1280;
 int g_screenHeight = 720;
 #endif
@@ -258,8 +258,6 @@ int main(int argc, char **argv)
 	//return Fluxions::test_fluxions_simple_property(argc, argv);
 	//return KASL::test_PythonInterpreter(argc, argv);
 
-	curl_global_init(CURL_GLOBAL_ALL);
-
 	bool showVersion = false;
 	map<string, string> options = MakeOptionsFromArgs(argc, (const char **)argv);
 	if (options.count("version"))
@@ -285,14 +283,39 @@ int main(int argc, char **argv)
 	}
 
 	glutInit(&argc, argv);
+	glutInitContextVersion(3, 2);
+	glutInitContextProfile(GLUT_CORE_PROFILE);
+	glutInitContextFlags(GLUT_DEBUG);
 #ifdef USE_MULTISAMPLING
 	glutSetOption(GLUT_MULTISAMPLE, 4);
 #endif
 	glutInitDisplayMode(g_displayMode);
 	glutInitWindowSize(g_screenWidth, g_screenHeight);
-	glutInitContextProfile(GLUT_CORE_PROFILE);
-	//glutInitContextFlags(GLUT_DEBUG);
 	glutCreateWindow(g_windowTitle);
+	GLenum glewResult = glewInit();
+	if (glewResult == GLEW_OK)
+	{
+		bool hasES2 = glewIsSupported("ARB_ES2_compatibility") ? true : false;
+		bool hasES3 = glewIsSupported("ARB_ES3_compatibility") ? true : false;
+		bool hasGL21 = GLEW_VERSION_2_1 ? true : false;
+		bool hasGL32 = GLEW_VERSION_3_2 ? true : false;
+		bool hasGL41 = GLEW_VERSION_4_1 ? true : false;
+		bool hasGL45 = GLEW_VERSION_4_5 ? true : false;
+		bool hasDebugOutput = glewIsSupported("ARB_debug_output") ? true : false;
+
+		hflog.infofn(__FUNCTION__, "GLEW (%s) initialized", glewGetString(GLEW_VERSION));
+		hflog.infofn(__FUNCTION__, "OpenGL ES 2.0: %s", hasES2 ? "true" : "false");
+		hflog.infofn(__FUNCTION__, "OpenGL ES 3.0: %s", hasES3 ? "true" : "false");
+		hflog.infofn(__FUNCTION__, "OpenGL 2.1: %s", hasGL21 ? "true" : "false");
+		hflog.infofn(__FUNCTION__, "OpenGL 3.2: %s", hasGL32 ? "true" : "false");
+		hflog.infofn(__FUNCTION__, "OpenGL 4.1: %s", hasGL41 ? "true" : "false");
+		hflog.infofn(__FUNCTION__, "OpenGL 4.5: %s", hasGL45 ? "true" : "false");
+		hflog.infofn(__FUNCTION__, "ARB_debug_output: %s", hasDebugOutput ? "true" : "false");
+	}
+	else
+	{
+		hflog.warningfn(__FUNCTION__, "GLEW did not initialize");
+	}
 	// glutCreateAffinity();
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
@@ -322,6 +345,8 @@ int main(int argc, char **argv)
 
 	try
 	{
+		curl_global_init(CURL_GLOBAL_ALL);
+
 		ParseCommandLine();
 		InitMenu();
 		OnInit();
