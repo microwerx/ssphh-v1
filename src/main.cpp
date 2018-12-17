@@ -255,6 +255,8 @@ int main(int argc, char **argv)
 {
 	do_tests();
 
+	curl_global_init(CURL_GLOBAL_ALL);
+
 	//return Fluxions::test_fluxions_simple_property(argc, argv);
 	//return KASL::test_PythonInterpreter(argc, argv);
 
@@ -283,7 +285,7 @@ int main(int argc, char **argv)
 	}
 
 	glutInit(&argc, argv);
-	glutInitContextVersion(3, 2);
+	//glutInitContextVersion(3, 2);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutInitContextFlags(GLUT_DEBUG);
 #ifdef USE_MULTISAMPLING
@@ -345,8 +347,6 @@ int main(int argc, char **argv)
 
 	try
 	{
-		curl_global_init(CURL_GLOBAL_ALL);
-
 		ParseCommandLine();
 		InitMenu();
 		OnInit();
@@ -436,23 +436,21 @@ void OnInit()
 #endif
 
 #ifndef FLUXIONS_NO_SDL
-	hflog.info("%s(): Initializing SDL", __FUNCTION__);
+	hflog.infofn(__FUNCTION__, "Initializing SDL");
 	SDL_Init(SDL_INIT_EVERYTHING);
 	IMG_Init(IMG_INIT_JPG || IMG_INIT_PNG);
 #endif
 
-	hflog.info("%s(): Initializing SSPHH");
+	hflog.infofn(__FUNCTION__, "Initializing SSPHH");
 	//InitSSPHH();
-	ssphhPtr = MakeShared<SSPHH_Application>();
+	ssphhPtr = SSPHH_Application::MakeShared();
 	imguiPtr = ImGuiWidget::MakeShared();
-	vfApp = Widget::MakeShared();
+	vfApp = Widget::MakeShared("root");
 
-	Widget::SharedPtr wssphhPtr = ssphhPtr;
-	Widget::SharedPtr wimguiPtr = imguiPtr;
-	imguiPtr->decorate(wssphhPtr);
-	vfApp->decorate(wimguiPtr);
+	imguiPtr->decorate(ssphhPtr);
+	vfApp->decorate(imguiPtr);
 
-	hflog.info("%s(): Initializing application", __FUNCTION__);
+	hflog.infofn(__FUNCTION__, "Initializing application");
 	//ssphhPtr->Init(g_args);
 	//ssphhPtr->OnInit(g_args);
 	vfApp->Init(g_args);

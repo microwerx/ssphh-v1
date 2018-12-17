@@ -45,7 +45,7 @@ void KillSSPHH()
 extern void PrintString9x15(float x, float y, int justification, const char *format, ...);
 
 SSPHH_Application::SSPHH_Application()
-    : PBSkyCubeMap(GL_TEXTURE_CUBE_MAP)
+    : PBSkyCubeMap(GL_TEXTURE_CUBE_MAP), Widget("ssphhapplication")
 {
     sceneFilename = "resources/scenes/test_texture_scene/test_gallery3_scene.scn";
 }

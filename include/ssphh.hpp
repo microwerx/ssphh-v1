@@ -448,6 +448,14 @@ public:
 
     vector<string> args; // to pull in the argc, argv from main()
 
+	using SharedPtr = std::shared_ptr<SSPHH_Application>;
+	using UniquePtr = std::unique_ptr<SSPHH_Application>;
+
+	template <class... _Types>
+	static SharedPtr MakeShared(_Types &&... _Args) { return SharedPtr(new SSPHH_Application(std::forward<_Types>(_Args)...)); }
+	template <class... _Types>
+	static UniquePtr MakeUnique(_Types &&... _Args) { return UniquePtr(new SSPHH_Application(std::forward<_Types>(_Args)...)); }
+
     SSPHH_Application();
     ~SSPHH_Application();
 
