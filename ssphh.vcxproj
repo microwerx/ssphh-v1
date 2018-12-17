@@ -70,8 +70,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)..\fluxions\dep\include;$(SolutionDir)..\fluxions\include;$(ProjectDir)include;$(SolutionDir)..\libs\include;C:\Program Files\Python36\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\fluxions\$(Platform)\$(Configuration);$(SolutionDir)$(Platform)\$(Configuration);$(SolutionDir)..\libs\lib\x64;C:\Program Files\Python36\libs;$(LibraryPath);C:\Program Files\Python37\libs\</LibraryPath>
+    <IncludePath>$(ProjectDir)..\fluxions\dep\include;$(ProjectDirDir)..\fluxions\include;$(ProjectDir)include;$(ProjectDir)..\libs\include;C:\Program Files\Python37\include;C:\Program Files\Python36\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\fluxions\$(Platform)\$(Configuration);$(ProjectDir)$(Platform)\$(Configuration);$(ProjectDir)..\libs\lib\x64;C:\Program Files\Python37\libs;C:\Program Files\Python36\libs;$(LibraryPath)</LibraryPath>
     <TargetName>$(ProjectName)-debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

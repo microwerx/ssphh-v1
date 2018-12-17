@@ -974,7 +974,7 @@ void SSPHH_Application::imguiShowSphlEditor()
 			ostringstream id;
 			id << "MS" << setfill('0') << setw(2) << i << " '" << sspl.name << "'";
 			const void *ptr = &sspl;
-			va_list args;
+			va_list args = NULL;
 			const char *colors[4] = {"R", "G", "B", "Mono"};
 			const ImVec4 mscolors[4] = {
 				{1.0f, 0.0f, 0.0f, 1.0f},
