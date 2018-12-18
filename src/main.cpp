@@ -94,7 +94,7 @@ int g_screenWidth = 1800;
 int g_screenHeight = 1200;
 #else
 const char *g_windowTitle = "Scalable Spherical Harmonics Hierarchies (SSPHH)";
-int g_displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH | GLUT_SRGB; // | GLUT_BORDERLESS;
+int g_displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH; // | GLUT_SRGB; // | GLUT_BORDERLESS;
 int g_screenWidth = 1280;
 int g_screenHeight = 720;
 #endif
@@ -304,8 +304,13 @@ int main(int argc, char **argv)
 		bool hasGL41 = GLEW_VERSION_4_1 ? true : false;
 		bool hasGL45 = GLEW_VERSION_4_5 ? true : false;
 		bool hasDebugOutput = glewIsSupported("ARB_debug_output") ? true : false;
+		int majorVersion = 0;
+		int minorVersion = 0;
+		glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
+		glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
 
 		hflog.infofn(__FUNCTION__, "GLEW (%s) initialized", glewGetString(GLEW_VERSION));
+		hflog.infofn(__FUNCTION__, "OpenGL %d.%d", majorVersion, minorVersion);
 		hflog.infofn(__FUNCTION__, "OpenGL ES 2.0: %s", hasES2 ? "true" : "false");
 		hflog.infofn(__FUNCTION__, "OpenGL ES 3.0: %s", hasES3 ? "true" : "false");
 		hflog.infofn(__FUNCTION__, "OpenGL 2.1: %s", hasGL21 ? "true" : "false");
@@ -438,7 +443,7 @@ void OnInit()
 #ifndef FLUXIONS_NO_SDL
 	hflog.infofn(__FUNCTION__, "Initializing SDL");
 	SDL_Init(SDL_INIT_EVERYTHING);
-	IMG_Init(IMG_INIT_JPG || IMG_INIT_PNG);
+	IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
 #endif
 
 	hflog.infofn(__FUNCTION__, "Initializing SSPHH");

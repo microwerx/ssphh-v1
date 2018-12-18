@@ -23,7 +23,7 @@
 namespace Fluxions
 {
 extern bool debugging;
-}
+} // namespace Fluxions
 
 shared_ptr<SSPHH_Application> ssphhPtr;
 
