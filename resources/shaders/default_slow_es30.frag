@@ -1,3 +1,6 @@
+#version 300 es
+#pragma optionNV(strict on)
+
 // SSPHH/Fluxions/Unicornfish/Viperfish/Hatchetfish/Sunfish/KASL/GLUT Extensions
 // Copyright (C) 2017 Jonathan Metzgar
 // All rights reserved.
@@ -16,8 +19,6 @@
 // along with this program.If not, see <https://www.gnu.org/licenses/>.
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
-#version 300 es
-#pragma optionNV(strict on)
 
 precision highp float;
 precision highp int; 
@@ -68,9 +69,6 @@ struct SphlLight
 	int Enabled;
 	vec3 E0;		// also represents the first degree of SPH
 	vec3 Position;
-	samplerCube LightProbeCubeMap;
-	samplerCube EnvironmentCubeMap;
-	samplerCube DepthShadowCubeMap;
 	float DepthShadowZFar;
 	vec3 sph[9];
 };
@@ -80,7 +78,6 @@ struct PointLight
 	int Enabled;
 	vec3 E0;
 	vec3 Position;
-	samplerCube DepthShadowCubeMap;
 	float DepthShadowZFar;
 };
 
@@ -140,6 +137,11 @@ uniform int SphlLightCount;
 
 uniform PointLight PointLights[16];
 uniform int PointLightCount;
+
+uniform samplerCube SphlLightProbeCubeMap[16];
+uniform samplerCube SphlEnvironmentCubeMap[16];
+uniform samplerCube SphlDepthShadowCubeMap[16];
+uniform samplerCube PointLightDepthShadowCubeMap[16];
 
 uniform float map_Kd_mix;
 uniform float map_Ks_mix;
@@ -522,7 +524,7 @@ float GetLightShadow(int lightId)
 	}
 	else if (SphlLights[lightId].Enabled > 0)
 	{
-		float LightZ = SphlLights[lightId].DepthShadowZFar * texture(SphlLights[lightId].DepthShadowCubeMap, Lights[lightId].L).r;
+		float LightZ = SphlLights[lightId].DepthShadowZFar * texture(SphlDepthShadowCubeMap[lightId], Lights[lightId].L).r;
 		float Z = Lights[lightId].distance;
 		float bias = 1.0;
 		shadow = Z - bias > LightZ ? 0.0 : 1.0;
@@ -563,7 +565,7 @@ float GetLightShadowMS(int lightId, float samples)
 			{
 				for (float z = -offset; z < offset; z += doffset)
 				{
-					float LightZ = SphlLights[lightId].DepthShadowZFar * texture(SphlLights[lightId].DepthShadowCubeMap, L + vec3(x,y,z)).r;
+					float LightZ = SphlLights[lightId].DepthShadowZFar * texture(SphlDepthShadowCubeMap[lightId], L + vec3(x,y,z)).r;
 					shadow += Z - bias > LightZ ? 0.0 : 1.0;
 				}
 			}
@@ -609,7 +611,7 @@ float GetLightShadowDiskPCF(int lightId)
 		for (int i = 0; i < samples; i++)
 		{
 			float LightZ = SphlLights[lightId].DepthShadowZFar *
-						   texture(SphlLights[lightId].DepthShadowCubeMap,
+						   texture(SphlDepthShadowCubeMap[lightId],
 						   	       L + sampleOffsetDirections[i] * diskRadius).r;
 			shadow += Z - bias > LightZ ? 0.0 : 1.0;
 		}
@@ -726,7 +728,7 @@ bool PrepareLight(int i)
 		Lights[i].distance = length(L);
 		Lights[i].distance2 = dot(L, L);
 		vec3 texcoord = vec3(L.x, -L.y, L.z);
-		Lights[i].I = texture(SphlLights[i].LightProbeCubeMap, texcoord).rgb;// * 6.0;
+		Lights[i].I = texture(SphlLightProbeCubeMap[i], texcoord).rgb;// * 6.0;
 		Lights[i].E0 = 1.0;
 	}
 	Lights[i].H = normalize(Fragment.V + Lights[i].L);
@@ -810,7 +812,7 @@ vec3 GetEnviroColor(int lightId)
 	else if (lightId >= 0)
 	{
 		vec3 R = vec3(-Fragment.R.x, Fragment.R.y, Fragment.R.z);
-		return texture(SphlLights[lightId].EnvironmentCubeMap, R).rgb;
+		return texture(SphlEnvironmentCubeMap[lightId], R).rgb;
 		//return texture(SphlLights[lightId].LightProbeCubeMap, R).rgb;
 	}
 	return vec3(0.0);//vec3(Fragment.R * 0.5 + 0.5);
@@ -950,7 +952,7 @@ vec3 GetPbrEnviroBrdf(int i)
 	float z = 1.0;
 	if (i == SunIndex)
 	{
-		z = texture(SphlLights[0].DepthShadowCubeMap, Fragment.R).z;
+		z = texture(SphlDepthShadowCubeMap[0], Fragment.R).z;
 		if (z != 1.0) return vec3(0.0);
 	}
 	//if (Fragment.NdotV <= 0.001) return vec3(0.0);
@@ -963,7 +965,7 @@ vec3 GetPbrEnviroBrdf(int i)
 vec3 GetPbrAmbient(int i)
 {
 	if (i < SunIndex)
-		return texture(SphlLights[i].LightProbeCubeMap, Fragment.N).rgb;
+		return texture(SphlLightProbeCubeMap[i], Fragment.N).rgb;
 	return vec3(0.0);
 }
 

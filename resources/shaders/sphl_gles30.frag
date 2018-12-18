@@ -1,3 +1,6 @@
+#version 300 es
+#pragma optionNV(strict on)
+
 // SSPHH/Fluxions/Unicornfish/Viperfish/Hatchetfish/Sunfish/KASL/GLUT Extensions
 // Copyright (C) 2017 Jonathan Metzgar
 // All rights reserved.
@@ -16,8 +19,6 @@
 // along with this program.If not, see <https://www.gnu.org/licenses/>.
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
-#version 300 es
-#pragma optionNV(strict on)
 
 precision highp float;
 precision highp int; 

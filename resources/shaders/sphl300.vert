@@ -1,7 +1,5 @@
-#version 100
-#ifdef GL_ES
+#version 300 es
 precision highp float;
-#endif
 
 // SSPHH/Fluxions/Unicornfish/Viperfish/Hatchetfish/Sunfish/KASL/GLUT Extensions
 // Copyright (C) 2017 Jonathan Metzgar
@@ -29,25 +27,25 @@ uniform mat4 WorldMatrix;
 uniform vec4 CameraPosition;
 
 // Input from OpenGL ES
-attribute vec4 aPosition;
-attribute vec3 aNormal;
-attribute vec4 aColor;
-attribute vec3 aTexCoord;
+in vec4 aPosition;
+in vec3 aNormal;
+in vec4 aColor;
+in vec3 aTexCoord;
 
 // Output to Fragment Shader
-varying vec4 VS_Color;
-varying vec3 VS_Normal;
-varying vec3 VS_TexCoord;
-varying vec3 VS_ViewVector;
-varying vec4 VS_Position;
+out vec4 vColor;
+out vec3 vNormal;
+out vec3 vTexCoord;
+out vec3 vViewVector;
+out vec4 vPosition;
 
 void main()
 {
-    VS_Color = aColor;
-    VS_TexCoord = aTexCoord;
-    VS_Normal = (WorldMatrix * vec4(aNormal, 0.0)).xyz;
+    vColor = aColor;
+    vTexCoord = aTexCoord;
+    vNormal = (WorldMatrix * vec4(aNormal, 0.0)).xyz;
     vec4 worldPosition = WorldMatrix * aPosition;
-    VS_Position = worldPosition;
-    VS_ViewVector = CameraPosition.xyz - worldPosition.xyz;
+    vPosition = worldPosition;
+    vViewVector = CameraPosition.xyz - worldPosition.xyz;
     gl_Position = (ProjectionMatrix * CameraMatrix * worldPosition);
 }

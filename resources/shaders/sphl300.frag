@@ -1,4 +1,4 @@
-#version 100
+#version 300 es
 
 // SSPHH/Fluxions/Unicornfish/Viperfish/Hatchetfish/Sunfish/KASL/GLUT Extensions
 // Copyright (C) 2017 Jonathan Metzgar
@@ -19,18 +19,7 @@
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 
-#ifdef GL_OES_standard_derivatives
-#extension GL_OES_standard_derivatives : warn
-#else
-// #error "No standard derivatives"
-#endif
-
 precision highp float;
-
-#ifdef GL_ES
-#else
-//	#error "GL_ES not defined"
-#endif
 
 // standard SimpleSceneGraph parameters
 uniform vec3 SunDirTo;
@@ -616,25 +605,22 @@ vec3 SphlComputeRGB(vec3 v)
 
 
 // Input from Vertex Shader
-varying vec3 VS_Normal;
-varying vec4 VS_Color;
-varying vec3 VS_TexCoord;
-varying vec3 VS_ViewVector;
-varying vec4 VS_Position;
+in vec3 vNormal;
+in vec4 vColor;
+in vec3 vTexCoord;
+in vec3 vViewVector;
+in vec4 vPosition;
 
+out vec4 FragColor;
 
 void main()
 {
-#ifdef GL_OES_standard_derivatives
-	vec4 dP1 = dFdx(VS_Position);
-	vec4 dP2 = dFdy(VS_Position);
+	vec4 dP1 = dFdx(vPosition);
+	vec4 dP2 = dFdy(vPosition);
 	vec3 fragN = normalize(cross(dP1.xyz, dP2.xyz));	
-#else
-	vec3 fragN = normalize(VS_Normal);
-#endif
 	vec4 outputColor = vec4(0.0);
-	vec3 N = normalize(VS_Normal);
-	vec3 V = normalize(VS_ViewVector);
+	vec3 N = normalize(vNormal);
+	vec3 V = normalize(vViewVector);
 	float NdotL = dot(N, SunDirTo);
 	float NdotH = max(0.0, dot(normalize(SunDirTo + V), N));
 	float cos_theta = 0.5 * (1.0 + NdotL);
@@ -645,7 +631,7 @@ void main()
 
 	//if (NdotL > 0.0)
 	{
-		vec4 color_d = vec4(VS_Color.rgb, 0.20);// + (1.0 - cos_theta);
+		vec4 color_d = vec4(vColor.rgb, 0.20);// + (1.0 - cos_theta);
 		vec4 color_s = vec4(SunE0.rgb, 0.0);
 		outputColor += color_d * max(0.0, cos_theta);
 		outputColor += color_s * pow(NdotH, 250.0);
@@ -655,12 +641,12 @@ void main()
 
 	if (SPHL_LightProbeMode != 0)
 	{
-		outputColor = textureCube(SPHL_LightProbe, VS_TexCoord);
+		outputColor = texture(SPHL_LightProbe, vTexCoord);
 	}
 	else
 	{
-		//outputColor = textureCube(SPHL_LightProbe, VS_TexCoord);		
+		//outputColor = texture(SPHL_LightProbe, vTexCoord);		
 	}
 
-	gl_FragColor = outputColor;
+	FragColor = outputColor;
 }

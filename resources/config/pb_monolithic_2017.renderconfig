@@ -88,8 +88,8 @@ fbo attach GL_RENDERBUFFER GL_COLOR_ATTACHMENT0 rb_color0
 renderconfig sphl
 
 program sphl
-vertshader sphl.vert
-fragshader sphl.frag
+vertshader sphl300.vert
+fragshader sphl300.frag
 vertattrib 0 aPosition
 vertattrib 1 aNormal
 vertattrib 2 aTexCoord
