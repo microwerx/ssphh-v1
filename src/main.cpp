@@ -255,6 +255,8 @@ int main(int argc, char **argv)
 {
 	do_tests();
 
+	std::regex path_replace("[/\\\\]+");
+
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	//return Fluxions::test_fluxions_simple_property(argc, argv);

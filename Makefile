@@ -45,7 +45,7 @@ cobjects: $(DEPCOBJECTS)
 	echo
 	echo $(DEPOBJECTS)
 
-$(TARGET): $(OBJECTS)
+$(TARGET): $(OBJECTS) ../fluxions/build/libfluxions.a
 	$(CXX) -o $@ $(OBJECTS) $(LDFLAGS)
 
 $(GCH): $(SRCDIR)/stdafx.h $(HEADERS)

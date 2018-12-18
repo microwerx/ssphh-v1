@@ -327,9 +327,13 @@ void SSPHH_Application::OnInit(const vector<string> &args)
 
     Interface.preCameraMatrix.LoadIdentity();
 
-    my_hud_info.glRendererString = string((char *)glGetString(GL_RENDERER));
-    my_hud_info.glVendorString = string((char *)glGetString(GL_VENDOR));
-    my_hud_info.glVersionString = string((char *)glGetString(GL_VERSION));
+    const char *renderer = (const char *)glGetString(GL_RENDERER);
+    const char *glvendor = (const char *)glGetString(GL_VENDOR);
+    const char *glversion = (const char *)glGetString(GL_VERSION);
+
+    my_hud_info.glRendererString = renderer ? renderer : "Unknown Renderer";
+    my_hud_info.glVendorString = glvendor ? glvendor : "Unknown Vendor";
+    my_hud_info.glVersionString = glversion ? glversion : "Unknown Version";
 
     if (!enviroCubeTexture3.LoadTextureCoronaCubeMap("export_cubemap.png", true))
     {
