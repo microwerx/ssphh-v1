@@ -2129,7 +2129,7 @@ void SSPHH_Application::RenderGLES30SPHLs()
 
     if (!rc.shaderProgram)
     {
-        hflog.info("%s(): sphl shader not found", __FUNCTION__);
+        //hflog.info("%s(): sphl shader not found", __FUNCTION__);
         return;
     }
 
