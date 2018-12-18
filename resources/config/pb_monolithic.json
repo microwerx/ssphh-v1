@@ -1,0 +1,21 @@
+{
+	"hello" : {
+		"member" : "hello",
+		"member2" : {
+			"me1" : 4,
+			"me2" : 5
+		}		
+	},
+	"sceneconfig" : {
+		"paths" : [
+			"./resources/shaders/",
+			"./resources/textures/"
+		],
+		"program" : {
+			"name" : "DefaultSlowProgram",
+			"vertShader" : "default_slow_vs.glsl",
+			"fragShader" : "default_slow_fs.glsl",
+			"attribs" : [ [0, "vtxPosition"], [1, "vtxNormal"], [2, "vtxTexCoord"], [3, "vtxColor"], [4, "vtxAttrib"] ]
+		}
+	}
+}
