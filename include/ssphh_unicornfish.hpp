@@ -28,7 +28,6 @@
 
 using namespace std;
 
-
 enum class UfType
 {
 	None,
@@ -38,7 +37,6 @@ enum class UfType
 	WorkerEcho,
 	Worker
 };
-
 
 //class SSPHHWorker : public Uf::Worker
 //{
@@ -119,8 +117,8 @@ enum class SUFType
 
 class SSPHHUnicornfish
 {
-public:
-	SSPHHUnicornfish() { }
+  public:
+	SSPHHUnicornfish() {}
 
 	const int port = 9081;
 	string broker_endpoint = "tcp://*:9081";
@@ -147,26 +145,27 @@ public:
 
 	bool IsStopped() const { return stopped; }
 
-	void StartClient(const string & endpoint);
-	void StartWorker(const string & endpoint, const string & service);
+	void StartClient(const string &endpoint);
+	void StartWorker(const string &endpoint, const string &service);
 	void StartBroker();
 	void StartStandalone(bool client = true, bool broker = true, bool worker = true);
 	void Join();
 	void Stop() { stopped = true; }
 
-	void SetMessage(SUFType type, const string & message);
-	const string & GetMessage(SUFType type);
+	void SetMessage(SUFType type, const string &message);
+	const string &GetMessage(SUFType type);
 
-	void ScatterJob(Fluxions::CoronaJob & job);
+	void ScatterJob(Fluxions::CoronaJob &job);
 	// Move the queue of scattered jobs out. CoronaJob::IsFinished() returns false
-	int PushScatteredJobs(map<string, Fluxions::CoronaJob> & jobs);
+	int PushScatteredJobs(map<string, Fluxions::CoronaJob> &jobs);
 	// Move the queue of gathered jobs back. CoronaJob::IsFinished() returns true
-	void PullFinishedJobs(map<string, Fluxions::CoronaJob> & jobs);
+	void PullFinishedJobs(map<string, Fluxions::CoronaJob> &jobs);
 	int GetNumScatteredJobs() const;
 	int GetNumFinishedJobs() const;
 
-	void GetFinishedJobs(map<string, Fluxions::CoronaJob> & finished_jobs);
-private:
+	void GetFinishedJobs(map<string, Fluxions::CoronaJob> &finished_jobs);
+
+  private:
 	mutex uf_mutex;
 	mutex uf_read_mutex;
 	mutex uf_write_mutex;
@@ -186,8 +185,6 @@ private:
 	string client_message;
 };
 
-
 extern SSPHHUnicornfish ssphhUf;
-
 
 #endif

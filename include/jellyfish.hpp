@@ -6,7 +6,7 @@
 // Jellyfish is a turntable widget
 class Jellyfish : public Viperfish::Widget
 {
-public:
+  public:
 	Jellyfish();
 	Jellyfish(const std::string &name);
 	virtual ~Jellyfish() override;
@@ -30,7 +30,6 @@ public:
 
 	virtual void OnInit(const std::vector<std::string> &args) override;
 	virtual void OnKill() override;
-
 };
 
 #endif

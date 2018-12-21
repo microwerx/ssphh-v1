@@ -15,4 +15,3 @@ void PrintStrokeStringJustified(float x, float y, int justification, void *font,
 extern Viperfish::Widget::SharedPtr gt_Widget;
 
 #endif
-
