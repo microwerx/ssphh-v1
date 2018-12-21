@@ -27,6 +27,12 @@
     <ClInclude Include="include\ssphh_ppmcompare.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\jellyfish.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\glut-template.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -60,6 +66,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ssphh_ppmcompare.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\jellyfish.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\glut-template.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

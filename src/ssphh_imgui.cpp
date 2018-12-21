@@ -83,6 +83,9 @@ static const string DebugShaderChoices[21] = {
 	ImGui::NewLine();     \
 	ImGui::Separator();
 
+namespace SSPHH
+{
+
 void SSPHH_Application::RenderImGuiHUD()
 {
 	x = 64.0f;
@@ -151,7 +154,7 @@ void SSPHH_Application::imguiShowMenuBar()
 			if (ImGui::BeginMenu("Colors"))
 			{
 				for (int i = 0; i < ImGuiCol_COUNT; i++)
-					ImGui::MenuItem(ImGui::GetStyleColName((ImGuiCol)i));
+					ImGui::MenuItem(ImGui::GetStyleColorName((ImGuiCol)i));
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Disabled", false)) // Disabled
@@ -227,10 +230,10 @@ void SSPHH_Application::imguiShowToolWindow()
 	{
 		glutLeaveMainLoop();
 	}
-	extern double g_Fps;
-	float time_ms = (float)(1000.0 / g_Fps);
+	extern double gt_Fps;
+	float time_ms = (float)(1000.0 / gt_Fps);
 	ImGui::SameLine();
-	ImGui::Text("[ %3.1f fps/ %3.1f ms ]", g_Fps, time_ms);
+	ImGui::Text("[ %3.1f fps/ %3.1f ms ]", gt_Fps, time_ms);
 	if (ImGui::SmallButton("Save Stats"))
 	{
 		imguiToolsSaveStats();
@@ -2071,13 +2074,13 @@ void SSPHH_Application::imguiCoronaGenerateTestProducts()
 					double frameTime = 0.0;
 					for (int i = 0; i < 10; i++)
 					{
-						OnRender();
+						OnRender3D();
 						frameTime += my_hud_info.totalRenderTime;
 					}
 					frameTime /= 10.0;
 
 					Interface.saveScreenshot = true;
-					OnRender();
+					OnRender3D();
 					times[make_tuple(ks, mrd, pl, d, "sphlrender")] = frameTime;
 					imguiCoronaGenerateCompareProduct(ks, mrd, pl, d);
 
@@ -2525,4 +2528,6 @@ void SSPHH_Application::imgui2NSizeSlider(const char *desc, int *choice, int *si
 	ImGui::SameLine();
 	ImGui::Text("= %d", 2 << *choice);
 	*size = 2 << *choice;
+}
+
 }
