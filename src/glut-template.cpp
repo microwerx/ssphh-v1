@@ -2,6 +2,7 @@
 #include <vector>
 #include <fluxions.hpp>
 #include <glut-template.hpp>
+#include <GL/freeglut.h>
 
 //////////////////////////////////////////////////////////////////////
 // G L O B A L   V A R I A B L E S ///////////////////////////////////
@@ -102,42 +103,11 @@ void GlutTemplateInit(int argc, char **argv)
 #endif
 
 	glutInit(&argc, argv);
-	//glutInitContextVersion(3, 2);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutInitContextFlags(GLUT_DEBUG);
 	glutInitDisplayMode(gt_displayMode);
 	glutInitWindowSize(gt_screenWidth, gt_screenHeight);
 	glutCreateWindow(gt_windowTitle.c_str());
-	GLenum glewResult = glewInit();
-	if (glewResult == GLEW_OK)
-	{
-		bool hasES2 = glewIsSupported("ARB_ES2_compatibility") ? true : false;
-		bool hasES3 = glewIsSupported("ARB_ES3_compatibility") ? true : false;
-		bool hasGL21 = GLEW_VERSION_2_1 ? true : false;
-		bool hasGL32 = GLEW_VERSION_3_2 ? true : false;
-		bool hasGL41 = GLEW_VERSION_4_1 ? true : false;
-		bool hasGL45 = GLEW_VERSION_4_5 ? true : false;
-		bool hasDebugOutput = glewIsSupported("ARB_debug_output") ? true : false;
-		int majorVersion = 0;
-		int minorVersion = 0;
-		glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
-		glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
-
-		hflog.infofn(__FUNCTION__, "GLEW (%s) initialized", glewGetString(GLEW_VERSION));
-		hflog.infofn(__FUNCTION__, "OpenGL %d.%d", majorVersion, minorVersion);
-		hflog.infofn(__FUNCTION__, "OpenGL ES 2.0: %s", hasES2 ? "true" : "false");
-		hflog.infofn(__FUNCTION__, "OpenGL ES 3.0: %s", hasES3 ? "true" : "false");
-		hflog.infofn(__FUNCTION__, "OpenGL 2.1: %s", hasGL21 ? "true" : "false");
-		hflog.infofn(__FUNCTION__, "OpenGL 3.2: %s", hasGL32 ? "true" : "false");
-		hflog.infofn(__FUNCTION__, "OpenGL 4.1: %s", hasGL41 ? "true" : "false");
-		hflog.infofn(__FUNCTION__, "OpenGL 4.5: %s", hasGL45 ? "true" : "false");
-		hflog.infofn(__FUNCTION__, "ARB_debug_output: %s", hasDebugOutput ? "true" : "false");
-	}
-	else
-	{
-		hflog.warningfn(__FUNCTION__, "GLEW did not initialize");
-	}
-	// glutCreateAffinity();
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(keyboard);
