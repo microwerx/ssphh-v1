@@ -95,8 +95,8 @@ void PPMCompare::Compare(Image3f &image1, Image3f &image2)
         &diffbwstat.image,
         &absdiffstat.image};
 
-    int width = image1.width();
-    int height = image1.height();
+    int width = (int)image1.width();
+    int height = (int)image1.height();
     for (auto &image : images)
     {
         image->resize(width, height);

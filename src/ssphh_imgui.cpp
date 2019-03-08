@@ -19,7 +19,8 @@
 
 #include "stdafx.h"
 #include <ssphh.hpp>
-#include <fluxions_corona_scene.hpp>
+#include <fluxions_corona_scene_file.hpp>
+#include <fluxions_corona_job.hpp>
 #include <fluxions_ssphh.hpp>
 
 using namespace Fluxions;
@@ -28,8 +29,8 @@ using namespace std;
 static const int AllBands = -100;
 static const int AllDegrees = -1;
 
-static float x = 64.0f;
-static float w = 384.0f;
+static float win_x = 64.0f;
+static float win_w = 384.0f;
 
 #ifdef __APPLE__
 #define __unix__
@@ -74,7 +75,7 @@ static const string DebugShaderChoices[21] = {
 	"17 - Closest SPHL only + Sun",
 	"18 - N.L + shadow",
 	"19 - ",
-	"20 - "};
+	"20 - " };
 
 #define NEWLINE_SEPARATOR \
 	ImGui::Separator();   \
@@ -85,8 +86,8 @@ static const string DebugShaderChoices[21] = {
 
 void SSPHH_Application::RenderImGuiHUD()
 {
-	x = 64.0f;
-	w = 256.0f;
+	win_x = 64.0f;
+	win_w = 256.0f;
 
 	imguiShowMenuBar();
 	imguiShowToolWindow();
@@ -214,8 +215,8 @@ void SSPHH_Application::imguiShowToolWindow()
 	///////////////////////////////////////////////////////////
 
 	//ImGui::SetNextWindowSize(ImVec2(320, 200));
-	ImGui::SetNextWindowContentWidth(w);
-	ImGui::SetNextWindowPos(ImVec2(x, 64));
+	ImGui::SetNextWindowContentWidth(win_w);
+	ImGui::SetNextWindowPos(ImVec2(win_x, 64));
 	ImGui::Begin("Tool Window");
 	ImGui::PushID("ToolWindow");
 	if (ImGui::Button("Hide GUI"))
@@ -531,7 +532,7 @@ void SSPHH_Application::imguiShowToolWindow()
 		if (!Interface.tools.gl_extensions.empty())
 		{
 			//ImGui::SetNext
-			ImGui::PushItemWidth(w - 16);
+			ImGui::PushItemWidth(win_w - 16);
 			ImGui::ListBox("##empty", &Interface.tools.gl_extensions_curitem, &Interface.tools.gl_extensions_cstr[0], (int)Interface.tools.gl_extensions.size(), 16);
 			ImGui::PopItemWidth();
 		}
@@ -547,7 +548,7 @@ void SSPHH_Application::imguiShowRenderConfigWindow()
 	{
 		return;
 	}
-	ImGui::SetNextWindowPos(ImVec2(x + w + 32, 64));
+	ImGui::SetNextWindowPos(ImVec2(win_x + win_w + 32, 64));
 	ImGui::Begin("Render Configuration");
 	ImGui::Checkbox("Debug view", &defaultRenderConfig.enableDebugView);
 	ImGui::Checkbox("Depth Test", &defaultRenderConfig.enableDepthTest);
@@ -597,7 +598,7 @@ void SSPHH_Application::imguiShowRenderConfigWindow()
 	for (size_t i = 0; i < sphls.size(); i++)
 	{
 		const GLuint *texid = sphls[i].lightProbeTexIds;
-		ImGui::Text("sphls[%d] light probes %d -- %d -- %d", (int)i, texid[0], texid[1], texid[2]);
+		ImGui::Text("sphls[%d] light probes %d -- %d -- %d", (int)i, (int)texid[0], (int)texid[1], (int)texid[2]);
 	}
 
 	ImGui::End();
@@ -611,10 +612,10 @@ void SSPHH_Application::imguiShowScenegraphEditor()
 
 	if (Interface.tools.showScenegraphEditor)
 	{
-		x += w + 64.0f;
-		ImGui::SetNextWindowContentWidth(w * 2);
-		ImGui::SetNextWindowPos(ImVec2(x, 64));
-		x += w;
+		win_x += win_w + 64.0f;
+		ImGui::SetNextWindowContentWidth(win_w * 2);
+		ImGui::SetNextWindowPos(ImVec2(win_x, 64));
+		win_x += win_w;
 		ImGui::Begin("Scenegraph");
 		static int sceneNumber = 0;
 		ImGui::Combo("Scene", &sceneNumber, "test_indoor_scene\0test_outside_scene\0test_mitsuba_scene");
@@ -644,14 +645,14 @@ void SSPHH_Application::imguiShowScenegraphEditor()
 			ReloadRenderConfigs();
 		}
 		ImGui::Text("Load time: %3.2f msec", Interface.lastRenderConfigLoadTime);
-		BoundingBoxf bbox = ssg.GetBoundingBox();
-		Vector3f sceneMin(trunc(bbox.minBounds.x - 0.5f), trunc(bbox.minBounds.x - 0.5f), trunc(bbox.minBounds.z - 0.5f));
-		Vector3f sceneMax(trunc(bbox.maxBounds.x + 0.5f), trunc(bbox.maxBounds.y + 0.5f), trunc(bbox.maxBounds.z + 0.5f));
-		Vector3f sceneSize(trunc(bbox.X() + 0.5f), trunc(bbox.Y() + 0.5f), trunc(bbox.Z() + 0.5f));
+		BoundingBoxf sceneBBox = ssg.GetBoundingBox();
+		Vector3f sceneMin(trunc(sceneBBox.minBounds.x - 0.5f), trunc(sceneBBox.minBounds.x - 0.5f), trunc(sceneBBox.minBounds.z - 0.5f));
+		Vector3f sceneMax(trunc(sceneBBox.maxBounds.x + 0.5f), trunc(sceneBBox.maxBounds.y + 0.5f), trunc(sceneBBox.maxBounds.z + 0.5f));
+		Vector3f sceneSize(trunc(sceneBBox.X() + 0.5f), trunc(sceneBBox.Y() + 0.5f), trunc(sceneBBox.Z() + 0.5f));
 		ImGui::Text("scene dimensions (%.1f %.1f %.1f)/(%.1f, %.1f, %.1f) [%.1f, %.1f, %.1f]",
-					sceneMin.x, sceneMin.y, sceneMin.z,
-					sceneMax.x, sceneMax.y, sceneMax.z,
-					sceneSize.x, sceneSize.y, sceneSize.z);
+			sceneMin.x, sceneMin.y, sceneMin.z,
+			sceneMax.x, sceneMax.y, sceneMax.z,
+			sceneSize.x, sceneSize.y, sceneSize.z);
 
 		ImGui::Checkbox("Environment", &Interface.ssg.showEnvironment);
 		if (Interface.ssg.showEnvironment)
@@ -660,17 +661,17 @@ void SSPHH_Application::imguiShowScenegraphEditor()
 			if (Interface.ssg.showEnvironmentDetails)
 			{
 				NEWLINE_SEPARATOR
-				ImGui::Text("sunColorMap      Unit/Id/SamplerId: %2d/%2d/%2d", ssg.environment.sunColorMapUnit, ssg.environment.sunColorMapId, ssg.environment.sunColorMapSamplerId);
+					ImGui::Text("sunColorMap      Unit/Id/SamplerId: %2d/%2d/%2d", ssg.environment.sunColorMapUnit, ssg.environment.sunColorMapId, ssg.environment.sunColorMapSamplerId);
 				ImGui::Text("sunDepthMap      Unit/Id/SamplerId: %2d/%2d/%2d", ssg.environment.sunDepthMapUnit, ssg.environment.sunDepthMapId, ssg.environment.sunDepthMapSamplerId);
 				ImGui::Text("enviroColorMap   Unit/Id/SamplerId: %2d/%2d/%2d", ssg.environment.enviroColorMapUnit, ssg.environment.enviroColorMapId, ssg.environment.enviroColorMapSamplerId);
 				ImGui::Text("enviroDepthMap   Unit/Id/SamplerId: %2d/%2d/%2d", ssg.environment.enviroDepthMapUnit, ssg.environment.enviroDepthMapId, ssg.environment.enviroDepthMapSamplerId);
 				ImGui::Text("pbskyColorMap    Unit/Id/SamplerId: %2d/%2d/%2d", ssg.environment.pbskyColorMapUnit, ssg.environment.pbskyColorMapId, ssg.environment.pbskyColorMapSamplerId);
 				ImGui::Text("shadow map: znear: %.1f, zfar: %0.1f, origin(%.1f, %.1f, %.1f), target(%.1f, %.1f, %.1f), up(%.2f, %.2f, %.2f)",
-							ssg.environment.sunShadowMapNearZ,
-							ssg.environment.sunShadowMapFarZ,
-							ssg.environment.sunShadowMapOrigin.x, ssg.environment.sunShadowMapOrigin.y, ssg.environment.sunShadowMapOrigin.z,
-							ssg.environment.sunShadowMapTarget.x, ssg.environment.sunShadowMapTarget.y, ssg.environment.sunShadowMapTarget.z,
-							ssg.environment.sunShadowMapUp.x, ssg.environment.sunShadowMapUp.y, ssg.environment.sunShadowMapUp.z);
+					ssg.environment.sunShadowMapNearZ,
+					ssg.environment.sunShadowMapFarZ,
+					ssg.environment.sunShadowMapOrigin.x, ssg.environment.sunShadowMapOrigin.y, ssg.environment.sunShadowMapOrigin.z,
+					ssg.environment.sunShadowMapTarget.x, ssg.environment.sunShadowMapTarget.y, ssg.environment.sunShadowMapTarget.z,
+					ssg.environment.sunShadowMapUp.x, ssg.environment.sunShadowMapUp.y, ssg.environment.sunShadowMapUp.z);
 				SEPARATOR_NEWLINE
 			}
 
@@ -772,7 +773,7 @@ void SSPHH_Application::imguiShowScenegraphEditor()
 			ImGui::Text("ZNEAR: %1.4f / ZFAR: %4.1f", ssg.camera.imageNearZ, ssg.camera.imageFarZ);
 			NEWLINE_SEPARATOR
 
-			ImGui::TextColored(Colors.Yellow, "Sun: ");
+				ImGui::TextColored(Colors.Yellow, "Sun: ");
 			ImGui::SameLine();
 			if (ImGui::SmallButton("+ 1hr"))
 			{
@@ -806,17 +807,17 @@ void SSPHH_Application::imguiShowScenegraphEditor()
 			}
 
 			ImGui::Text("DATE: %02d/%02d/%04d %02d:%02d:%02d%.3f -- LST : %2.3f",
-						ssg.environment.pbsky.getMonth(),
-						ssg.environment.pbsky.getDay(),
-						ssg.environment.pbsky.getYear(),
-						ssg.environment.pbsky.getHour(),
-						ssg.environment.pbsky.getMin(),
-						ssg.environment.pbsky.getSec(),
-						ssg.environment.pbsky.getSecFract(),
-						ssg.environment.pbsky.getLST());
+				ssg.environment.pbsky.getMonth(),
+				ssg.environment.pbsky.getDay(),
+				ssg.environment.pbsky.getYear(),
+				ssg.environment.pbsky.getHour(),
+				ssg.environment.pbsky.getMin(),
+				ssg.environment.pbsky.getSec(),
+				ssg.environment.pbsky.getSecFract(),
+				ssg.environment.pbsky.getLST());
 			ImGui::Text("LAT: % 2.2f LONG: % 3.2f",
-						ssg.environment.pbsky.GetLatitude(),
-						ssg.environment.pbsky.GetLongitude());
+				ssg.environment.pbsky.GetLatitude(),
+				ssg.environment.pbsky.GetLongitude());
 			NEWLINE_SEPARATOR
 		}
 
@@ -824,10 +825,10 @@ void SSPHH_Application::imguiShowScenegraphEditor()
 		if (Interface.ssg.showGeometry)
 		{
 			NEWLINE_SEPARATOR
-			if (Interface.ssg.geometryCollapsed.size() != ssg.geometry.size())
-			{
-				Interface.ssg.geometryCollapsed.resize(ssg.geometry.size());
-			}
+				if (Interface.ssg.geometryCollapsed.size() != ssg.geometry.size())
+				{
+					Interface.ssg.geometryCollapsed.resize(ssg.geometry.size());
+				}
 
 			int i = 0;
 			for (auto &g : ssg.geometry)
@@ -841,13 +842,13 @@ void SSPHH_Application::imguiShowScenegraphEditor()
 					ImGui::Text("filename: %s", g.second.fpi.fname.c_str());
 					ImGui::Text("mtllib:   %s", g.second.mtllibName.c_str());
 					BoundingBoxf bbox = g.second.bbox;
-					Vector3f sceneMin = bbox.minBounds;
-					Vector3f sceneMax = bbox.maxBounds;
-					Vector3f sceneSize = bbox.Size();
+					Vector3f meshSceneMin = bbox.minBounds;
+					Vector3f meshSceneMax = bbox.maxBounds;
+					Vector3f meshSceneSize = bbox.Size();
 					ImGui::Text("dimensions (%.1f %.1f %.1f)/(%.1f, %.1f, %.1f) [%.1f, %.1f, %.1f]",
-								sceneMin.x, sceneMin.y, sceneMin.z,
-								sceneMax.x, sceneMax.y, sceneMax.z,
-								sceneSize.x, sceneSize.y, sceneSize.z);
+						meshSceneMin.x, meshSceneMin.y, meshSceneMin.z,
+						meshSceneMax.x, meshSceneMax.y, meshSceneMax.z,
+						meshSceneSize.x, meshSceneSize.y, meshSceneSize.z);
 					//ImGui::Text("dimensions: %.2f/%.2f/%.2f", g.second.bbox.MaxX(), g.second.bbox.MaxY(), g.second.bbox.MaxZ());
 
 					imguiMatrix4fEditControl(i, g.second.transform);
@@ -879,6 +880,7 @@ void SSPHH_Application::imguiShowScenegraphEditor()
 void SSPHH_Application::imguiMatrix4fEditControl(int id, Matrix4f &m)
 {
 	NEWLINE_SEPARATOR
+		ImGui::PushID(id);
 	ImGui::Text("Rotate: ");
 	if (ImGui::Button("LoadIdentity()"))
 	{
@@ -960,6 +962,7 @@ void SSPHH_Application::imguiMatrix4fEditControl(int id, Matrix4f &m)
 		m.m21, m.m22, m.m23, m.m24,
 		m.m31, m.m32, m.m33, m.m34,
 		m.m41, m.m42, m.m43, m.m44);
+	ImGui::PopID();
 }
 
 void SSPHH_Application::imguiShowSphlEditor()
@@ -970,11 +973,11 @@ void SSPHH_Application::imguiShowSphlEditor()
 
 	if (Interface.tools.showSphlEditor)
 	{
-		x += w + 64.0f;
+		win_x += win_w + 64.0f;
 		ImGui::SetNextWindowContentWidth(512);
 		ImGui::SetNextWindowSize(ImVec2(512, 256));
 		ImGui::SetNextWindowPos(ImVec2(screenWidth - 600, screenHeight - 300));
-		x += w;
+		win_x += win_w;
 		ImGui::Begin("SSPL Editor");
 		ImGui::Text("%d SSPLs", (int)ssg.ssphhLights.size());
 		if (ImGui::Button("Add SSPL"))
@@ -990,16 +993,16 @@ void SSPHH_Application::imguiShowSphlEditor()
 			id << "MS" << setfill('0') << setw(2) << i << " '" << sspl.name << "'";
 			const void *ptr = &sspl;
 #ifdef WIN32
-			va_list args = nullptr;
+			//va_list args = nullptr;
 #elif __unix__
 			// va_list args = va_list();
 #endif
-			const char *colors[4] = {"R", "G", "B", "Mono"};
+			const char *colors[4] = { "R", "G", "B", "Mono" };
 			const ImVec4 mscolors[4] = {
 				{1.0f, 0.0f, 0.0f, 1.0f},
 				{0.0f, 1.0f, 0.0f, 1.0f},
 				{0.0f, 0.0f, 1.0f, 1.0f},
-				{1.0f, 1.0f, 1.0f, 1.0f}};
+				{1.0f, 1.0f, 1.0f, 1.0f} };
 			float minValue = -5.0f;
 			float maxValue = 5.0f;
 			ImGui::PushID(i);
@@ -1092,7 +1095,7 @@ void SSPHH_Application::imguiShowSphlEditor()
 					label << "Multispectral " << colors[j];
 					ptr = &sspl.msph[j];
 					if (ImGui::TreeNode(ptr, "%s", label.str().c_str()))
-					// if (ImGui::TreeNodeV(ptr, label.str().c_str(), args))
+						// if (ImGui::TreeNodeV(ptr, label.str().c_str(), args))
 					{
 						ImGui::SameLine();
 						ImGui::TextColored(mscolors[j], "%s", label.str().c_str());
@@ -1139,13 +1142,13 @@ void SSPHH_Application::imguiShowSphlEditor()
 							ImGui::PushID(l);
 							for (int m = -l; m <= l; m++)
 							{
-								int lm = sspl.msph[j].getCoefficientIndex(l, m);
+								int lm = (int)sspl.msph[j].getCoefficientIndex(l, m);
 								float oldValue = sspl.msph[j].getCoefficient(l, m);
 								ImGui::PushID(i * 100000 + j * 10000 + lm * 100);
 								auto offset = sspl.msph[j].getCoefficientIndex(l, m);
 								ostringstream label;
 								label << "l = " << l << ", m = " << m << " (" << offset << ")"
-									  << "##" << setw(2) << setfill('0') << i << j;
+									<< "##" << setw(2) << setfill('0') << i << j;
 
 								if (ImGui::SmallButton("iso"))
 								{
@@ -1362,9 +1365,9 @@ void SSPHH_Application::imguiShowMaterialEditor()
 
 	if (Interface.tools.showMaterialEditor)
 	{
-		x += w + 64.0f;
-		ImGui::SetNextWindowContentWidth(w);
-		ImGui::SetNextWindowPos(ImVec2(x, 64));
+		win_x += win_w + 64.0f;
+		ImGui::SetNextWindowContentWidth(win_w);
+		ImGui::SetNextWindowPos(ImVec2(win_x, 64));
 		ImGui::Begin("Material Editor");
 		//if (Interface.mtls.mtlsCollapsed.size() != ssg.materials.size())
 		//{
@@ -1376,15 +1379,15 @@ void SSPHH_Application::imguiShowMaterialEditor()
 		{
 			int i = 0;
 			SEPARATOR_NEWLINE
-			for (auto &mtllib : ssg.materials)
-			{
-				ImGui::Text("Mtllib %i: %s", mtllib.first, mtllib.second.name.c_str());
-				for (auto &map : mtllib.second.maps)
+				for (auto &mtllib : ssg.materials)
 				{
-					ImGui::Text("map: %s", map.second.mapName.c_str());
+					ImGui::Text("Mtllib %i: %s", mtllib.first, mtllib.second.name.c_str());
+					for (auto &map : mtllib.second.maps)
+					{
+						ImGui::Text("map: %s", map.second.mapName.c_str());
+					}
+					i++;
 				}
-				i++;
-			}
 			NEWLINE_SEPARATOR
 		}
 
@@ -1443,7 +1446,7 @@ void SSPHH_Application::imguiShowMaterialEditor()
 						{
 							auto pmtl = Interface.mtls.mtls_ptrs[mtllib_mtl_key];
 							NEWLINE_SEPARATOR
-							const float stepSize = 0.01f;
+								const float stepSize = 0.01f;
 							// const float minSize = -5.0f;
 							// const float maxSize = 5.0f;
 #define JOIN(x) (x + ("##" + mtllib_mtl_key)).c_str()
@@ -1608,7 +1611,7 @@ void SSPHH_Application::imguiCoronaGenerateSCN()
 			break;
 
 		ostringstream ostr;
-		ostr << "export_corona_cubemap_" << setw(2) << setfill('0') << i << ".scn";
+		ostr << "export_corona_cubemap_" << setw(2) << setfill('0') << (int)i << ".scn";
 		coronaScene.WriteCubeMapSCN(ostr.str(), ssg, sphls[i].position.xyz());
 	}
 
@@ -1646,13 +1649,13 @@ void SSPHH_Application::imguiCoronaGenerateSphlVIZ()
 			int pl = Interface.ssphh.VIZ_PassLimit;
 			string viz_name;
 			viz_name = CoronaJob::MakeVIZName(Interface.sceneName,
-											  recvLight,
-											  sendLight,
-											  false,
-											  false,
-											  Interface.ssphh.enableKs,
-											  mrd,
-											  pl);
+				recvLight,
+				sendLight,
+				false,
+				false,
+				Interface.ssphh.enableKs,
+				mrd,
+				pl);
 
 			CoronaJob job(viz_name, CoronaJob::Type::VIZ, sendLight, recvLight);
 			if (Interface.ssphh.enableHDR)
@@ -1686,17 +1689,17 @@ void SSPHH_Application::imguiCoronaGenerateSphlVIZ()
 
 void SSPHH_Application::imguiCoronaGenerateSphlINIT()
 {
-	double t0 = hflog.getSecondsElapsed();
+	double timeElapsed = hflog.getSecondsElapsed();
 	ssg.ssphh.INIT(ssg);
-	Interface.ssphh.lastINITTime = hflog.getSecondsElapsed() - t0;
+	Interface.ssphh.lastINITTime = hflog.getSecondsElapsed() - timeElapsed;
 	DirtySPHLs();
 }
 
 void SSPHH_Application::imguiCoronaGenerateSphlHIER()
 {
-	double t0 = hflog.getSecondsElapsed();
+	double timeElapsed = hflog.getSecondsElapsed();
 	ssg.ssphh.HIER(Interface.ssphh.HierarchiesIncludeSelf, Interface.ssphh.HierarchiesIncludeNeighbors, Interface.ssphh.MaxDegrees);
-	Interface.ssphh.lastHIERTime = hflog.getSecondsElapsed() - t0;
+	Interface.ssphh.lastHIERTime = hflog.getSecondsElapsed() - timeElapsed;
 	DirtySPHLs();
 }
 
@@ -1725,14 +1728,14 @@ void SSPHH_Application::imguiCoronaGenerateSphlGEN()
 		int mrd = Interface.ssphh.GEN_MaxRayDepth;
 		int pl = Interface.ssphh.GEN_PassLimit;
 		CoronaJob job(CoronaJob::MakeGENName(
-						  Interface.sceneName,
-						  sendLight,
-						  false,
-						  false,
-						  Interface.ssphh.enableKs,
-						  mrd,
-						  pl),
-					  CoronaJob::Type::GEN, sendLight);
+			Interface.sceneName,
+			sendLight,
+			false,
+			false,
+			Interface.ssphh.enableKs,
+			mrd,
+			pl),
+			CoronaJob::Type::GEN, sendLight);
 		if (Interface.ssphh.enableHDR)
 			job.EnableHDR();
 		if (Interface.ssphh.enableHQ)
@@ -1786,7 +1789,7 @@ void SSPHH_Application::imguiCoronaGenerateSky()
 		glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, ssg.environment.pbskyColorMapId);
 		for (int i = 0; i < 6; i++)
 		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA32F, lightProbe.width(), lightProbe.height(), 0, GL_RGBA, GL_FLOAT, lightProbe.getImageData(i));
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA32F, (GLsizei)lightProbe.width(), (GLsizei)lightProbe.height(), 0, GL_RGBA, GL_FLOAT, lightProbe.getImageData(i));
 		}
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 		glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, 0);
@@ -1807,7 +1810,7 @@ void SSPHH_Application::imguiCoronaGenerateREF()
 	imguiCoronaCheckCache();
 	if (Interface.ssphh.enableREF)
 	{
-		double t0 = hflog.getSecondsElapsed();
+		double time0 = hflog.getSecondsElapsed();
 		string name = CoronaJob::MakeREFName(
 			Interface.sceneName,
 			false,
@@ -1830,12 +1833,12 @@ void SSPHH_Application::imguiCoronaGenerateREF()
 		else
 			job1.Start(coronaScene, ssg);
 		Interface.ssphh.lastREFPath = job1.GetOutputPath();
-		Interface.ssphh.lastREFTime = hflog.getSecondsElapsed() - t0;
+		Interface.ssphh.lastREFTime = hflog.getSecondsElapsed() - time0;
 	}
 
 	if (Interface.ssphh.enableREFCubeMap)
 	{
-		double t0 = hflog.getSecondsElapsed();
+		double time0 = hflog.getSecondsElapsed();
 		string name = CoronaJob::MakeREFName(
 			Interface.sceneName,
 			true,
@@ -1858,7 +1861,7 @@ void SSPHH_Application::imguiCoronaGenerateREF()
 		else
 			job2.Start(coronaScene, ssg);
 		Interface.ssphh.lastREFCubeMapPath = job2.GetOutputPath();
-		Interface.ssphh.lastREFCubeMapTime = hflog.getSecondsElapsed() - t0;
+		Interface.ssphh.lastREFCubeMapTime = hflog.getSecondsElapsed() - time0;
 	}
 }
 
@@ -1868,8 +1871,8 @@ void SSPHH_Application::imguiCoronaDeleteCache()
 	{
 		string base_filename = CoronaJob::MakeGENName(Interface.sceneName, i);
 
-//vector<string> files_to_delete = {};
-// Delete sun-to-sphl light probe
+		//vector<string> files_to_delete = {};
+		// Delete sun-to-sphl light probe
 #ifdef WIN32
 		DeleteFile((base_filename + ".scn").c_str());
 		DeleteFile((base_filename + ".exr").c_str());
@@ -1906,23 +1909,23 @@ void SSPHH_Application::imguiCoronaDeleteCache()
 		// we count one more for the sun-to-sphl files
 		for (int j = 0; j <= MaxSphlLights; j++)
 		{
-			string base_filename = CoronaJob::MakeVIZName(Interface.sceneName, i, j);
+			string viz_base_filename = CoronaJob::MakeVIZName(Interface.sceneName, i, j);
 
 			// Delete sun-to-sphl light probe
-			DeleteFile((base_filename + ".scn").c_str());
-			DeleteFile((base_filename + ".exr").c_str());
-			DeleteFile((base_filename + ".ppm").c_str());
-			DeleteFile((base_filename + "_hq.exr").c_str());
-			DeleteFile((base_filename + "_hq.ppm").c_str());
-			DeleteFile((base_filename + "_sph.ppm").c_str());
-			DeleteFile((base_filename + ".json").c_str());
-			DeleteFile((base_filename + "_tonemap.conf").c_str());
-			DeleteFile((base_filename + "_01_Sprime.ppm").c_str());
-			DeleteFile((base_filename + "_02_self.ppm").c_str());
-			DeleteFile((base_filename + "_03_neighbor.ppm").c_str());
-			DeleteFile((base_filename + "_01_Sprime.json").c_str());
-			DeleteFile((base_filename + "_02_self.json").c_str());
-			DeleteFile((base_filename + "_03_neighbor.json").c_str());
+			DeleteFile((viz_base_filename + ".scn").c_str());
+			DeleteFile((viz_base_filename + ".exr").c_str());
+			DeleteFile((viz_base_filename + ".ppm").c_str());
+			DeleteFile((viz_base_filename + "_hq.exr").c_str());
+			DeleteFile((viz_base_filename + "_hq.ppm").c_str());
+			DeleteFile((viz_base_filename + "_sph.ppm").c_str());
+			DeleteFile((viz_base_filename + ".json").c_str());
+			DeleteFile((viz_base_filename + "_tonemap.conf").c_str());
+			DeleteFile((viz_base_filename + "_01_Sprime.ppm").c_str());
+			DeleteFile((viz_base_filename + "_02_self.ppm").c_str());
+			DeleteFile((viz_base_filename + "_03_neighbor.ppm").c_str());
+			DeleteFile((viz_base_filename + "_01_Sprime.json").c_str());
+			DeleteFile((viz_base_filename + "_02_self.json").c_str());
+			DeleteFile((viz_base_filename + "_03_neighbor.json").c_str());
 		}
 	}
 
@@ -1944,7 +1947,7 @@ void SSPHH_Application::imguiCoronaDeleteCache()
 		gt_cm + "_hq",
 		gt_cm + "_hq_hdr",
 		gt_mrdpl,
-		gt_cm_mrdpl};
+		gt_cm_mrdpl };
 
 	for (auto &product : products)
 	{
@@ -1963,9 +1966,9 @@ using TestProduct = tuple<bool, int, int, int, string>;
 
 void SSPHH_Application::imguiCoronaGenerateTestProducts()
 {
-	vector<int> maxRayDepths = {25, 3, 1, 0};
-	vector<int> passes = {1, 3, 25};
-	vector<int> degrees = {9, 2};
+	vector<int> maxRayDepths = { 25, 3, 1, 0 };
+	vector<int> passes = { 1, 3, 25 };
+	vector<int> degrees = { 9, 2 };
 
 	//// Exhaustive statistics
 	//vector<int> maxRayDepths = { 25, 10, 5, 4, 3, 2, 1, 0 };
@@ -1975,7 +1978,7 @@ void SSPHH_Application::imguiCoronaGenerateTestProducts()
 	//vector<int> maxRayDepths = { 25, 10, 5, 4, 3, 2, 1, 0 };
 	//vector<int> passes = { 50, 25, 10, 5, 4, 3, 2, 1 };
 	//vector<int> degrees = { 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
-	vector<int> specular = {1};
+	vector<int> specular = { 1 };
 	map<TestProduct, double> times;
 
 	auto gmrd = Interface.ssphh.GEN_MaxRayDepth;
@@ -2085,14 +2088,14 @@ void SSPHH_Application::imguiCoronaGenerateTestProducts()
 					float progress = (float)((double)count / (double)totalProducts);
 					string pname = GetPathTracerSphlRenderName(Interface.sceneName, ks, mrd, pl, d);
 					hflog.infofn(__FUNCTION__, "%4d/%4d (%3.2f%% done) products -- finished %s", count, totalProducts, progress,
-								 pname.c_str());
+						pname.c_str());
 				}
 			}
 		}
 	}
 
 	ofstream fout(Interface.sceneName + "_stats.csv",
-				  Interface.ssphh.genProductsIgnoreCache ? ios::out : ios::app);
+		Interface.ssphh.genProductsIgnoreCache ? ios::out : ios::app);
 	auto dtg = hflog.makeDTG();
 	fout << dtg << endl;
 	fout << "name,dtg,ks,mrd,pl,md,time,ptE,sphlE,d1E,d2E" << endl;
@@ -2141,8 +2144,8 @@ void SSPHH_Application::imguiCoronaGenerateCompareProduct(bool ks, int mrd, int 
 	ppmcompare.Init(ks, mrd, pl, md);
 	ppmcompare.Compare(image1, image2);
 	ppmcompare.SaveResults(Interface.sceneName, pathtracer_name,
-						   Interface.ssphh.ppmcompareGenPPMs,
-						   Interface.ssphh.ppmcompareIgnoreCache);
+		Interface.ssphh.ppmcompareGenPPMs,
+		Interface.ssphh.ppmcompareIgnoreCache);
 
 	Interface.ssphh.lastPathTracerTotalEnergy = ppmcompare.image1stat.sumI;
 	Interface.ssphh.lastSphlRenderTotalEnergy = ppmcompare.image2stat.sumI;
@@ -2207,7 +2210,7 @@ void SSPHH_Application::imguiUfShowWindow()
 	{
 		Interface.uf.windowInit = true;
 		ImGui::SetNextWindowContentWidth(512.0f);
-		ImGui::SetNextWindowPos(ImVec2(x + w + 32, 64));
+		ImGui::SetNextWindowPos(ImVec2(win_x + win_w + 32, 64));
 	}
 	ImGui::Begin("Unicornfish");
 	if (Interface.uf.uf_type == UfType::None)

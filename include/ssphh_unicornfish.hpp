@@ -24,7 +24,8 @@
 #include <unicornfish_broker.hpp>
 #include <unicornfish_client.hpp>
 #include <unicornfish_worker.hpp>
-#include <fluxions_corona_scene.hpp>
+#include <fluxions_corona_job.hpp>
+#include <fluxions_corona_scene_file.hpp>
 
 using namespace std;
 

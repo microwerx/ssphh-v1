@@ -20,7 +20,8 @@
 #define SSPHH_HPP
 
 #include <fluxions.hpp>
-#include <fluxions_corona_scene.hpp>
+#include <fluxions_corona_scene_file.hpp>
+#include <fluxions_corona_job.hpp>
 #include <fluxions_renderer.hpp>
 #include <hatchetfish.hpp>
 #include <kasl_python.hpp>
@@ -111,7 +112,7 @@ private:
     SimpleGeometryMesh ssphh_hierarchy_mesh;
     FxModel geosphere;
     // Sphl sphl;
-    map<int, Sphl> sphls;
+    map<size_t, Sphl> sphls;
     bool coefs_init = false;
     // End SPHL code
 

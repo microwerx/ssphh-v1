@@ -942,7 +942,7 @@ void APIENTRY glutTemplateDebugFunc(GLenum source, GLenum type, GLuint id, GLenu
 	}
 
 	hflog.info("%s", ostr.str().c_str());
-	string m = message;
+	string m(message, length);
 	istringstream istr(m);
 	string line;
 	while (getline(istr, line))

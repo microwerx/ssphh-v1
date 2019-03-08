@@ -218,7 +218,7 @@ void SSPHH_Application::ParseCommandArguments(const vector<string> &args)
         return;
 
     size_t count = args.size();
-    int i = 1;
+    //int i = 1;
     for (size_t j = 1; j < count; j++)
     {
         bool nextArgExists = j < count - 1;
@@ -795,7 +795,7 @@ void SSPHH_Application::AdvanceSunClock(double numSeconds, bool recomputeSky)
 {
     pbsky_timeOffsetInSeconds += numSeconds;
     ssg.environment.pbsky.SetTime(pbsky_localtime, (float)pbsky_timeOffsetInSeconds);
-    Interface.recomputeSky = true;
+    Interface.recomputeSky = recomputeSky;
 }
 
 void SSPHH_Application::OnUpdate(double deltaTime)
@@ -1096,7 +1096,7 @@ void SSPHH_Application::OnRender()
 
 void SSPHH_Application::OnRenderOverlay()
 {
-    bool isCameraViewMatrixVisible = true;
+    //bool isCameraViewMatrixVisible = true;
 
     float xpos = 0.0f;
     float ypos = screenHeight - 15.0f * 15.0f;
@@ -1218,7 +1218,7 @@ void SSPHH_Application::RenderHUD()
     glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "GROUND RADIANCE:   R: % -3.1f  G: % -3.1f  B: % -3.2f",
                                    groundRadiance.r, groundRadiance.g, groundRadiance.b);
 
-    float seconds = (float)(ssg.environment.pbsky.getSec() + ssg.environment.pbsky.getSecFract());
+    //float seconds = (float)(ssg.environment.pbsky.getSec() + ssg.environment.pbsky.getSecFract());
     ypos += 15.0f;
     glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "DATE: %02d/%02d/%02d %02d:%02d:%02d%.3f  LST: %2.3f",
                                    ssg.environment.pbsky.getMonth(),
@@ -1762,8 +1762,7 @@ void ConvertBuffer(GLenum srccomponents, GLenum srctype, const void *srcdata, GL
     }
 
     size_t size = w * h * layers;
-    size_t addr = 0;
-    for (int addr = 0; addr < size; addr++)
+    for (size_t addr = 0; addr < size; addr++)
     {
         for (int i = 0; i < (int)dstcomponents; i++)
         {
@@ -1787,7 +1786,7 @@ void ConvertBuffer(GLenum srccomponents, GLenum srctype, const void *srcdata, GL
                 else if (dstubpixels && srcfpixels)
                 {
                     float v = *srcfpixels++;
-                    *dstubpixels++ = Fluxions::clamp((int)(v * 255.99f), 0, 255);
+                    *dstubpixels++ = (unsigned char)Fluxions::clamp((int)(v * 255.99f), 0, 255);
                 }
                 else if (dstfpixels && srcubpixels)
                 {
