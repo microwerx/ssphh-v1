@@ -21,30 +21,34 @@
 #include "stdafx.h"
 
 #ifdef WIN32
-#ifdef NDEBUG
-#ifndef FLUXIONS_NO_SDL
-#pragma comment(lib, "SDL2.lib")
-#pragma comment(lib, "SDL2main.lib")
-#pragma comment(lib, "SDL2_image.lib")
-#endif
-
-#pragma comment(lib, "freeglut_static.lib")
-#pragma comment(lib, "zmq4.lib")
-#else
+#define _STDCALL_SUPPORTED
 
 #ifndef FLUXIONS_NO_SDL
 #pragma comment(lib, "SDL2.lib")
 #pragma comment(lib, "SDL2main.lib")
 #pragma comment(lib, "SDL2_image.lib")
-#endif
-
-#pragma comment(lib, "freeglut_staticd.lib")
-#pragma comment(lib, "zmq4d.lib")
 #endif
 
 #pragma comment(lib, "fluxions.lib")
-#define _STDCALL_SUPPORTED
+#pragma comment(lib, "glew32.lib")
+#ifndef FLUXIONS_NO_OPENEXR
+#pragma comment(lib, "Half-2_3.lib")
+//#pragma comment(lib, "Iex-2_3")
+//#pragma comment(lib, "IexMath-2_3")
+#pragma comment(lib, "IlmImf-2_3.lib")
+//#pragma comment(lib, "IlmImfUtil-2_3")
+//#pragma comment(lib, "IlmThread-2_3")
+//#pragma comment(lib, "Imath-2_3")
 #endif
+
+#ifdef NDEBUG
+#pragma comment(lib, "freeglut_static.lib")
+#pragma comment(lib, "zmq4.lib")
+#else
+#pragma comment(lib, "freeglut_staticd.lib")
+#pragma comment(lib, "zmq4d.lib")
+#endif // NDEBUG
+#endif // WIN32
 
 #include <functional>
 #include <stdio.h>
@@ -60,119 +64,24 @@
 #include <unicornfish.hpp>
 #include "ssphh.hpp"
 
+#include <glut-template.hpp>
+
 #ifndef FLUXIONS_NO_SDL
-#ifdef WIN32
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#else
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #endif
-#endif
-
-// #define USE_MULTISAMPLING
-
-#ifndef WIN32
-#define APIENTRY
-#endif
-
-using namespace std;
-//using namespace SSPHH;
 
 extern void do_tests();
 
-void PrintString9x15(float x, float y, int justification, const char *format, ...);
-void PrintBitmapStringJustified(float x, float y, int justification, void *font, const char *format, ...);
-void PrintStrokeStringJustified(float x, float y, int justification, void *font, const char *format, ...);
-
-#define GRAPP2017 0
-
-#if GRAPP2017
-const char *g_windowTitle = "GRAPP 2017 - Metzgar - Semwal";
-int g_displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE | GLUT_SRGB | GLUT_BORDERLESS;
-int g_screenWidth = 1800;
-int g_screenHeight = 1200;
-#else
-const char *g_windowTitle = "Scalable Spherical Harmonics Hierarchies (SSPHH)";
-int g_displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH; // | GLUT_SRGB; // | GLUT_BORDERLESS;
-int g_screenWidth = 1280;
-int g_screenHeight = 720;
-#endif
-double g_Fps = 0;
-double g_aspectRatio = (double)g_screenWidth / (double)g_screenHeight;
-int g_mouseDX = 0;
-int g_mouseDY = 0;
-int g_mouseX = 0;
-int g_mouseY = 0;
-int g_mouseButtons = 0;
-int g_joystickButtonMask = 0;
-int g_joystickX = 0;
-int g_joystickY = 0;
-int g_joystickZ = 0;
-int g_joystickPollInterval = 16;
-int g_timer1millis = 0;
-int g_timer2millis = 0;
-int g_timer3millis = 0;
-int g_timer4millis = 0;
-int g_timer1value = 0;
-int g_timer2value = 0;
-int g_timer3value = 0;
-int g_timer4value = 0;
-int g_frameCount = 0;
-bool g_willResetErrorCountAfterFrame = false;
-int g_errorCount = 0;
-double g_updateInterval = 0.01666667f;
-double g_renderInterval = 0.01666667f;
-double g_Fov = 45.0;
-double g_zNear = 0.01;
-double g_zFar = 100.0;
-int g_keyMap[256] = {0};
-int g_specialKeyMap[256] = {0};
-vector<string> g_args;
-
-using namespace Viperfish;
-Widget::SharedPtr vfApp;
-Widget::SharedPtr imguiPtr;
+Viperfish::Widget::SharedPtr vfApp;
+Viperfish::Widget::SharedPtr imguiPtr;
 
 double g_distance = -10.0;
 double xrot = 0.0;
 double yrot = 0.0;
 
-void ParseCommandLine();
-void InitMenu();
-void OnInit();
-void OnKill();
-void OnUpdate(double deltaTime);
-void OnRender();
-void OnRenderOverlay();
-
-void Set2DViewport();
-void Set3DViewport();
-
-void APIENTRY glutTemplateDebugFunc(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const GLvoid *userParam);
-
-void glutCreateAffinity();
-
-void display();
-void reshape(int width, int height);
-void keyboard(unsigned char key, int x, int y);
-void keyboardup(unsigned char key, int x, int y);
-void special(int key, int x, int y);
-void specialup(int key, int x, int y);
-void mouse(int button, int state, int x, int y);
-void motion(int x, int y);
-void passive(int x, int y);
-void entry(int state);
-void visibility(int state);
-void idle();
-void timer1(int value);
-void timer2(int value);
-void timer3(int value);
-void timer4(int value);
-void menu(int state);
-void menustatus(int state, int x, int y);
-void windowstatus(int state);
-void joystick(unsigned int buttonMask, int x, int y, int z);
+void Init();
+void Kill();
 
 namespace Fluxions
 {
@@ -184,92 +93,15 @@ namespace KASL
 extern int test_PythonInterpreter(int argc, char **argv);
 }
 
-void glutCreateAffinity()
-{
-#if (0)
-	glewInit();
-	const int MAX_GPUS = 4;
-	GPU_DEVICE gpuDevice;
-	HGPUNV hGPU[MAX_GPUS];
-	vector<GPU_DEVICE> gpuDevices;
-
-	if (!glewIsExtensionSupported("WGL_NV_gpu_affinity"))
-	{
-		hflog.info("%s(): WGL_NV_gpu_affinity not supported", __FUNCTION__);
-		return;
-	}
-
-	int i = 0;
-	while (i < MAX_GPUS && wglEnumGpusNV(i, &hGPU[i]) == TRUE)
-	{
-		wglEnumGpuDevicesNV(hGPU[i], i, &gpuDevice);
-		gpuDevices.push_back(gpuDevice);
-		hflog.info("%s(): WGL_NV_gpu_affinity supports %d Device: %s Name: %s", __FUNCTION__, i, gpuDevice.DeviceName, gpuDevice.DeviceString);
-		i++;
-	}
-#endif
-}
-
-std::map<std::string, std::string> MakeOptionsFromArgs(int argc, const char **argv)
-{
-	std::map<std::string, std::string> argv_options;
-	for (int i = 0; i < argc; i++)
-	{
-		string option = argv[i];
-		hflog.info("%s(): Processing '%s'", __FUNCTION__, option.c_str());
-		std::regex dashequals("(^-+|=)",
-							  std::regex_constants::ECMAScript);
-		std::sregex_token_iterator it(option.begin(),
-									  option.end(),
-									  dashequals,
-									  -1);
-		std::sregex_token_iterator end;
-		size_t count = 0;
-
-		string key = "";
-		string value = "";
-		for (; it != end; it++)
-		{
-			if (count == 1)
-			{
-				key = *it;
-			}
-			else if (count == 2)
-			{
-				value = *it;
-			}
-			string token = *it;
-			hflog.info("%s(): token %d '%s'", __FUNCTION__, count, token.c_str());
-			count++;
-		}
-		if (key.length() > 0)
-		{
-			argv_options.emplace(std::make_pair(key, value));
-			hflog.info("%s(): argv adding key '%s' = '%s'", __FUNCTION__, key.c_str(), value.c_str());
-		}
-	}
-	return argv_options;
-}
-
 int main(int argc, char **argv)
 {
 	do_tests();
 
-	std::regex path_replace("[/\\\\]+");
-
 	curl_global_init(CURL_GLOBAL_ALL);
 
-	//return Fluxions::test_fluxions_simple_property(argc, argv);
-	//return KASL::test_PythonInterpreter(argc, argv);
+	map<string, string> options = Fluxions::MakeOptionsFromArgs(argc, (const char **)argv);
 
-	bool showVersion = false;
-	map<string, string> options = MakeOptionsFromArgs(argc, (const char **)argv);
 	if (options.count("version"))
-	{
-		showVersion = true;
-	}
-
-	if (showVersion)
 	{
 		printf("SSPHH by Jonathan Metzgar\nCopyright (C) 2017 Jonathan Metzgar\n\n");
 		printf("This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or\n(at your option) any later version.\n\n");
@@ -277,395 +109,45 @@ int main(int argc, char **argv)
 		printf("You should have received a copy of the GNU General Public License\nalong with this program.  If not, see <http://www.gnu.org/licenses/>.\n\n");
 	}
 
-#ifdef WIN32
-	SetProcessDPIAware();
-#endif
-
-	for (int i = 0; i < argc; i++)
+	Fluxions::debugging = false;
+	if (options.count("debug"))
 	{
-		g_args.push_back(argv[i]);
+		Fluxions::debugging = true;
 	}
 
-	glutInit(&argc, argv);
-	//glutInitContextVersion(3, 2);
-	glutInitContextProfile(GLUT_CORE_PROFILE);
-	glutInitContextFlags(GLUT_DEBUG);
-#ifdef USE_MULTISAMPLING
-	glutSetOption(GLUT_MULTISAMPLE, 4);
-#endif
-	glutInitDisplayMode(g_displayMode);
-	glutInitWindowSize(g_screenWidth, g_screenHeight);
-	glutCreateWindow(g_windowTitle);
-	GLenum glewResult = glewInit();
-	if (glewResult == GLEW_OK)
-	{
-		bool hasES2 = glewIsSupported("ARB_ES2_compatibility") ? true : false;
-		bool hasES3 = glewIsSupported("ARB_ES3_compatibility") ? true : false;
-		bool hasGL21 = GLEW_VERSION_2_1 ? true : false;
-		bool hasGL32 = GLEW_VERSION_3_2 ? true : false;
-		bool hasGL41 = GLEW_VERSION_4_1 ? true : false;
-		bool hasGL45 = GLEW_VERSION_4_5 ? true : false;
-		bool hasDebugOutput = glewIsSupported("ARB_debug_output") ? true : false;
-		int majorVersion = 0;
-		int minorVersion = 0;
-		glGetIntegerv(GL_MAJOR_VERSION, &majorVersion);
-		glGetIntegerv(GL_MINOR_VERSION, &minorVersion);
-
-		hflog.infofn(__FUNCTION__, "GLEW (%s) initialized", glewGetString(GLEW_VERSION));
-		hflog.infofn(__FUNCTION__, "OpenGL %d.%d", majorVersion, minorVersion);
-		hflog.infofn(__FUNCTION__, "OpenGL ES 2.0: %s", hasES2 ? "true" : "false");
-		hflog.infofn(__FUNCTION__, "OpenGL ES 3.0: %s", hasES3 ? "true" : "false");
-		hflog.infofn(__FUNCTION__, "OpenGL 2.1: %s", hasGL21 ? "true" : "false");
-		hflog.infofn(__FUNCTION__, "OpenGL 3.2: %s", hasGL32 ? "true" : "false");
-		hflog.infofn(__FUNCTION__, "OpenGL 4.1: %s", hasGL41 ? "true" : "false");
-		hflog.infofn(__FUNCTION__, "OpenGL 4.5: %s", hasGL45 ? "true" : "false");
-		hflog.infofn(__FUNCTION__, "ARB_debug_output: %s", hasDebugOutput ? "true" : "false");
-	}
-	else
-	{
-		hflog.warningfn(__FUNCTION__, "GLEW did not initialize");
-	}
-	// glutCreateAffinity();
-	glutDisplayFunc(display);
-	glutReshapeFunc(reshape);
-	glutKeyboardFunc(keyboard);
-	glutKeyboardUpFunc(keyboardup);
-	glutSpecialFunc(special);
-	glutSpecialUpFunc(specialup);
-	glutMouseFunc(mouse);
-	glutMotionFunc(motion);
-	glutPassiveMotionFunc(passive);
-	glutEntryFunc(entry);
-	glutVisibilityFunc(visibility);
-	glutIdleFunc(idle);
-	if (g_timer1millis != 0)
-		glutTimerFunc(g_timer1millis, timer1, g_timer1value);
-	if (g_timer2millis != 0)
-		glutTimerFunc(g_timer2millis, timer2, g_timer2value);
-	if (g_timer3millis != 0)
-		glutTimerFunc(g_timer3millis, timer3, g_timer3value);
-	if (g_timer4millis != 0)
-		glutTimerFunc(g_timer4millis, timer4, g_timer4value);
-	glutMenuStateFunc(menu);
-	glutMenuStatusFunc(menustatus);
-	glutWindowStatusFunc(windowstatus);
-	glutJoystickFunc(joystick, g_joystickPollInterval);
-	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
-
-	try
-	{
-		ParseCommandLine();
-		InitMenu();
-		OnInit();
-		glutMainLoop();
-		OnKill();
-	}
-	catch (...)
-	{
-		hflog.error("%s(): Caught an unhandled exception", __FUNCTION__);
-	}
+	GlutTemplateSetParameters("SSPHH", 1280, 720);
+	GlutTemplateInit(argc, argv);
+	Init();
+	GlutTemplateWidget(vfApp);
+	GlutTemplateMainLoop();
+	Kill();
 
 	curl_global_cleanup();
 
 	return 0;
 }
 
-// ParseCommandLine()
-// This function is called prior to the OnInit() initialization call of the
-// application.
-void ParseCommandLine()
-{
-	for (auto arg = g_args.begin(); arg != g_args.end(); arg++)
-	{
-		// do something with the arguments...
-	}
-}
-
-// InitMenu()
-void InitMenu()
-{
-	// Initialize menu entries here
-}
-
-// OnInit()
+// Init()
 // This function is called prior to the main loop of the application.
 // OpenGL is already initialized prior to this call.
 //
-void OnInit()
+void Init()
 {
-	hflog.info("%s(): Initializing OpenGL", __FUNCTION__);
-	glewInit();
+	Fluxions::Init();
+	Fluxions::EnableGLDebugFunc();
 
-#ifdef USE_MULTISAMPLING
-	glEnable(GL_MULTISAMPLE);
-#endif
-	std::cerr << std::hex << glDebugMessageCallback << std::endl;
-	if (glDebugMessageCallback)
-	{
-		glDebugMessageCallback((GLDEBUGPROC)glutTemplateDebugFunc, NULL);
-		glEnable(GL_DEBUG_OUTPUT);
-	}
-	else
-	{
-		hflog.warningfn(__FUNCTION__, "No glDebugMessageCallback");
-	}
-
-	const char *versionString = (char *)glGetString(GL_VERSION);
-	const char *vendorString = (char *)glGetString(GL_VENDOR);
-	const char *rendererString = (char *)glGetString(GL_RENDERER);
-	const char *extensionsString = (char *)glGetString(GL_EXTENSIONS);
-
-	bool showglextension = false;
-	for (auto arg = g_args.begin(); arg != g_args.end(); arg++)
-	{
-		if (*arg == "--glextensions")
-		{
-			showglextension = true;
-		}
-	}
-
-	hflog.info("GL_RENDERER: %s\n", rendererString);
-	hflog.info("GL_VERSION:  %s\n", versionString);
-	hflog.info("GL_VENDOR:   %s\n", vendorString);
-	if (showglextension)
-	{
-		hflog.info("GL_EXTENSIONS: %s\n", extensionsString);
-	}
-
-	GLint maxUniformBufferBindings;
-
-	glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &maxUniformBufferBindings);
-	hflog.info("GL_MAX_UNIFORM_BUFFER_BINDINGS: %d\n", maxUniformBufferBindings);
-
-	glHint(GL_FRAGMENT_SHADER_DERIVATIVE_HINT_ARB, GL_NICEST);
-#ifdef GL_FRAGMENT_SHADER_DERIVATIVE_HINT_OES
-	glHint(GL_FRAGMENT_SHADER_DERIVATIVE_HINT_OES, GL_NICEST);
-#endif
-
-#ifndef FLUXIONS_NO_SDL
-	hflog.infofn(__FUNCTION__, "Initializing SDL");
-	SDL_Init(SDL_INIT_EVERYTHING);
-	IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
-#endif
-
-	hflog.infofn(__FUNCTION__, "Initializing SSPHH");
-	//InitSSPHH();
-	ssphhPtr = SSPHH_Application::MakeShared();
-	imguiPtr = ImGuiWidget::MakeShared();
-	vfApp = Widget::MakeShared("root");
-
+	ssphhPtr = std::make_shared<SSPHH::SSPHH_Application>("ssphh");
+	imguiPtr = std::make_shared<Viperfish::DearImGuiWidget>("imguiwidget");
 	imguiPtr->decorate(ssphhPtr);
+	vfApp = std::make_shared<Viperfish::Widget>("controller");
 	vfApp->decorate(imguiPtr);
-
-	hflog.infofn(__FUNCTION__, "Initializing application");
-	//ssphhPtr->Init(g_args);
-	//ssphhPtr->OnInit(g_args);
-	vfApp->Init(g_args);
-	//vfApp->OnInit(g_args);
 }
 
-void OnKill()
+void Kill()
 {
-	KillSSPHH();
-
-	//IMG_Quit();
-	//SDL_Quit();
+	Fluxions::Kill();
 }
-
-// OnUpdate(deltaTime)
-// This function is called during the main loop of the application.
-//
-void OnUpdate(double deltaTime)
-{
-	xrot += 35 * deltaTime;
-	yrot += 35 * deltaTime;
-
-#ifdef WIN32
-	INPUT input;
-	ZeroMemory(&input, sizeof(INPUT));
-	input.type = INPUT_MOUSE;
-	input.mi.dwFlags = MOUSEEVENTF_MOVE;
-	SendInput(1, &input, sizeof(INPUT));
-	Sleep(0);
-#elif _POSIX_VERSION
-	usleep(0);
-#endif
-
-	// ssphh.OnUpdate(deltaTime);
-	vfApp->OnUpdate(deltaTime);
-}
-
-void OnRender()
-{
-	// RenderOpenGL11TestScene();
-
-	// ssphh.OnRender();
-	vfApp->OnRender();
-}
-
-void OnRenderOverlay()
-{
-	glutSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
-
-	// ssphh.OnRenderOverlay();
-	vfApp->OnRenderOverlay();
-}
-
-void Set2DViewport()
-{
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	Matrix4f ortho2d;
-	ortho2d.Ortho2D(0, g_screenWidth, g_screenHeight, 0);
-	glMultMatrixf(ortho2d.const_ptr());
-	glMatrixMode(GL_MODELVIEW);
-}
-
-void Set3DViewport()
-{
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	Matrix4f perspective;
-	perspective.PerspectiveY(g_Fov, g_aspectRatio, g_zNear, g_zFar);
-	glMultMatrixf(perspective.const_ptr());
-	glMatrixMode(GL_MODELVIEW);
-}
-
-void display()
-{
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-	glViewport(0, 0, g_screenWidth, g_screenHeight);
-	glLoadIdentity();
-	Set3DViewport();
-	OnRender();
-
-	glViewport(0, 0, g_screenWidth, g_screenHeight);
-	glLoadIdentity();
-	Set2DViewport();
-	OnRenderOverlay();
-
-	if (g_displayMode & GLUT_DOUBLE)
-	{
-		glutSwapBuffers();
-	}
-	g_frameCount++;
-	if (g_willResetErrorCountAfterFrame)
-		g_errorCount = 0;
-}
-
-void reshape(int width, int height)
-{
-	g_aspectRatio = (double)width / (double)height;
-	g_screenWidth = width;
-	g_screenHeight = height;
-	glViewport(0, 0, width, height);
-
-	// ssphh.OnReshape(width, height);
-	vfApp->OnReshape(width, height);
-}
-
-void keyboard(unsigned char key, int x, int y)
-{
-	g_keyMap[key] = 1;
-
-	string keyName = Viperfish::KeyToHTML5Name(key);
-	// ssphh.OnKeyDown(keyName, glutGetModifiers());
-	vfApp->OnKeyDown(keyName, glutGetModifiers());
-
-	//if (key == 27)
-	//	glutLeaveMainLoop();
-	//if (key == '=')
-	//	g_distance += 1;
-	//if (key == '-')
-	//	g_distance -= 1;
-}
-
-void keyboardup(unsigned char key, int x, int y)
-{
-	g_keyMap[key] = 0;
-
-	string keyName = Viperfish::KeyToHTML5Name(key);
-	// ssphh.OnKeyUp(keyName, glutGetModifiers());
-	vfApp->OnKeyUp(keyName, glutGetModifiers());
-}
-
-void special(int key, int x, int y)
-{
-	g_specialKeyMap[key] = 1;
-
-	string keyName = Viperfish::SpecialKeyToHTML5Name(key);
-	// ssphh.OnKeyDown(keyName, glutGetModifiers());
-	vfApp->OnKeyDown(keyName, glutGetModifiers());
-}
-
-void specialup(int key, int x, int y)
-{
-	g_specialKeyMap[key] = 0;
-
-	string keyName = Viperfish::SpecialKeyToHTML5Name(key);
-	// ssphh.OnKeyUp(keyName, glutGetModifiers());
-	vfApp->OnKeyUp(keyName, glutGetModifiers());
-}
-
-void mouse(int button, int state, int x, int y)
-{
-	int buttonMask = 1 << button;
-	if (state == GLUT_UP)
-	{
-		g_mouseButtons &= ~buttonMask;
-	}
-	else
-	{
-		g_mouseButtons |= buttonMask;
-	}
-	g_mouseDX = x - g_mouseX;
-	g_mouseDY = x - g_mouseY;
-	g_mouseX = x;
-	g_mouseY = y;
-
-	// ssphh.OnMouseMove(g_mouseX, g_mouseY);
-	vfApp->OnMouseMove(g_mouseX, g_mouseY);
-	if (state == GLUT_DOWN)
-		// ssphh.OnMouseButtonDown(button);
-		vfApp->OnMouseButtonDown(button);
-	else if (state == GLUT_UP)
-		// ssphh.OnMouseButtonUp(button);
-		vfApp->OnMouseButtonUp(button);
-}
-
-void motion(int x, int y)
-{
-	g_mouseDX = x - g_mouseX;
-	g_mouseDY = x - g_mouseY;
-	g_mouseX = x;
-	g_mouseY = y;
-
-	// ssphh.OnMouseMove(g_mouseX, g_mouseY);
-	vfApp->OnMouseMove(g_mouseX, g_mouseY);
-}
-
-void passive(int x, int y)
-{
-	g_mouseDX = x - g_mouseX;
-	g_mouseDY = x - g_mouseY;
-	g_mouseX = x;
-	g_mouseY = y;
-
-	// ssphh.OnMouseMove(X, y);
-	vfApp->OnMouseMove(x, y);
-}
-
-void entry(int state)
-{
-	if (state == GLUT_ENTERED)
-		// ssphh.OnMouseEnter();
-		vfApp->OnMouseEnter();
-	else
-		// ssphh.OnMouseLeave();
-		vfApp->OnMouseLeave();
-}
+<<<<<<< HEAD
 
 void visibility(int state)
 {
@@ -1001,3 +483,5 @@ void RenderOpenGL11TestScene()
 	glDisable(GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
 }
+=======
+>>>>>>> e1246e9235f084527a11053e742c1294e6459f98

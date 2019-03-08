@@ -1,0 +1,17 @@
+#ifndef GLUT_TEMPLATE_HPP
+#define GLUT_TEMPLATE_HPP
+
+#include <viperfish.hpp>
+
+void GlutTemplateSetParameters(const std::string &windowTitle, int width, int height, int displayMode = GL_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL);
+void GlutTemplateInit(int argc, char **argv);
+void GlutTemplateWidget(Viperfish::Widget::SharedPtr widget);
+void GlutTemplateMainLoop();
+
+void PrintString9x15(float x, float y, int justification, const char *format, ...);
+void PrintBitmapStringJustified(float x, float y, int justification, void *font, const char *format, ...);
+void PrintStrokeStringJustified(float x, float y, int justification, void *font, const char *format, ...);
+
+extern Viperfish::Widget::SharedPtr gt_Widget;
+
+#endif

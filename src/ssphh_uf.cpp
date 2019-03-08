@@ -21,14 +21,14 @@
 #include <ssphh_unicornfish.hpp>
 
 
-extern shared_ptr<SSPHH_Application> ssphhPtr;
-SSPHHUnicornfish ssphhUf;
+using namespace Fluxions;
 
+extern shared_ptr<SSPHH::SSPHH_Application> ssphhPtr;
+SSPHHUnicornfish ssphhUf;
 
 void DoClient(const char * endpoint, SSPHHUnicornfish * context);
 void DoWorker(const char * endpoint, const char * service, SSPHHUnicornfish * context);
 void DoBroker(const char * endpoint, SSPHHUnicornfish * context);
-
 
 void SSPHHUnicornfish::StartClient(const string & endpoint)
 {
@@ -184,7 +184,7 @@ void DoClient(const char * endpoint, SSPHHUnicornfish * context)
 		return;
 	if (!ssphhPtr)
 		return;
-	shared_ptr<SSPHH_Application> ssphh = ssphhPtr;
+	shared_ptr<SSPHH::SSPHH_Application> ssphh = ssphhPtr;
 
 	context->SetMessage(SUFType::Client, "started");
 	Uf::Client client;

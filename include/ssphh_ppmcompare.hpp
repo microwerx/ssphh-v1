@@ -23,11 +23,14 @@
 #include <fluxions_gte.hpp>
 #include <fluxions_stdcxx.hpp>
 
+namespace SSPHH
+{
 using namespace std;
 using namespace Fluxions;
 
-struct IntensityStat {
-    Image3f image;
+struct IntensityStat
+{
+    Fluxions::Image3f image;
 
     double sumI = 0.0;
     double minI = 1e6;
@@ -51,7 +54,7 @@ struct IntensityStat {
 
     int count = 0;
 
-    IntensityStat& operator+=(const Color3f& color);
+    IntensityStat &operator+=(const Color3f &color);
     void Finalize();
 
     //inline Color3f min(const Color3f& v1, const Color3f& v2)
@@ -65,12 +68,14 @@ struct IntensityStat {
     //}
 };
 
-class PPMCompare {
-public:
+class PPMCompare
+{
+  public:
     PPMCompare();
     ~PPMCompare();
 
-    enum class ColorSpaceType {
+    enum class ColorSpaceType
+    {
         XYZ,
         SRGB,
         P3
@@ -78,8 +83,8 @@ public:
 
     void Init(bool hasSpecular, int maxRayDepth, int passCount, int maxDegree);
     void SetConversion(ColorSpaceType im1type, ColorSpaceType im2type);
-    void Compare(Image3f& image1, Image3f& image2);
-    void SaveResults(const string& statsName, const string& pathtracerName, bool genDiffs = false, bool ignoreCache = false);
+    void Compare(Image3f &image1, Image3f &image2);
+    void SaveResults(const string &statsName, const string &pathtracerName, bool genDiffs = false, bool ignoreCache = false);
 
     // main product variables
     IntensityStat image1stat;
@@ -90,7 +95,7 @@ public:
 
     double compareTime = 0.0;
 
-private:
+  private:
     // count, avg, min, max, avgI, minI, maxI
     using BlockCountTuple = tuple<float, Color3d, Color3f, Color3f, float, float, float>;
     vector<BlockCountTuple> blockcounts;
@@ -106,13 +111,13 @@ private:
     int bcwidth = 0;
     int bcheight = 0;
 
-private:
+  private:
     bool ks;
     int mrd;
     int pl;
     int md;
     int blockSize = 32;
-    ColorSpaceType imageColorSpaces[2] = { ColorSpaceType::SRGB, ColorSpaceType::SRGB };
+    ColorSpaceType imageColorSpaces[2] = {ColorSpaceType::SRGB, ColorSpaceType::SRGB};
 
     inline float reverseGamma(float value)
     {
@@ -130,7 +135,7 @@ private:
         return 0.0f;
     }
 
-    inline Color3f SRGBtoXYZ(const Color3f& color)
+    inline Color3f SRGBtoXYZ(const Color3f &color)
     {
         Color3f out;
         Vector3f srgb(reverseGamma(color.r), reverseGamma(color.g), reverseGamma(color.b));
@@ -143,7 +148,7 @@ private:
         return out;
     }
 
-    inline Color3f XYZtoSRGB(const Color3f& color)
+    inline Color3f XYZtoSRGB(const Color3f &color)
     {
         // Step 1: matrix multiplication
         Matrix3f conversionMatrix(
@@ -156,7 +161,7 @@ private:
         return srgb;
     }
 
-    inline Color3f XYZtoSRGB255(const Color3f& color)
+    inline Color3f XYZtoSRGB255(const Color3f &color)
     {
         // Step 1: matrix multiplication
         Matrix3f conversionMatrix(
@@ -172,5 +177,5 @@ private:
         return srgb;
     }
 };
-
+} // namespace SSPHH
 #endif
