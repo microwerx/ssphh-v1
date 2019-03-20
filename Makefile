@@ -1,5 +1,10 @@
-# requires the following packages
+
+# Debian packages
 # libczmq-dev libzmq3-dev libcurl4-gnutls-dev libsodium-dev zlib1g-dev python3-dev freeglut3-dev libglew-dev
+
+# Fedora packages
+# dnf install czmq-devel zeromq-devel libcurl-devel libsodium-devel zlib-devel python3-devel glew-devel
+
 # development packages
 # global
 
