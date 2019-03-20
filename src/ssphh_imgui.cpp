@@ -32,6 +32,8 @@ static const int AllDegrees = -1;
 static float win_x = 64.0f;
 static float win_w = 384.0f;
 
+extern double gt_Fps;
+
 #ifdef __APPLE__
 #define __unix__
 #endif
@@ -231,7 +233,7 @@ void SSPHH_Application::imguiShowToolWindow()
 	{
 		glutLeaveMainLoop();
 	}
-	extern double gt_Fps;
+
 	float time_ms = (float)(1000.0 / gt_Fps);
 	ImGui::SameLine();
 	ImGui::Text("[ %3.1f fps/ %3.1f ms ]", gt_Fps, time_ms);

@@ -3,7 +3,7 @@
 # libczmq-dev libzmq3-dev libcurl4-gnutls-dev libsodium-dev zlib1g-dev python3-dev freeglut3-dev libglew-dev
 
 # Fedora packages
-# dnf install czmq-devel zeromq-devel libcurl-devel libsodium-devel zlib-devel python3-devel glew-devel
+# dnf install czmq-devel zeromq-devel libcurl-devel libsodium-devel zlib-devel python3-devel glew-devel SDL2-devel SDL2_image-devel
 
 # development packages
 # global
@@ -13,8 +13,12 @@ DEP_SRCDIR = ../fluxions/dep/src
 SRCDIR = src
 INCDIR = include
 OBJDIR = build
+FLUXIONS = ../fluxions/build/libfluxions.a
 FLUXIONS_INCDIR = ../fluxions/include
 FLUXIONS_LIBDIR = ../fluxions/build
+FLUXIONS_SRCDIR = ../fluxions/src
+FLUXIONS_HEADERS = $(wildcard $(FLUXIONS_INCDIR)/*.hpp) $(wildcard $(FLUXIONS_INCDIR)/*.h)
+FLUXIONS_SOURCES = $(wildcard $(FLUXIONS_SRCDIR)/*.cpp) $(wildcard $(FLUXIONS_SRCDIR)/*.c)
 DEPCXXSOURCES = $(wildcard $(DEP_SRCDIR)/*.cpp)
 DEPCSOURCES = $(wildcard $(DEP_SRCDIR)/*.c)
 CXXSOURCES = $(wildcard $(SRCDIR)/*.cpp)
@@ -34,11 +38,11 @@ CC = gcc
 CCFLAGS = -Wall -I$(INCDIR) -I$(DEP_INCDIR) `python3-config --includes`
 CXX = g++
 CXXFLAGS = -std=c++14 -g -Wall -I$(INCDIR) -I$(DEP_INCDIR) -I$(FLUXIONS_INCDIR) `python3-config --includes`
-LDFLAGS = -L../fluxions/build -lfluxions -lglut -lGLEW -lGL -lcurl -lczmq -lzmq -lSDL2_image -lSDL2 -lSDL2main -lpthread -lstdc++
+LDFLAGS = -L../fluxions/build -lfluxions -lglut -lGLEW -lGL -lcurl -lczmq -lzmq -lSDL2_image -lSDL2 -lIlmImf -lHalf -lImath -lpthread -lstdc++
 
 .PHONY: all clean precompiled
 
-all: GTAGS $(GCH) $(TARGET)
+all: GTAGS $(GCH) $(TARGET) $(FLUXIONS)
 
 precompiled: $(GCH)
 	echo $(SRCOBJECTS)
@@ -55,6 +59,9 @@ $(TARGET): $(OBJECTS) ../fluxions/build/libfluxions.a
 
 $(GCH): $(SRCDIR)/stdafx.h $(HEADERS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(FLUXIONS): $(FLUXIONS_HEADERS) $(FLUXIONS_SOURCES)
+	$(MAKE) -C ../fluxions/
 
 # $(OBJDIR)/%.o: $(CXXSOURCES)/%.cpp $(GCH)
 # 	$(CXX) $(CXXFLAGS) -c $< -o $@
