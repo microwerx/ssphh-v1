@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{0c104db6-85db-4737-a636-1a658ff6820f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ssphh.hpp">
@@ -76,7 +79,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\default_slow_es30.frag" />
-    <None Include="resources\shaders\default_slow_es30.vert" />
+    <None Include="resources\shaders\default_slow_es30.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="resources\shaders\default_slow_es30.vert">
+      <Filter>shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
