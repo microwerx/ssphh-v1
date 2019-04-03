@@ -625,27 +625,39 @@ namespace SSPHH
 			imguiWinX += imguiWinW;
 			ImGui::Begin("Scenegraph");
 			static int sceneNumber = 0;
+			static char scenenameBuffer[128];
+			int lastSceneNumber = sceneNumber;
 			ImGui::Combo("Scene", &sceneNumber, "test_indoor_scene\0test_outside_scene\0test_mitsuba_scene");
-			if (ImGui::Button("Reload Scene"))
-			{
-				sceneFilename = "resources/scenes/test_texture_scene/";
+			if (ImGui::Button("Reset")) { Interface.ssg.resetScene = true; }
+			ImGui::SameLine();
+			if (ImGui::Button("Save")) { Interface.ssg.saveScene = true; }
+			ImGui::SameLine();
+			if (ImGui::Button("Load")) { Interface.ssg.loadScene = true; }
+			if (lastSceneNumber != sceneNumber) {
 				switch (sceneNumber)
 				{
 				case 0:
-					sceneFilename += "test_indoor_scene.scn";
+					Interface.ssg.scenename = "test_indoor_scene.scn";
 					break;
 				case 1:
-					sceneFilename += "test_outdoor_scene.scn";
+					Interface.ssg.scenename += "test_outdoor_scene.scn";
 					break;
 				case 2:
-					sceneFilename += "test_mitsuba_scene.scn";
+					Interface.ssg.scenename += "test_mitsuba_scene.scn";
 					break;
 				default:
 					sceneFilename += "simple_inside_scene.scn";
 					break;
 				}
-				ReloadScenegraph();
 			}
+			auto safeCopy = [](char *dest, std::string &input, size_t maxChars) {
+				size_t size = min(input.size(), maxChars-1);
+				memcpy(dest, input.data(), size);
+			};
+			safeCopy(scenenameBuffer, Interface.ssg.scenename, sizeof(scenenameBuffer));
+			ImGui::InputText("Scene", scenenameBuffer, sizeof(scenenameBuffer));
+			Interface.ssg.scenename = scenenameBuffer;
+
 			ImGui::Text("Load time: %3.2f msec", Interface.lastScenegraphLoadTime);
 			if (ImGui::Button("Reload Render Config"))
 			{
@@ -1009,7 +1021,8 @@ namespace SSPHH
 					{1.0f, 0.0f, 0.0f, 1.0f},
 					{0.0f, 1.0f, 0.0f, 1.0f},
 					{0.0f, 0.0f, 1.0f, 1.0f},
-					{1.0f, 1.0f, 1.0f, 1.0f} };
+					{1.0f, 1.0f, 1.0f, 1.0f}
+				};
 				float minValue = -5.0f;
 				float maxValue = 5.0f;
 				ImGui::PushID(i);

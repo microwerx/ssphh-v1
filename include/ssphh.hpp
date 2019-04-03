@@ -208,6 +208,13 @@ namespace SSPHH
 				float cameraFOV = 45.0f;
 
 				vector<pair<int, bool>> geometryCollapsed;
+
+				std::string scenename;
+
+				bool resetScene = false;
+				bool saveScene = false;
+				bool loadScene = false;
+				bool createScene = false;
 			} ssg;
 
 			struct MATERIALSINFO
@@ -341,12 +348,15 @@ namespace SSPHH
 
 			struct TESTSWINDOW
 			{
-				bool bSaveSphlJSON = false;
-				bool bReadSphlJSON = false;
-				bool bSaveSphlEXR = false;
-				bool bReadSphlEXR = false;
-				bool bSaveSphlPPM = false;
-				bool bReadSphlPPM = false;
+				bool bTestSPHLs = false;
+				bool bShowSPHLResults = false;
+				int saveSphlJSON = 0;
+				int readSphlJSON = 0;
+				int saveSphlOBJ = 0;
+				int saveSphlEXR = 0;
+				int readSphlEXR = 0;
+				int saveSphlPPM = 0;
+				int readSphlPPM = 0;
 			} tests;
 
 			bool recomputeSky = true;
@@ -438,6 +448,7 @@ namespace SSPHH
 		void RenderDeferredHUD();
 
 		void SaveScreenshot();
+		void ProcessScenegraphTasks();
 
 		static string GetPathTracerName(const string &sceneName, bool ks, int mrd, int pl);
 		static string GetSphlRenderName(const string &sceneName, int md);

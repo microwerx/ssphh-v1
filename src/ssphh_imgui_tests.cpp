@@ -29,12 +29,27 @@ namespace SSPHH
 		}
 
 		ImGui::Separator();
-		ImGui::Text("Save SPHL JSON: %d", Interface.tests.bSaveSphlJSON);
-		ImGui::Text("Read SPHL JSON: %d", Interface.tests.bReadSphlJSON);
-		ImGui::Text("Save SPHL PPM:  %d", Interface.tests.bSaveSphlPPM);
-		ImGui::Text("Read SPHL PPM:  %d", Interface.tests.bReadSphlPPM);
-		ImGui::Text("Save SPHL EXR:  %d", Interface.tests.bSaveSphlEXR);
-		ImGui::Text("Read SPHL EXR:  %d", Interface.tests.bReadSphlEXR);
+		if (ImGui::Button("Test SPHLs")) {
+			Interface.tests.bTestSPHLs = true;
+			Interface.tests.bShowSPHLResults = true;
+		}
+		ImGui::SameLine();
+		ImGui::Checkbox("Show SPHL Results", &Interface.tests.bShowSPHLResults);
+		if (Interface.tests.bShowSPHLResults) {
+			ImGui::Text("Save SPHL JSON: %d", Interface.tests.saveSphlJSON);
+			ImGui::Text("Read SPHL JSON: %d", Interface.tests.readSphlJSON);
+			ImGui::Text("Save SPHL OBJ:  %d", Interface.tests.saveSphlOBJ);
+			ImGui::Text("Save SPHL PPM:  %d", Interface.tests.saveSphlPPM);
+			ImGui::Text("Read SPHL PPM:  %d", Interface.tests.readSphlPPM);
+			ImGui::Text("Save SPHL EXR:  %d", Interface.tests.saveSphlEXR);
+			ImGui::Text("Read SPHL EXR:  %d", Interface.tests.readSphlEXR);
+		}
+		ImGui::Separator();
+		ImGui::Text("0 = not done");
+		ImGui::Text("1 = requested");
+		ImGui::Text("2 = finished");
+		ImGui::Text("3 = warning");
+		ImGui::Text("4 = error");
 
 		ImGui::PopID();
 		ImGui::End();
