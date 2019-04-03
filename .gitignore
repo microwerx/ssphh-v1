@@ -311,3 +311,30 @@ __pycache__/
 *.exe
 *.out
 *.app
+
+
+# Scenes, Images, etc
+!*.mtl
+!*.obj
+!*.scn
+!*.ico
+!*.vert
+!*.frag
+!*.png
+!*.jpg
+!*.exr
+!*.renderconfig
+!*.json
+!*.conf
+!*.ppm
+
+# Ignore the corona_export folder and cache files
+corona_export/
+*.cache
+export*
+CoronaStandalone_log.txt
+
+# Ignore the resources folder
+resources/
+
+x64/
