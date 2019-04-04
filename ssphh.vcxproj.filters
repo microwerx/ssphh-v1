@@ -80,6 +80,9 @@
     <ClCompile Include="src\ssphh_imgui_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ssphh_tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\default_slow_es30.frag">

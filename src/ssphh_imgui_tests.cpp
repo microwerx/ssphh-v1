@@ -18,17 +18,6 @@ namespace SSPHH
 		ImGui::Checkbox("Tests Window", &Interface.tools.showTestsWindow);
 
 		ImGui::Separator();
-		if (ImGui::Button("Test SPHL JSON Read/Save")) {
-			// do tests
-		}
-		if (ImGui::Button("Test SPHL PPM Read/Save")) {
-			// do tests
-		}
-		if (ImGui::Button("Test SPHL EXR Read/Save")) {
-			// do tests
-		}
-
-		ImGui::Separator();
 		if (ImGui::Button("Test SPHLs")) {
 			Interface.tests.bTestSPHLs = true;
 			Interface.tests.bShowSPHLResults = true;

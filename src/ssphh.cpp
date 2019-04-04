@@ -605,7 +605,6 @@ namespace SSPHH
 			ImGuiIO &io = ImGui::GetIO();
 			if (isalnum(c) || c == ' ' || c == '-' || c == '_' || c == '.')
 			{
-				//io.KeyShift = keyboard.ShiftKeyBit ? true : false;
 				io.AddInputCharacter(c);
 				return;
 			}
@@ -916,7 +915,13 @@ namespace SSPHH
 			Interface.renderCoronaCubeMapSCN = false;
 		}
 
-		ProcessScenegraphTasks();
+		if (Interface.tools.showScenegraphEditor) {
+			ProcessScenegraphTasks();
+		}
+
+		if (Interface.tools.showTestsWindow) {
+			Test();
+		}
 
 		GI_ScatterJobs();
 		GI_GatherJobs();

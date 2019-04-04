@@ -441,11 +441,20 @@ namespace SSPHH
 
 		void imguiMatrix4fEditControl(int id, Matrix4f &m);
 
+		// TESTS
+
+		void Test();
+		void TestSPHLs();
+
+		// RENDERING
+
 		void RenderHUD();
 		void RenderMainHUD();
 		void RenderImGuiHUD();
 		void RenderHelp();
 		void RenderDeferredHUD();
+
+		// TASKS
 
 		void SaveScreenshot();
 		void ProcessScenegraphTasks();
