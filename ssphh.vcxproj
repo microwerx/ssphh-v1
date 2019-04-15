@@ -118,6 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

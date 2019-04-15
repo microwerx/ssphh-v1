@@ -64,12 +64,16 @@ struct SphlLight
 	int Enabled;
 	vec3 E0;		// also represents the first degree of SPH
 	vec3 Position;
-	samplerCube LightProbeCubeMap;
-	samplerCube EnvironmentCubeMap;
-	samplerCube DepthShadowCubeMap;
+	// samplerCube LightProbeCubeMap;
+	// samplerCube EnvironmentCubeMap;
+	// samplerCube DepthShadowCubeMap;
 	float DepthShadowZFar;
 	vec3 sph[9];
 };
+
+uniform samplerCube SphlLightProbeCubeMap[16];
+uniform samplerCube SphlEnvironmentCubeMap[16];
+uniform samplerCube SphlDepthShadowCubeMap[16];
 
 uniform SphlLight SphlLights[16];
 uniform int SphlLightCount;
@@ -80,6 +84,45 @@ uniform int ShaderDebugSphl;
 
 int SunIndex = 16;
 out vec3 VS_LightI[17];
+
+vec4 textureSphlLightProbeCubeMap(int id, vec3 uvw)
+{
+	if (id == 0) return texture(SphlLightProbeCubeMap[0], uvw).rgba;
+	if (id == 1) return texture(SphlLightProbeCubeMap[1], uvw).rgba;
+	if (id == 2) return texture(SphlLightProbeCubeMap[2], uvw).rgba;
+	if (id == 3) return texture(SphlLightProbeCubeMap[3], uvw).rgba;
+	if (id == 4) return texture(SphlLightProbeCubeMap[4], uvw).rgba;
+	if (id == 5) return texture(SphlLightProbeCubeMap[5], uvw).rgba;
+	if (id == 6) return texture(SphlLightProbeCubeMap[6], uvw).rgba;
+	if (id == 7) return texture(SphlLightProbeCubeMap[7], uvw).rgba;
+	return vec4(0.0);
+}
+
+vec4 textureSphlEnvironmentCubeMap(int id, vec3 uvw)
+{
+	if (id == 0) return texture(SphlEnvironmentCubeMap[0], uvw);
+	if (id == 1) return texture(SphlEnvironmentCubeMap[1], uvw);
+	if (id == 2) return texture(SphlEnvironmentCubeMap[2], uvw);
+	if (id == 3) return texture(SphlEnvironmentCubeMap[3], uvw);
+	if (id == 4) return texture(SphlEnvironmentCubeMap[4], uvw);
+	if (id == 5) return texture(SphlEnvironmentCubeMap[5], uvw);
+	if (id == 6) return texture(SphlEnvironmentCubeMap[6], uvw);
+	if (id == 7) return texture(SphlEnvironmentCubeMap[7], uvw);
+	return vec4(0.0);	
+}
+
+float textureSphlDepthShadowCubeMap(int id, vec3 uvw)
+{
+	if (id == 0) return texture(SphlDepthShadowCubeMap[0], uvw).r;
+	if (id == 1) return texture(SphlDepthShadowCubeMap[1], uvw).r;
+	if (id == 2) return texture(SphlDepthShadowCubeMap[2], uvw).r;
+	if (id == 3) return texture(SphlDepthShadowCubeMap[3], uvw).r;
+	if (id == 4) return texture(SphlDepthShadowCubeMap[4], uvw).r;
+	if (id == 5) return texture(SphlDepthShadowCubeMap[5], uvw).r;
+	if (id == 6) return texture(SphlDepthShadowCubeMap[6], uvw).r;
+	if (id == 7) return texture(SphlDepthShadowCubeMap[7], uvw).r;
+	return 1.0;
+}
 
 struct FragmentInfo
 {
@@ -111,9 +154,9 @@ bool PrepareLight(int i)
 		return false;
 	// spread
 	float spread = 1.0;
-	vec3 k_a = texture(SphlLights[i].LightProbeCubeMap, Fragment.N).rgb;
-	k_a += texture(SphlLights[i].LightProbeCubeMap, Fragment.V).rgb;
-	k_a += texture(SphlLights[i].LightProbeCubeMap, Fragment.R).rgb;
+	vec3 k_a = textureSphlLightProbeCubeMap(i, Fragment.N).rgb;
+	k_a += textureSphlLightProbeCubeMap(i, Fragment.V).rgb;
+	k_a += textureSphlLightProbeCubeMap(i, Fragment.R).rgb;
 	if (spread > 0.0)
 	{
 

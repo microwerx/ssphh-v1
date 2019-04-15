@@ -69,6 +69,9 @@ struct SphlLight
 	int Enabled;
 	vec3 E0;		// also represents the first degree of SPH
 	vec3 Position;
+	// samplerCube LightProbeCubeMap;
+	// samplerCube EnvironmentCubeMap;
+	// samplerCube DepthShadowCubeMap;
 	float DepthShadowZFar;
 	vec3 sph[9];
 };
@@ -142,6 +145,45 @@ uniform samplerCube SphlLightProbeCubeMap[16];
 uniform samplerCube SphlEnvironmentCubeMap[16];
 uniform samplerCube SphlDepthShadowCubeMap[16];
 uniform samplerCube PointLightDepthShadowCubeMap[16];
+
+vec4 textureSphlLightProbeCubeMap(int id, vec3 uvw)
+{
+	if (id == 0) return texture(SphlLightProbeCubeMap[0], uvw).rgba;
+	if (id == 1) return texture(SphlLightProbeCubeMap[1], uvw).rgba;
+	if (id == 2) return texture(SphlLightProbeCubeMap[2], uvw).rgba;
+	if (id == 3) return texture(SphlLightProbeCubeMap[3], uvw).rgba;
+	if (id == 4) return texture(SphlLightProbeCubeMap[4], uvw).rgba;
+	if (id == 5) return texture(SphlLightProbeCubeMap[5], uvw).rgba;
+	if (id == 6) return texture(SphlLightProbeCubeMap[6], uvw).rgba;
+	if (id == 7) return texture(SphlLightProbeCubeMap[7], uvw).rgba;
+	return vec4(0.0);
+}
+
+vec4 textureSphlEnvironmentCubeMap(int id, vec3 uvw)
+{
+	if (id == 0) return texture(SphlEnvironmentCubeMap[0], uvw);
+	if (id == 1) return texture(SphlEnvironmentCubeMap[1], uvw);
+	if (id == 2) return texture(SphlEnvironmentCubeMap[2], uvw);
+	if (id == 3) return texture(SphlEnvironmentCubeMap[3], uvw);
+	if (id == 4) return texture(SphlEnvironmentCubeMap[4], uvw);
+	if (id == 5) return texture(SphlEnvironmentCubeMap[5], uvw);
+	if (id == 6) return texture(SphlEnvironmentCubeMap[6], uvw);
+	if (id == 7) return texture(SphlEnvironmentCubeMap[7], uvw);
+	return vec4(0.0);	
+}
+
+float textureSphlDepthShadowCubeMap(int id, vec3 uvw)
+{
+	if (id == 0) return texture(SphlDepthShadowCubeMap[0], uvw).r;
+	if (id == 1) return texture(SphlDepthShadowCubeMap[1], uvw).r;
+	if (id == 2) return texture(SphlDepthShadowCubeMap[2], uvw).r;
+	if (id == 3) return texture(SphlDepthShadowCubeMap[3], uvw).r;
+	if (id == 4) return texture(SphlDepthShadowCubeMap[4], uvw).r;
+	if (id == 5) return texture(SphlDepthShadowCubeMap[5], uvw).r;
+	if (id == 6) return texture(SphlDepthShadowCubeMap[6], uvw).r;
+	if (id == 7) return texture(SphlDepthShadowCubeMap[7], uvw).r;
+	return 1.0;
+}
 
 uniform float map_Kd_mix;
 uniform float map_Ks_mix;
@@ -524,7 +566,8 @@ float GetLightShadow(int lightId)
 	}
 	else if (SphlLights[lightId].Enabled > 0)
 	{
-		float LightZ = SphlLights[lightId].DepthShadowZFar * texture(SphlDepthShadowCubeMap[lightId], Lights[lightId].L).r;
+		float LightZ = SphlLights[lightId].DepthShadowZFar * textureSphlDepthShadowCubeMap(lightId, Lights[lightId].L);
+		//*  texture(SphlDepthShadowCubeMap[lightId], Lights[lightId].L).r;
 		float Z = Lights[lightId].distance;
 		float bias = 1.0;
 		shadow = Z - bias > LightZ ? 0.0 : 1.0;
@@ -565,7 +608,8 @@ float GetLightShadowMS(int lightId, float samples)
 			{
 				for (float z = -offset; z < offset; z += doffset)
 				{
-					float LightZ = SphlLights[lightId].DepthShadowZFar * texture(SphlDepthShadowCubeMap[lightId], L + vec3(x,y,z)).r;
+					float LightZ = SphlLights[lightId].DepthShadowZFar * textureSphlDepthShadowCubeMap(lightId, L + vec3(x, y, z));
+					 // * texture(SphlDepthShadowCubeMap[lightId], L + vec3(x,y,z)).r;
 					shadow += Z - bias > LightZ ? 0.0 : 1.0;
 				}
 			}
@@ -610,9 +654,9 @@ float GetLightShadowDiskPCF(int lightId)
 		int samples = 21;
 		for (int i = 0; i < samples; i++)
 		{
-			float LightZ = SphlLights[lightId].DepthShadowZFar *
-						   texture(SphlDepthShadowCubeMap[lightId],
-						   	       L + sampleOffsetDirections[i] * diskRadius).r;
+			float LightZ = SphlLights[lightId].DepthShadowZFar * textureSphlDepthShadowCubeMap(lightId, L + sampleOffsetDirections[i] * diskRadius);
+						   // texture(SphlDepthShadowCubeMap[lightId],
+						   // 	       L + sampleOffsetDirections[i] * diskRadius).r;
 			shadow += Z - bias > LightZ ? 0.0 : 1.0;
 		}
 
@@ -728,7 +772,7 @@ bool PrepareLight(int i)
 		Lights[i].distance = length(L);
 		Lights[i].distance2 = dot(L, L);
 		vec3 texcoord = vec3(L.x, -L.y, L.z);
-		Lights[i].I = texture(SphlLightProbeCubeMap[i], texcoord).rgb;// * 6.0;
+		Lights[i].I = textureSphlLightProbeCubeMap(i, texcoord).rgb;// * 6.0;
 		Lights[i].E0 = 1.0;
 	}
 	Lights[i].H = normalize(Fragment.V + Lights[i].L);
@@ -812,7 +856,7 @@ vec3 GetEnviroColor(int lightId)
 	else if (lightId >= 0)
 	{
 		vec3 R = vec3(-Fragment.R.x, Fragment.R.y, Fragment.R.z);
-		return texture(SphlEnvironmentCubeMap[lightId], R).rgb;
+		return textureSphlEnvironmentCubeMap(lightId, R).rgb;
 		//return texture(SphlLights[lightId].LightProbeCubeMap, R).rgb;
 	}
 	return vec3(0.0);//vec3(Fragment.R * 0.5 + 0.5);
@@ -830,7 +874,7 @@ vec3 CalcBRDF(int lightId)
 		}
 		vec3 diffuseColor;
 		vec3 specularColor;
-		vec3 lightColor = texture(SphlLights[i].LightProbeCubeMap, Lights[i].L).rgb;
+		vec3 lightColor = textureSphlLightProbeCubeMap(i, Lights[i].L).rgb;
 
 		diffuseColor = Lights[i].NdotL * Material.Kd;
 		specularColor = pow(Lights[i].NdotH, Material.specularExponent) * Material.Ks;
@@ -965,7 +1009,7 @@ vec3 GetPbrEnviroBrdf(int i)
 vec3 GetPbrAmbient(int i)
 {
 	if (i < SunIndex)
-		return texture(SphlLightProbeCubeMap[i], Fragment.N).rgb;
+		return textureSphlLightProbeCubeMap(i, Fragment.N).rgb;
 	return vec3(0.0);
 }
 

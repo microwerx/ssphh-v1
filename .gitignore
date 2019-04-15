@@ -320,6 +320,7 @@ __pycache__/
 !*.ico
 !*.vert
 !*.frag
+!*.geom
 !*.png
 !*.jpg
 !*.exr
@@ -330,11 +331,16 @@ __pycache__/
 
 # Ignore the corona_export folder and cache files
 corona_export/
+corona_output/
 *.cache
 export*
 CoronaStandalone_log.txt
 
 # Ignore the resources folder
 resources/
+output/
+!resources/shaders/*
+!resources/renderconfigs/*
+!resources/models/*
 
 x64/

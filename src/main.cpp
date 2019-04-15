@@ -20,6 +20,12 @@
 
 #include "stdafx.h"
 
+// For Drag and Drop
+#include <Windows.h>
+#include <WinUser.h>
+#include <shellapi.h> // for DragAcceptFiles()
+#include <oleidl.h>		// for Drag and Drop
+
 #ifdef WIN32
 #define _STDCALL_SUPPORTED
 
@@ -93,6 +99,109 @@ namespace KASL
 extern int test_PythonInterpreter(int argc, char **argv);
 }
 
+class MyDropTarget : public IDropTarget
+{
+private:
+	ULONG referenceCount;
+	bool acceptFormat;
+	HWND window;
+
+public:
+	MyDropTarget()
+	{
+		window = GetActiveWindow();
+		acceptFormat = false;
+		referenceCount = 1;
+	}
+
+	virtual HRESULT STDMETHODCALLTYPE QueryInterface(
+		/* [in] */ REFIID riid,
+		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR *__RPC_FAR *ppvObject) override
+	{
+		// tell other objects about our capabilities 
+		if (riid == IID_IUnknown || riid == IID_IDropTarget)
+		{
+			*ppvObject = this;
+			AddRef();
+			return NOERROR;
+		}
+		*ppvObject = NULL;
+		return ResultFromScode(E_NOINTERFACE);
+	}
+
+	virtual ULONG STDMETHODCALLTYPE AddRef(void) override
+	{
+		return referenceCount++;
+	}
+
+	virtual ULONG STDMETHODCALLTYPE Release(void) override
+	{
+		if (--referenceCount == 0) {
+			delete this;
+			return 0;
+		}
+		return referenceCount;
+	}
+
+	virtual HRESULT STDMETHODCALLTYPE DragEnter(
+		/* [unique][in] */ __RPC__in_opt IDataObject *pDataObj,
+		/* [in] */ DWORD grfKeyState,
+		/* [in] */ POINTL pt,
+		/* [out][in] */ __RPC__inout DWORD *pdwEffect) override
+	{
+		hflog.infofn(__FUNCTION__, "DragEnter");
+		return NOERROR;
+	}
+
+	virtual HRESULT STDMETHODCALLTYPE DragOver(
+		/* [in] */ DWORD grfKeyState,
+		/* [in] */ POINTL pt,
+		/* [out][in] */ __RPC__inout DWORD *pdwEffect) override
+	{
+		hflog.infofn(__FUNCTION__, "DragOver");
+		return NOERROR;
+	}
+
+	virtual HRESULT STDMETHODCALLTYPE DragLeave(void) override
+	{
+		hflog.infofn(__FUNCTION__, "DragLeave");
+		return NOERROR;
+	}
+
+	virtual HRESULT STDMETHODCALLTYPE Drop(
+		/* [unique][in] */ __RPC__in_opt IDataObject *pDataObj,
+		/* [in] */ DWORD grfKeyState,
+		/* [in] */ POINTL pt,
+		/* [out][in] */ __RPC__inout DWORD *pdwEffect) override
+	{
+		hflog.infofn(__FUNCTION__, "Drop");
+		return NOERROR;
+	}
+};
+
+static MyDropTarget *pDropTarget = nullptr;
+
+void InitDragDrop()
+{
+	hflog.infofn(__FUNCTION__, "Starting Drag and Drop");
+	HRESULT oleInitialized = OleInitialize(nullptr);
+	HWND hwnd = GetActiveWindow();
+	if (!hwnd) return;
+	DragAcceptFiles(hwnd, TRUE);
+	pDropTarget = new MyDropTarget();
+	HRESULT result = RegisterDragDrop(hwnd, (IDropTarget *)pDropTarget);
+}
+
+void KillDragDrop()
+{
+	if (pDropTarget) {
+		if (pDropTarget->Release() == 0) {
+			pDropTarget = nullptr;
+		};
+	}
+	OleUninitialize();
+}
+
 int main(int argc, char **argv)
 {
 	do_tests();
@@ -119,6 +228,7 @@ int main(int argc, char **argv)
 	GlutTemplateInit(argc, argv);
 	InitApp();
 	GlutTemplateWidget(vfApp);
+	InitDragDrop();
 	GlutTemplateMainLoop();
 	KillApp();
 
