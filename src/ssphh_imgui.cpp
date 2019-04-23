@@ -88,11 +88,17 @@ static const string DebugShaderChoices[21] = {
 
 namespace SSPHH
 {
+	void SSPHH_Application::InitImGui()
+	{
+		//ImGuiIO& io = ImGui::GetIO();
+		//io.Fonts->AddFontDefault();
+		//io.Fonts->AddFontFromFileTTF("resources/fonts/dock-medium.otf", 16.0f);
+	}
 
 	void SSPHH_Application::RenderImGuiHUD()
 	{
 		imguiWinX = 64.0f;
-		imguiWinW = 256.0f;
+		imguiWinW = 384.0f;
 
 		imguiShowMenuBar();
 		imguiShowToolWindow();
@@ -626,8 +632,11 @@ namespace SSPHH
 			ImGui::Begin("Scenegraph");
 			static int sceneNumber = 0;
 			static char scenenameBuffer[128];
+			static const char *scenes = "test_indoor_scene\0test_outside_scene\0test_mitsuba_scene\0\0";
+			//static const char *scenes = "indoor\0outside\0mitsuba\0\0";
 			int lastSceneNumber = sceneNumber;
-			ImGui::Combo("Scene", &sceneNumber, "test_indoor_scene\0test_outside_scene\0test_mitsuba_scene");
+			ImGui::Combo("Scene", &sceneNumber, scenes);
+
 			if (ImGui::Button("Reset")) { Interface.ssg.resetScene = true; }
 			ImGui::SameLine();
 			if (ImGui::Button("Save")) { Interface.ssg.saveScene = true; }
@@ -651,7 +660,7 @@ namespace SSPHH
 				}
 			}
 			auto safeCopy = [](char *dest, std::string &input, size_t maxChars) {
-				size_t size = min(input.size(), maxChars-1);
+				size_t size = min(input.size(), maxChars - 1);
 				memcpy(dest, input.data(), size);
 			};
 			safeCopy(scenenameBuffer, Interface.ssg.scenename, sizeof(scenenameBuffer));
@@ -1570,14 +1579,25 @@ namespace SSPHH
 
 	void SSPHH_Application::imguiSphlSaveToOBJ()
 	{
-		int i = 0;
-		for (auto &it : sphls)
-		{
-			auto &sphl = it.second;
+		//int i = 0;
+		//for (auto &it : sphls)
+		//{
+		//	auto &sphl = it.second;
 
+		//	ostringstream ostr;
+		//	ostr << "sphl" << setw(2) << setfill('0') << i;
+		//	sphl.sph_model.SaveOBJ(ostr.str());
+		//	i++;
+		//}
+
+		size_t i = 0;
+		for (auto &sphl : ssg.ssphhLights) {
 			ostringstream ostr;
-			ostr << "sphl" << setw(2) << setfill('0') << i;
-			sphl.sph_model.SaveOBJ(ostr.str());
+			ostr << ssg.name << "_sphl_" << setw(2) << setfill('0') << i;
+			sphl.SaveOBJ("output", ostr.str());
+			std::string path = "output/" + ostr.str();
+			sphl.SaveCoronaLightProbe(path + ".ppm");
+			sphl.SaveCoronaLightProbe(path + ".exr");
 			i++;
 		}
 	}
@@ -1620,7 +1640,7 @@ namespace SSPHH
 	void SSPHH_Application::imguiCoronaGenerateSCN()
 	{
 		// Algorithm
-		// generate export_corona_cubemap_XX.scn      (64x64) where XX is the index of the SPHL
+		// generate export_corona_cubemap_sphl_XX.scn      (64x64) where XX is the index of the SPHL
 		// generate export_corona_ground_truth.png (1280x720)
 		// run corona to generate export_corona_cubemap.png      (64x64)
 		// run corona to generate export_corona_ground_truth.png (1280x720)
@@ -1631,11 +1651,12 @@ namespace SSPHH
 				break;
 
 			ostringstream ostr;
-			ostr << "export_corona_cubemap_" << setw(2) << setfill('0') << (int)i << ".scn";
+			ostr << CoronaJob::exportPathPrefix << "export_corona_cubemap_sphl_" << setw(2) << setfill('0') << (int)i << ".scn";
 			coronaScene.WriteCubeMapSCN(ostr.str(), ssg, sphls[i].position.xyz());
 		}
 
-		coronaScene.WriteSCN("export_corona_ground_truth.scn", ssg);
+		coronaScene.WriteSCN(CoronaJob::exportPathPrefix + "export_corona_ground_truth.scn", ssg);
+		coronaScene.WriteCubeMapSCN(CoronaJob::exportPathPrefix + "export_corona_ground_truth_cube.scn", ssg);
 	}
 
 	void SSPHH_Application::imguiCoronaGenerateSphlVIZ()
@@ -1798,13 +1819,19 @@ namespace SSPHH
 
 		job.Start(coronaScene, ssg);
 
-		FilePathInfo fpi(job.GetOutputPath());
+		bool loadEXR = true;
+		FilePathInfo fpi(job.GetOutputPath(loadEXR));
 		if (fpi.Exists())
 		{
 			Image4f lightProbe;
-			lightProbe.loadPPM(fpi.path);
-			//lightProbe.scaleColors(1.0f / (2.5f * powf(2.0f, ssg.environment.toneMapExposure)));
-			lightProbe.ReverseSRGB().ReverseToneMap(ssg.environment.toneMapExposure);
+			if (loadEXR) {
+				lightProbe.loadEXR(fpi.path);
+			}
+			else {
+				lightProbe.loadPPM(fpi.path);
+				//lightProbe.scaleColors(1.0f / (2.5f * powf(2.0f, ssg.environment.toneMapExposure)));
+				lightProbe.ReverseSRGB().ReverseToneMap(ssg.environment.toneMapExposure);
+			}
 			lightProbe.convertRectToCubeMap();
 			glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, ssg.environment.pbskyColorMapId);
 			for (int i = 0; i < 6; i++)
@@ -1813,6 +1840,9 @@ namespace SSPHH
 			}
 			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 			glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+		}
+		else {
+			hflog.errorfn(__FUNCTION__, "Could not generate %s", fpi.path.c_str());
 		}
 	}
 
@@ -2301,13 +2331,13 @@ namespace SSPHH
 		static bool init = false;
 		if (!init)
 		{
-			float w = 480.0f;
-			float h = 640.0f;
+			float w = 512.0f;
+			float h = 768.0f;
 			ImGui::SetNextWindowPos(ImVec2(screenWidth - w, screenHeight - h));
 			ImGui::SetNextWindowSize(ImVec2(w, h));
 			init = true;
 		}
-		ImGui::SetNextWindowContentWidth(480.0f);
+		ImGui::SetNextWindowContentWidth(512.0f);
 		ImGui::Begin("SSPHH");
 		if (ImGui::Button("MV"))
 		{

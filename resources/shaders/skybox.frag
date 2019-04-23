@@ -88,5 +88,9 @@ vec4 GetPBSky(vec3 L, float spread)
 
 void main()
 {	
-    gl_FragColor = ToneMapExposure * GetPBSky(fsTexCoord, 0.0);
+	// exposure and gamma
+	vec3 finalColor = GetPBSky(fsTexCoord, 0.0).rgb * ToneMapExposure;
+	finalColor = pow(finalColor, vec3(1.0 / ToneMapGamma));	
+
+    gl_FragColor = vec4(finalColor, 1.0);
 }

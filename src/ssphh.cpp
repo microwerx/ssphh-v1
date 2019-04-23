@@ -341,6 +341,8 @@ namespace SSPHH
 		InitRenderConfigs();
 		LoadRenderConfigs();
 
+		InitImGui();
+
 		glutSetErrorMessage(__FILE__, __LINE__, "inside OnInit()");
 
 		Interface.preCameraMatrix.LoadIdentity();
@@ -2801,10 +2803,11 @@ namespace SSPHH
 
 	bool SSPHH_Application::GI_ProcessJob(CoronaJob &job)
 	{
-		FilePathInfo fpi(job.GetOutputPath());
+		bool useEXR = true;
+		FilePathInfo fpi(job.GetOutputPath(useEXR));
 		if (fpi.DoesNotExist())
 		{
-			hflog.error("%s(): Could not find rendered light probe %s.ppm", __FUNCTION__, job.GetOutputPath().c_str());
+			hflog.errorfn(__FUNCTION__, "Could not find rendered light probe %s", job.GetOutputPath(useEXR).c_str());
 			return false;
 		}
 
@@ -2824,7 +2827,12 @@ namespace SSPHH
 		Sph4f sph;
 		if (job.IsVIZ())
 		{
-			sphl.vizgenLightProbes[recvLight].loadPPM(fpi.path);
+			if (useEXR) {
+				sphl.vizgenLightProbes[recvLight].loadEXR(fpi.path);
+			}
+			else {
+				sphl.vizgenLightProbes[recvLight].loadPPM(fpi.path);
+			}
 			sphl.vizgenLightProbes[recvLight].convertRectToCubeMap();
 			sphl.LightProbeToSph(sphl.vizgenLightProbes[recvLight], sph.msph);
 			job.CopySPH(sph);
@@ -2832,12 +2840,18 @@ namespace SSPHH
 		}
 		else if (job.IsGEN())
 		{
-			sphl.ReadCoronaLightProbe(job.GetOutputPath());
+			sphl.ReadCoronaLightProbe(job.GetOutputPath(useEXR));
 			sphl.SaveCoronaLightProbe(job.GetName() + "_sph.ppm");
 			if (ssg.ssphh.saveJSONs)
 				sphl.SaveJsonSph(job.GetName() + "_sph.json");
 
-			sphl.vizgenLightProbes[sendLight].loadPPM(fpi.path);
+			if (useEXR) {
+				sphl.vizgenLightProbes[sendLight].loadEXR(fpi.path);
+			}
+			else {
+				sphl.vizgenLightProbes[sendLight].loadPPM(fpi.path);
+
+			}
 			sphl.vizgenLightProbes[sendLight].convertRectToCubeMap();
 			sphl.LightProbeToSph(sphl.vizgenLightProbes[sendLight], sph.msph);
 			job.CopySPH(sph);

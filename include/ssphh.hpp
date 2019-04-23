@@ -394,6 +394,8 @@ namespace SSPHH
 
 		void AdvanceSunClock(double numSeconds, bool recomputeSky = false);
 
+		void InitImGui();
+
 		void imguiSphlAdd();
 		void imguiSphlDelete();
 		void imguiSphlRandomize();

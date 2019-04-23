@@ -224,7 +224,7 @@ int main(int argc, char **argv)
 		Fluxions::debugging = true;
 	}
 
-	GlutTemplateSetParameters("SSPHH", 1280, 720);
+	GlutTemplateSetParameters("SSPHH", 2048, 1024);
 	GlutTemplateInit(argc, argv);
 	InitApp();
 	GlutTemplateWidget(vfApp);

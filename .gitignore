@@ -344,3 +344,4 @@ output/
 !resources/models/*
 
 x64/
+sample_stratification.ppm
