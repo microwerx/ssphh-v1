@@ -69,9 +69,6 @@ struct SphlLight
 	int Enabled;
 	vec3 E0;		// also represents the first degree of SPH
 	vec3 Position;
-	// samplerCube LightProbeCubeMap;
-	// samplerCube EnvironmentCubeMap;
-	// samplerCube DepthShadowCubeMap;
 	float DepthShadowZFar;
 	vec3 sph[9];
 };
@@ -133,7 +130,7 @@ FragmentInfo Fragment;
 
 int firstLightIndex = 0;
 int lastLightIndex = SunIndex;
-int ShadowQuality = 0;
+const int ShadowQuality = 0;
 
 uniform SphlLight SphlLights[16];
 uniform int SphlLightCount;
@@ -428,8 +425,6 @@ vec3 DeferredLightBuffer;
 
 void DoDeferredMain();
 void DoDeferredLightAccum();
-
-
 
 
 vec4 tone_map(vec4 color, float exp)
@@ -776,7 +771,7 @@ bool PrepareLight(int i)
 		Lights[i].E0 = 1.0;
 	}
 	Lights[i].H = normalize(Fragment.V + Lights[i].L);
-	Lights[i].NdotL = max(0.001, dot(Fragment.N, Lights[i].L));
+	Lights[i].NdotL = max(0.0, dot(Fragment.N, Lights[i].L));
 	Lights[i].NdotV = max(0.001, dot(Fragment.N, Fragment.V));
 	//Lights[i].NdotL = dot(Fragment.N, Lights[i].L); if (Lights[i].NdotL <= 0.0) return false;
 	//Lights[i].NdotV = dot(Fragment.N, Fragment.V); if (Lights[i].NdotV <= 0.0) return false;
@@ -1743,6 +1738,8 @@ void main(void)
 		toneMapScale = ToneMapScale;
 	DoDeferredMain();
 	DoDeferredLightAccum();
+
+	DeferredLightBuffer = max(vec3(0.0), DeferredLightBuffer);
 
 	// exposure and gamma
 	vec3 finalColor = DeferredLightBuffer * ToneMapExposure;

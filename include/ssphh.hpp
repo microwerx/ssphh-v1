@@ -273,6 +273,7 @@ namespace SSPHH
 				vector<double> viz_times;
 				bool HierarchiesIncludeSelf = true;
 				bool HierarchiesIncludeNeighbors = true;
+				float HierarchiesMix;
 				int HierarchiesMaxSphls = MaxSphlLights;
 				bool HierarchiesGeneratePPMs = false;
 				int MaxDegrees = MaxSphlDegree;

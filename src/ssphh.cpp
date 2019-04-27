@@ -230,23 +230,23 @@ namespace SSPHH
 		Interface.lastScenegraphLoadTime = stopwatch.GetMillisecondsElapsed();
 	}
 
-	void SSPHH_Application::ParseCommandArguments(const vector<string> &args)
+	void SSPHH_Application::ParseCommandArguments(const vector<string> &cmdargs)
 	{
-		if (args.size() <= 1)
+		if (cmdargs.size() <= 1)
 			return;
 
-		size_t count = args.size();
+		size_t count = cmdargs.size();
 		int i = 1;
 		for (size_t j = 1; j < count; j++)
 		{
 			bool nextArgExists = j < count - 1;
-			if ((args[j] == "-scene") && nextArgExists)
+			if ((cmdargs[j] == "-scene") && nextArgExists)
 			{
 				// next argument is the path
-				FilePathInfo fpi(args[j + 1]);
+				FilePathInfo fpi(cmdargs[j + 1]);
 				if (fpi.Exists())
 				{
-					sceneFilename = args[j + 1];
+					sceneFilename = cmdargs[j + 1];
 					hflog.info("%s(): loading scene file %s", __FUNCTION__, sceneFilename.c_str());
 				}
 				else
@@ -256,30 +256,30 @@ namespace SSPHH
 				j++;
 			}
 
-			if (args[j] == "-broker")
+			if (cmdargs[j] == "-broker")
 			{
 				Interface.uf.uf_type = UfType::Broker;
 				hflog.info("Unicornfish: starting in broker mode");
 			}
-			if (args[j] == "-worker")
+			if (cmdargs[j] == "-worker")
 			{
 				Interface.uf.uf_type = UfType::Worker;
 				hflog.info("Unicornfish: starting in client mode");
 			}
-			if (args[j] == "-client")
+			if (cmdargs[j] == "-client")
 			{
 				Interface.uf.uf_type = UfType::Client;
 				hflog.info("Unicornfish: starting in worker mode");
 			}
-			if ((args[j] == "-endpoint") && nextArgExists)
+			if ((cmdargs[j] == "-endpoint") && nextArgExists)
 			{
-				Interface.uf.endpoint = args[j + 1];
+				Interface.uf.endpoint = cmdargs[j + 1];
 				j++;
 				hflog.info("Unicornfish: using endpoint %s", Interface.uf.endpoint.c_str());
 			}
-			if ((args[j] == "-service") && nextArgExists)
+			if ((cmdargs[j] == "-service") && nextArgExists)
 			{
-				Interface.uf.service = args[j + 1];
+				Interface.uf.service = cmdargs[j + 1];
 				hflog.info("Unicornfish: using service %s", Interface.uf.service.c_str());
 				j++;
 			}

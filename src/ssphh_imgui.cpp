@@ -999,13 +999,19 @@ namespace SSPHH
 		// S P H L   E D I T O R //////////////////////////////////
 		///////////////////////////////////////////////////////////
 
+		static bool init = false;
+		static int w = 512;
+		static int h = 256;
+
 		if (Interface.tools.showSphlEditor)
 		{
-			imguiWinX += imguiWinW + 64.0f;
-			ImGui::SetNextWindowContentWidth(512);
-			ImGui::SetNextWindowSize(ImVec2(512, 256));
-			ImGui::SetNextWindowPos(ImVec2(screenWidth - 600, screenHeight - 300));
-			imguiWinX += imguiWinW;
+			if (!init) {
+				init = true;
+
+				ImGui::SetNextWindowSize(ImVec2(w, h));
+				ImGui::SetNextWindowPos(ImVec2(screenWidth - w, screenHeight - h));
+			}
+			ImGui::SetNextWindowContentWidth(w);
 			ImGui::Begin("SSPL Editor");
 			ImGui::Text("%d SSPLs", (int)ssg.ssphhLights.size());
 			if (ImGui::Button("Add SSPL"))
@@ -1739,6 +1745,7 @@ namespace SSPHH
 	void SSPHH_Application::imguiCoronaGenerateSphlHIER()
 	{
 		double timeElapsed = hflog.getSecondsElapsed();
+		ssg.ssphh.VIZmix = Interface.ssphh.HierarchiesMix;
 		ssg.ssphh.HIER(Interface.ssphh.HierarchiesIncludeSelf, Interface.ssphh.HierarchiesIncludeNeighbors, Interface.ssphh.MaxDegrees);
 		Interface.ssphh.lastHIERTime = hflog.getSecondsElapsed() - timeElapsed;
 		DirtySPHLs();
@@ -2331,13 +2338,13 @@ namespace SSPHH
 		static bool init = false;
 		if (!init)
 		{
-			float w = 512.0f;
-			float h = 768.0f;
+			float w = 640.0f;
+			float h = 800.0f;
 			ImGui::SetNextWindowPos(ImVec2(screenWidth - w, screenHeight - h));
 			ImGui::SetNextWindowSize(ImVec2(w, h));
 			init = true;
 		}
-		ImGui::SetNextWindowContentWidth(512.0f);
+		ImGui::SetNextWindowContentWidth(640.0f);
 		ImGui::Begin("SSPHH");
 		if (ImGui::Button("MV"))
 		{
@@ -2529,6 +2536,8 @@ namespace SSPHH
 		ImGui::Checkbox("Self ", &Interface.ssphh.HierarchiesIncludeSelf);
 		ImGui::SameLine();
 		ImGui::Checkbox("Neighbors", &Interface.ssphh.HierarchiesIncludeNeighbors);
+		ImGui::SameLine();
+		ImGui::SliderFloat("Mix", &Interface.ssphh.HierarchiesMix, 0.0, 1.0);
 		ImGui::Text("Show ");
 		ImGui::SameLine();
 		ImGui::Checkbox("SPHLs", &Interface.ssphh.enableShowSPHLs);

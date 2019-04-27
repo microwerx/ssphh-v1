@@ -1,3 +1,5 @@
+#version 300 es
+
 // SSPHH/Fluxions/Unicornfish/Viperfish/Hatchetfish/Sunfish/KASL/GLUT Extensions
 // Copyright (C) 2017 Jonathan Metzgar
 // All rights reserved.
@@ -16,7 +18,6 @@
 // along with this program.If not, see <https://www.gnu.org/licenses/>.
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
-#version 300 es
 
 // Uniforms
 
@@ -64,9 +65,6 @@ struct SphlLight
 	int Enabled;
 	vec3 E0;		// also represents the first degree of SPH
 	vec3 Position;
-	// samplerCube LightProbeCubeMap;
-	// samplerCube EnvironmentCubeMap;
-	// samplerCube DepthShadowCubeMap;
 	float DepthShadowZFar;
 	vec3 sph[9];
 };
@@ -82,7 +80,7 @@ uniform int ShaderDebugChoice;
 uniform int ShaderDebugLight;
 uniform int ShaderDebugSphl;
 
-int SunIndex = 16;
+const int SunIndex = 16;
 out vec3 VS_LightI[17];
 
 vec4 textureSphlLightProbeCubeMap(int id, vec3 uvw)
