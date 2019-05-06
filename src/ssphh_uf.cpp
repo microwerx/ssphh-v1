@@ -259,8 +259,11 @@ void DoClient(const char * endpoint, SSPHHUnicornfish * context)
 		ostr << numGatheredJobs;
 		context->SetMessage(SUFType::Client, ostr.str());
 	}
-	if (!result) hflog.error("%s(): client: error!", __FUNCTION__);
-	hflog.info("%s(): client: okay, quitting", __FUNCTION__);
+	if (!result)
+	{
+		hflog.errorfn(__FUNCTION__, "client: error!");
+	}
+	hflog.infofn(__FUNCTION__, "client: okay, quitting");
 	client.Disconnect();
 	context->SetMessage(SUFType::Client, "stopped");
 }
@@ -274,7 +277,7 @@ void DoWorker(const char * endpoint, const char * service, SSPHHUnicornfish * co
 	Uf::Worker worker;
 	bool result = worker.ConnectToBroker(endpoint, service);
 	while (result && !context->IsStopped())
-	{		
+	{
 		Uf::Message reply;
 		if (worker.WaitRequest())
 		{
@@ -309,7 +312,7 @@ void DoWorker(const char * endpoint, const char * service, SSPHHUnicornfish * co
 		}
 	}
 	worker.Disconnect();
-	hflog.info("%s(): worker: okay, quitting -- was doing \"%s\"", __FUNCTION__, service);
+	hflog.infofn(__FUNCTION__, "worker: okay, quitting -- was doing \"%s\"", service);
 	context->SetMessage(SUFType::Worker, "stopped");
 }
 
@@ -330,8 +333,11 @@ void DoBroker(const char * endpoint, SSPHHUnicornfish * context)
 		ostr << broker.GetNumRequests();
 		context->SetMessage(SUFType::Broker, ostr.str());
 	}
-	if (!result) hflog.info("%s(): broker: error!", __FUNCTION__);
+	if (!result)
+	{
+		hflog.infofn(__FUNCTION__, "%s(): broker: error!");
+	}
 	broker.Delete();
-	hflog.info("%s(): broker: okay, quitting", __FUNCTION__);
+	hflog.infofn(__FUNCTION__, "broker: okay, quitting");
 	context->SetMessage(SUFType::Broker, "stopped");
 }

@@ -118,7 +118,7 @@ enum class SUFType
 
 class SSPHHUnicornfish
 {
-  public:
+public:
 	SSPHHUnicornfish() {}
 
 	const int port = 9081;
@@ -166,7 +166,7 @@ class SSPHHUnicornfish
 
 	void GetFinishedJobs(map<string, Fluxions::CoronaJob> &finished_jobs);
 
-  private:
+private:
 	mutex uf_mutex;
 	mutex uf_read_mutex;
 	mutex uf_write_mutex;

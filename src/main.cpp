@@ -91,12 +91,12 @@ void KillApp();
 
 namespace Fluxions
 {
-extern int test_fluxions_simple_property(int argc, char **argv);
+	extern int test_fluxions_simple_property(int argc, char **argv);
 }
 
 namespace KASL
 {
-extern int test_PythonInterpreter(int argc, char **argv);
+	extern int test_PythonInterpreter(int argc, char **argv);
 }
 
 class MyDropTarget : public IDropTarget
@@ -149,7 +149,8 @@ public:
 		/* [in] */ POINTL pt,
 		/* [out][in] */ __RPC__inout DWORD *pdwEffect) override
 	{
-		hflog.infofn(__FUNCTION__, "DragEnter");
+		//hflog.infofn(__FUNCTION__, "DragEnter");
+		HFLOGINFO("DragEnter");
 		return NOERROR;
 	}
 
@@ -158,13 +159,15 @@ public:
 		/* [in] */ POINTL pt,
 		/* [out][in] */ __RPC__inout DWORD *pdwEffect) override
 	{
-		hflog.infofn(__FUNCTION__, "DragOver");
+		//hflog.infofn(__FUNCTION__, "DragOver");
+		HFLOGINFO("DragOver");
 		return NOERROR;
 	}
 
 	virtual HRESULT STDMETHODCALLTYPE DragLeave(void) override
 	{
-		hflog.infofn(__FUNCTION__, "DragLeave");
+		//hflog.infofn(__FUNCTION__, "DragLeave");
+		HFLOGINFO("DragLeave");
 		return NOERROR;
 	}
 
