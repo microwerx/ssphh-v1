@@ -386,8 +386,6 @@ public:
 		/* [in] */ POINTL pt,
 		/* [out][in] */ __RPC__inout DWORD *pdwEffect) override
 	{
-		//hflog.infofn(__FUNCTION__, "DragOver");
-		HFLOGINFO("DragOver");
 		if (acceptFormat) {
 			DropEffect(grfKeyState, pt, *pdwEffect);
 			*pdwEffect = replaceIncoming ? DROPEFFECT_MOVE : DROPEFFECT_COPY;
