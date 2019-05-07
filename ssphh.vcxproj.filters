@@ -39,6 +39,9 @@
     <ClInclude Include="include\Damselfish.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\DragDrop.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -87,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Damselfish.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DragDrop.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

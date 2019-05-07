@@ -129,6 +129,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\Damselfish.hpp" />
+    <ClInclude Include="include\DragDrop.hpp" />
     <ClInclude Include="include\glut-template.hpp" />
     <ClInclude Include="include\jellyfish.hpp" />
     <ClInclude Include="include\ssphh.hpp" />
@@ -138,6 +139,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Damselfish.cpp" />
+    <ClCompile Include="src\DragDrop.cpp" />
     <ClCompile Include="src\glut-template.cpp" />
     <ClCompile Include="src\jellyfish.cpp" />
     <ClCompile Include="src\main.cpp">
