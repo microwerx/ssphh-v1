@@ -18,56 +18,95 @@
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 #include "stdafx.h"
 #include <ssphh.hpp>
-#include "ssphh_unicornfish.hpp"
+#include <ssphh_unicornfish.hpp>
 
 
-//SSPHHClient::SSPHHClient()
-//{
-//
-//}
-//
-//
-//SSPHHClient::~SSPHHClient()
-//{
-//
-//}
-//
-//
-//void SSPHHClient::Connect(UfStringQueue *readFromQueue, UfStringQueue *writeToQueue, const char *endpoint)
-//{
-//	if (readFromQueue == nullptr || writeToQueue == nullptr || endpoint == nullptr) return;
-//	this->readFromQueue = readFromQueue;
-//	this->writeToQueue = writeToQueue;
-//	this->client.ConnectToBroker(endpoint);
-//}
-//
-//
-//void SSPHHClient::Send(const string &msg)
-//{
-//	if (writeToQueue)
-//	{
-//		writeToQueue->Push(msg);
-//	}
-//}
-//
-//
-//const string &SSPHHClient::Recv()
-//{
-//	if (readFromQueue)
-//	{
-//		readFromQueue->Pop(recvString);
-//		return recvString;
-//	}
-//	recvString.clear();
-//	return recvString;
-//}
-//
-//
-//size_t SSPHHClient::MessagesAvailable() const
-//{
-//	if (readFromQueue)
-//	{
-//		return readFromQueue->Size();
-//	}
-//	return 0;
-//}
+void DoClient(const char * endpoint, Unicornfish * uf)
+{
+	if (!uf)
+		return;
+	if (!ssphhPtr)
+		return;
+	shared_ptr<SSPHH::SSPHH_Application> ssphh = ssphhPtr;
+
+	uf->SetMessage(Unicornfish::NodeType::Client, "started");
+	Uf::Client client;
+	bool result = client.ConnectToBroker(endpoint);
+	int numGatheredJobs = 0;
+	int numWorkingJobs = 0;
+	map<string, CoronaJob> scatteredJobs;
+	map<string, int64_t> sent_times;
+	while (result && !uf->IsStopped())
+	{
+		// Find out if we have scattered jobs to send out
+		int numScatteredJobs = uf->PushScatteredJobs(scatteredJobs);
+
+		auto cur_time = zclock_mono();
+
+		// Send out scattered jobs
+		if (numScatteredJobs > 0)
+		{
+			for (auto & job : scatteredJobs)
+			{
+				int64_t dt = cur_time - sent_times[job.first];
+				if (!job.second.IsJobWorking() && dt >= 25000)
+				{
+					Uf::Message request(&job.second, sizeof(CoronaJob));
+					request.Push(job.first);
+					sent_times[job.first] = cur_time;
+					client.SendRequest(ssphh->GetSceneName().c_str(), request);
+				}
+			}
+		}
+
+		// Check for replies
+		while (client.PollReply())
+		{
+			if (client.WaitReply())
+			{
+				Uf::Message reply = client.GetReply();
+				string jobName = reply.PopString();
+				string status = reply.PopString();
+				if (status == "finished")
+				{
+					// this is where we would "pop" the results
+					CoronaJob job;
+					reply.PopMem(&job, sizeof(CoronaJob));
+					scatteredJobs[jobName] = job;
+					memset(&job, 0, sizeof(CoronaJob));
+					//scatteredJobs[jobName].MarkJobFinished();
+				}
+				if (status == "working")
+				{
+					if (scatteredJobs.find(jobName) != scatteredJobs.end())
+						scatteredJobs[jobName].MarkJobWorking();
+				}
+			}
+		}
+
+		numWorkingJobs = 0;
+		for (auto & sj : scatteredJobs)
+		{
+			if (sj.second.IsJobFinished())
+				numGatheredJobs++;
+			if (sj.second.IsJobWorking())
+				numWorkingJobs++;
+		}
+
+		uf->PullFinishedJobs(scatteredJobs);
+
+		ostringstream ostr;
+		ostr << "client: scattered/working/finished: ";
+		ostr << numScatteredJobs << "/";
+		ostr << numWorkingJobs << "/";
+		ostr << numGatheredJobs;
+		uf->SetMessage(Unicornfish::NodeType::Client, ostr.str());
+	}
+	if (!result)
+	{
+		HFLOGERROR("client: error!");
+	}
+	HFLOGINFO("client: okay, quitting");
+	client.Disconnect();
+	uf->SetMessage(Unicornfish::NodeType::Client, "stopped");
+}

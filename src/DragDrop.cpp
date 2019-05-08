@@ -158,7 +158,7 @@ private:
 	bool replaceIncoming;
 	HWND window;
 	DWORD dropEffect;
-	DragDropImpl *dragDropImpl_ = nullptr;
+	DragDrop *dragDrop_ = nullptr;
 
 	bool QueryDataObject(IDataObject *pDataObject) {
 		acceptFormat = false;
@@ -217,59 +217,67 @@ private:
 		return dwAllowed & DROPEFFECT_COPY;
 	}
 
-	std::string text;
-	std::wstring unicodeText;
-	std::vector<std::string> paths;
-	bool gotText;
-	bool gotUnicodeText;
-	bool gotPath;
-
-	void Reset() {
-		gotText = false;
-		gotUnicodeText = false;
-		gotPath = false;
-		text.resize(0);
-		unicodeText.resize(0);
-		paths.resize(0);
-	}
-
 	void CopyPaths(FORMATETC *fmt, STGMEDIUM *medium) {
+		std::vector<std::string> &paths_ = dragDrop_->paths_;
 		if (!fmt || fmt->cfFormat != CF_HDROP) return;
 		SIZE_T bytes = GlobalSize(medium->hGlobal);
 		HDROP hDrop = (HDROP)GlobalLock(medium->hGlobal);
 		UINT count = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
 		if (count > 0) {
-			paths.resize(count);
+			paths_.resize(count);
 			for (UINT i = 0; i < count; i++) {
 				UINT bufferSize = DragQueryFile(hDrop, i, NULL, 0);
-				paths[i].resize(bufferSize + 1);
-				DragQueryFile(hDrop, i, (char *)paths[i].data(), bufferSize + 1);
+				paths_[i].resize(bufferSize + 1);
+				DragQueryFile(hDrop, i, (char *)paths_[i].data(), bufferSize + 1);
 			}
 		}
 		GlobalUnlock(medium->hGlobal);
-		for (auto & path : paths) {
-			HFLOGINFO("%s", path.c_str());
+		if (!paths_.empty()) {
+			for (auto & path : paths_) {
+				HFLOGINFO("%s", path.c_str());
+			}
+			dragDrop_->gotPaths_ = true;
+			HFLOGINFO("%S", unicodeText_.c_str());
+		}
+		else {
+			dragDrop_->gotPaths_ = false;
 		}
 	}
 
 	void CopyText(FORMATETC *fmt, STGMEDIUM *medium) {
+		std::string &text_ = dragDrop_->text_;
+
 		if (!fmt || fmt->cfFormat != CF_TEXT) return;
 		SIZE_T bytes = GlobalSize(medium->hGlobal);
 		char *buffer = (char *)GlobalLock(medium->hGlobal);
-		text.resize(bytes + 1);
-		memcpy((LPVOID)text.data(), buffer, bytes);
+		text_.resize(bytes + 1);
+		memcpy((LPVOID)text_.data(), buffer, bytes);
 		GlobalUnlock(medium->hGlobal);
-		HFLOGINFO("%s", text.c_str());
+		if (bytes > 1) {
+			dragDrop_->gotText_ = true;
+			HFLOGINFO("%s", text_.c_str());
+		}
+		else {
+			dragDrop_->gotText_ = false;
+		}
 	}
 
 	void CopyUnicode(FORMATETC *fmt, STGMEDIUM *medium) {
+		std::wstring &unicodeText_ = dragDrop_->unicodeText_;
+
 		if (!fmt || fmt->cfFormat != CF_UNICODETEXT) return;
 		SIZE_T bytes = GlobalSize(medium->hGlobal);
 		char *buffer = (char *)GlobalLock(medium->hGlobal);
-		unicodeText.resize(bytes + 1);
-		memcpy((LPVOID)unicodeText.data(), buffer, bytes);
+		unicodeText_.resize(bytes + 1);
+		memcpy((LPVOID)unicodeText_.data(), buffer, bytes);
 		GlobalUnlock(medium->hGlobal);
-		HFLOGINFO("%S", unicodeText.c_str());
+		if (bytes > 1) {
+			dragDrop_->gotUnicodeText_ = true;
+			HFLOGINFO("%S", unicodeText_.c_str());
+		}
+		else {
+			dragDrop_->gotUnicodeText_ = false;
+		}
 	}
 
 	HRESULT ProcessDropData(IDataObject *pDataObject)
@@ -300,13 +308,13 @@ private:
 		return S_OK;
 	}
 public:
-	MyDropTarget(DragDropImpl *pDragDropImpl)
+	MyDropTarget(DragDrop *pDragDrop)
 	{
 		window = GetActiveWindow();
 		acceptFormat = false;
 		referenceCount_ = 1;
 		dropEffect = 0;
-		dragDropImpl_ = pDragDropImpl;
+		dragDrop_ = pDragDrop;
 	}
 
 	virtual HRESULT STDMETHODCALLTYPE QueryInterface(
@@ -349,7 +357,7 @@ public:
 		*pdwEffect = DropEffect(grfKeyState, pt, DROPEFFECT_COPY);
 
 		if (QueryDataObject(pDataObj)) {
-			Reset();
+			dragDrop_->Reset();
 			SetFocus(window);
 		}
 		else {
@@ -503,35 +511,9 @@ public:
 };
 
 
-class DragDropImpl
-{
-public:
-	void Init() {
-		hflog.infofn(__FUNCTION__, "Starting Drag and Drop");
-		HRESULT oleInitialized = OleInitialize(nullptr);
-		HWND hwnd = GetActiveWindow();
-		if (!hwnd) return;
-		DragAcceptFiles(hwnd, TRUE);
-		pDropTarget = new MyDropTarget(this);
-		HRESULT result = RegisterDragDrop(hwnd, (IDropTarget *)pDropTarget);
-	}
-
-	void Kill() {
-		if (pDropTarget) {
-			if (pDropTarget->Release() == 0) {
-				pDropTarget = nullptr;
-			};
-		}
-		OleUninitialize();
-	}
-
-	MyDropTarget *pDropTarget = nullptr;
-};
-
 
 DragDrop::DragDrop()
 {
-	pImpl = new DragDropImpl();
 }
 
 
@@ -540,22 +522,42 @@ DragDrop::~DragDrop()
 	if (started) {
 		Kill();
 	}
-	delete pImpl;
 }
 
 
 void DragDrop::Init()
 {
 	started = true;
-	pImpl->Init();
+	hflog.infofn(__FUNCTION__, "Starting Drag and Drop");
+	HRESULT oleInitialized = OleInitialize(nullptr);
+	HWND hwnd = GetActiveWindow();
+	if (!hwnd) return;
+	DragAcceptFiles(hwnd, TRUE);
+	pDropTarget = new MyDropTarget(this);
+	HRESULT result = RegisterDragDrop(hwnd, (IDropTarget *)pDropTarget);
 }
+
 
 void DragDrop::Kill()
 {
 	started = false;
-	pImpl->Kill();
+	if (pDropTarget) {
+		if (pDropTarget->Release() == 0) {
+			pDropTarget = nullptr;
+		};
+	}
+	OleUninitialize();
 }
 
+
+void DragDrop::Reset() {
+	gotText_ = false;
+	gotUnicodeText_ = false;
+	gotPaths_ = false;
+	text_.resize(0);
+	unicodeText_.resize(0);
+	paths_.resize(0);
+}
 
 
 //////////////////////////////////////////////////////////////////////

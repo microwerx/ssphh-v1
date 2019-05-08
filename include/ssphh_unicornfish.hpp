@@ -109,17 +109,18 @@ enum class UfType
 //};
 
 // SUF = SSPHH Unicornfish
-enum class SUFType
-{
-	Client,
-	Worker,
-	Broker
-};
 
-class SSPHHUnicornfish
+class Unicornfish
 {
 public:
-	SSPHHUnicornfish() {}
+	enum class NodeType
+	{
+		Client,
+		Worker,
+		Broker
+	};
+
+	Unicornfish() {}
 
 	const int port = 9081;
 	string broker_endpoint = "tcp://*:9081";
@@ -153,8 +154,8 @@ public:
 	void Join();
 	void Stop() { stopped = true; }
 
-	void SetMessage(SUFType type, const string &message);
-	const string &GetMessage(SUFType type);
+	void SetMessage(Unicornfish::NodeType type, const string &message);
+	const string &GetMessage(Unicornfish::NodeType type);
 
 	void ScatterJob(Fluxions::CoronaJob &job);
 	// Move the queue of scattered jobs out. CoronaJob::IsFinished() returns false
@@ -186,6 +187,10 @@ private:
 	string client_message;
 };
 
-extern SSPHHUnicornfish ssphhUf;
+void DoClient(const char * endpoint, Unicornfish * context);
+void DoWorker(const char * endpoint, const char * service, Unicornfish * context);
+void DoBroker(const char * endpoint, Unicornfish * context);
+
+extern Unicornfish ssphhUf;
 
 #endif

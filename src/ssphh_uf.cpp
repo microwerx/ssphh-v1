@@ -18,40 +18,36 @@
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 #include "stdafx.h"
 #include <ssphh.hpp>
-#include <ssphh_unicornfish.hpp>
+#include <unicornfish.hpp>
 
 
 using namespace Fluxions;
 
 extern shared_ptr<SSPHH::SSPHH_Application> ssphhPtr;
-SSPHHUnicornfish ssphhUf;
+Unicornfish ssphhUf;
 
-void DoClient(const char * endpoint, SSPHHUnicornfish * context);
-void DoWorker(const char * endpoint, const char * service, SSPHHUnicornfish * context);
-void DoBroker(const char * endpoint, SSPHHUnicornfish * context);
-
-void SSPHHUnicornfish::StartClient(const string & endpoint)
+void Unicornfish::StartClient(const string & endpoint)
 {
 	client_thread = thread(DoClient, endpoint.c_str(), this);
 }
 
-void SSPHHUnicornfish::StartWorker(const string & endpoint, const string & service)
+void Unicornfish::StartWorker(const string & endpoint, const string & service)
 {
 	worker_thread = thread(DoWorker, endpoint.c_str(), service.c_str(), this);
 }
 
-void SSPHHUnicornfish::StartBroker()
+void Unicornfish::StartBroker()
 {
 	broker_thread = thread(DoBroker, broker_endpoint.c_str(), this);
 }
 
-void SSPHHUnicornfish::StartStandalone(bool client, bool broker, bool worker)
+void Unicornfish::StartStandalone(bool client, bool broker, bool worker)
 {
 	if (!ssphhPtr)
 		return;
 	if (!stopped) return;
 	stopped = false;
-	hflog.info("%s(): Starting standalone...", __FUNCTION__);
+	HFLOGINFO("Starting standalone...");
 	if (broker)
 		broker_thread = thread(DoBroker, "tcp://*:9081", this);
 	if (client)
@@ -60,29 +56,29 @@ void SSPHHUnicornfish::StartStandalone(bool client, bool broker, bool worker)
 		worker_thread = thread(DoWorker, "tcp://127.0.0.1:9081", ssphhPtr->GetSceneName().c_str(), this);
 }
 
-void SSPHHUnicornfish::Join()
+void Unicornfish::Join()
 {
 	Stop();
-	hflog.info("%s(): Stopping, waiting for threads to join...", __FUNCTION__);
+	HFLOGINFO("Stopping, waiting for threads to join...");
 	if (client_thread.joinable()) client_thread.join();
 	if (worker_thread.joinable()) worker_thread.join();
 	if (broker_thread.joinable()) broker_thread.join();
 }
 
 
-int SSPHHUnicornfish::GetNumScatteredJobs() const
+int Unicornfish::GetNumScatteredJobs() const
 {
 	return (int)incoming_jobs.size();
 }
 
 
-int SSPHHUnicornfish::GetNumFinishedJobs() const
+int Unicornfish::GetNumFinishedJobs() const
 {
 	return (int)finished_jobs.size();
 }
 
 
-void SSPHHUnicornfish::GetFinishedJobs(map<string, Fluxions::CoronaJob> & jobs)
+void Unicornfish::GetFinishedJobs(map<string, Fluxions::CoronaJob> & jobs)
 {
 	LockWrite();
 	jobs = finished_jobs;
@@ -92,7 +88,7 @@ void SSPHHUnicornfish::GetFinishedJobs(map<string, Fluxions::CoronaJob> & jobs)
 }
 
 
-void SSPHHUnicornfish::ScatterJob(CoronaJob & job)
+void Unicornfish::ScatterJob(CoronaJob & job)
 {
 	LockWrite();
 	incoming_jobs[job.GetName()] = job;
@@ -100,7 +96,7 @@ void SSPHHUnicornfish::ScatterJob(CoronaJob & job)
 }
 
 
-int SSPHHUnicornfish::PushScatteredJobs(map<string, Fluxions::CoronaJob> & jobs)
+int Unicornfish::PushScatteredJobs(map<string, Fluxions::CoronaJob> & jobs)
 {
 	LockWrite();
 	int count = (int)incoming_jobs.size();
@@ -116,7 +112,7 @@ int SSPHHUnicornfish::PushScatteredJobs(map<string, Fluxions::CoronaJob> & jobs)
 }
 
 
-void SSPHHUnicornfish::PullFinishedJobs(map<string, Fluxions::CoronaJob> & jobs)
+void Unicornfish::PullFinishedJobs(map<string, Fluxions::CoronaJob> & jobs)
 {
 	LockWrite();
 	bool finishedJobFound;
@@ -138,18 +134,18 @@ void SSPHHUnicornfish::PullFinishedJobs(map<string, Fluxions::CoronaJob> & jobs)
 }
 
 
-void SSPHHUnicornfish::SetMessage(SUFType type, const string & message)
+void Unicornfish::SetMessage(Unicornfish::NodeType type, const string & message)
 {
 	LockWrite();
 	switch (type)
 	{
-	case SUFType::Client:
+	case Unicornfish::NodeType::Client:
 		client_message = message;
 		break;
-	case SUFType::Broker:
+	case Unicornfish::NodeType::Broker:
 		broker_message = message;
 		break;
-	case SUFType::Worker:
+	case Unicornfish::NodeType::Worker:
 		worker_message = message;
 		break;
 	}
@@ -157,19 +153,19 @@ void SSPHHUnicornfish::SetMessage(SUFType type, const string & message)
 }
 
 
-const string & SSPHHUnicornfish::GetMessage(SUFType type)
+const string & Unicornfish::GetMessage(Unicornfish::NodeType type)
 {
 	string & s = client_message;
 	LockRead();
 	switch (type)
 	{
-	case SUFType::Client:
+	case Unicornfish::NodeType::Client:
 		s = client_message;
 		break;
-	case SUFType::Broker:
+	case Unicornfish::NodeType::Broker:
 		s = broker_message;
 		break;
-	case SUFType::Worker:
+	case Unicornfish::NodeType::Worker:
 		s = worker_message;
 		break;
 	}
@@ -178,166 +174,3 @@ const string & SSPHHUnicornfish::GetMessage(SUFType type)
 }
 
 
-void DoClient(const char * endpoint, SSPHHUnicornfish * context)
-{
-	if (!context)
-		return;
-	if (!ssphhPtr)
-		return;
-	shared_ptr<SSPHH::SSPHH_Application> ssphh = ssphhPtr;
-
-	context->SetMessage(SUFType::Client, "started");
-	Uf::Client client;
-	bool result = client.ConnectToBroker(endpoint);
-	int numGatheredJobs = 0;
-	int numWorkingJobs = 0;
-	map<string, CoronaJob> scatteredJobs;
-	map<string, int64_t> sent_times;
-	while (result && !context->IsStopped())
-	{
-		// Find out if we have scattered jobs to send out
-		int numScatteredJobs = context->PushScatteredJobs(scatteredJobs);
-
-		auto cur_time = zclock_mono();
-
-		// Send out scattered jobs
-		if (numScatteredJobs > 0)
-		{
-			for (auto & job : scatteredJobs)
-			{
-				int64_t dt = cur_time - sent_times[job.first];
-				if (!job.second.IsJobWorking() && dt >= 25000)
-				{
-					Uf::Message request(&job.second, sizeof(CoronaJob));
-					request.Push(job.first);
-					sent_times[job.first] = cur_time;
-					client.SendRequest(ssphh->GetSceneName().c_str(), request);
-				}
-			}
-		}
-
-		// Check for replies
-		while (client.PollReply())
-		{
-			if (client.WaitReply())
-			{
-				Uf::Message reply = client.GetReply();
-				string jobName = reply.PopString();
-				string status = reply.PopString();
-				if (status == "finished")
-				{
-					// this is where we would "pop" the results
-					CoronaJob job;
-					reply.PopMem(&job, sizeof(CoronaJob));
-					scatteredJobs[jobName] = job;
-					memset(&job, 0, sizeof(CoronaJob));
-					//scatteredJobs[jobName].MarkJobFinished();
-				}
-				if (status == "working")
-				{
-					if (scatteredJobs.find(jobName) != scatteredJobs.end())
-						scatteredJobs[jobName].MarkJobWorking();
-				}
-			}
-		}
-
-		numWorkingJobs = 0;
-		for (auto & sj : scatteredJobs)
-		{
-			if (sj.second.IsJobFinished())
-				numGatheredJobs++;
-			if (sj.second.IsJobWorking())
-				numWorkingJobs++;
-		}
-
-		context->PullFinishedJobs(scatteredJobs);
-
-		ostringstream ostr;
-		ostr << "client: scattered/working/finished: ";
-		ostr << numScatteredJobs << "/";
-		ostr << numWorkingJobs << "/";
-		ostr << numGatheredJobs;
-		context->SetMessage(SUFType::Client, ostr.str());
-	}
-	if (!result)
-	{
-		hflog.errorfn(__FUNCTION__, "client: error!");
-	}
-	hflog.infofn(__FUNCTION__, "client: okay, quitting");
-	client.Disconnect();
-	context->SetMessage(SUFType::Client, "stopped");
-}
-
-
-void DoWorker(const char * endpoint, const char * service, SSPHHUnicornfish * context)
-{
-	if (!context)
-		return;
-	context->SetMessage(SUFType::Worker, "started");
-	Uf::Worker worker;
-	bool result = worker.ConnectToBroker(endpoint, service);
-	while (result && !context->IsStopped())
-	{
-		Uf::Message reply;
-		if (worker.WaitRequest())
-		{
-			Uf::Message request = worker.GetRequest();
-			string jobName = request.PopString();
-			CoronaJob job;
-			request.PopMem(&job, sizeof(CoronaJob));
-			auto & frame = request.PopFrame();
-			memcpy(&job, frame.GetData(), frame.SizeInBytes());
-
-			reply = request;
-			reply.Push("working");
-			reply.Push(jobName);
-			worker.SendReply(reply);
-
-			string messageStr = "working ";
-			messageStr += jobName;
-			context->SetMessage(SUFType::Worker, messageStr);
-
-			// do the job!
-			ssphhPtr->RunJob(job);
-			job.MarkJobFinished();
-
-			reply = request;
-			reply.Push(&job, sizeof(CoronaJob));
-			reply.Push("finished");
-			reply.Push(jobName);
-			worker.SendReply(reply);
-			memset(&job, 0, sizeof(CoronaJob));
-
-			context->SetMessage(SUFType::Worker, "waiting");
-		}
-	}
-	worker.Disconnect();
-	hflog.infofn(__FUNCTION__, "worker: okay, quitting -- was doing \"%s\"", service);
-	context->SetMessage(SUFType::Worker, "stopped");
-}
-
-
-void DoBroker(const char * endpoint, SSPHHUnicornfish * context)
-{
-	if (!context) return;
-	Uf::Broker broker;
-	context->SetMessage(SUFType::Broker, "started");
-	bool result = broker.Create(endpoint);
-	while (result && !context->IsStopped())
-	{
-		result = broker.RunLoop();
-		ostringstream ostr;
-		ostr << "Workers Total/Waiting/Requests: ";
-		ostr << broker.GetNumWorkers() << "/";
-		ostr << broker.GetNumWaitingWorkers() << "/";
-		ostr << broker.GetNumRequests();
-		context->SetMessage(SUFType::Broker, ostr.str());
-	}
-	if (!result)
-	{
-		hflog.infofn(__FUNCTION__, "%s(): broker: error!");
-	}
-	broker.Delete();
-	hflog.infofn(__FUNCTION__, "broker: okay, quitting");
-	context->SetMessage(SUFType::Broker, "stopped");
-}
