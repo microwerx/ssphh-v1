@@ -23,22 +23,22 @@
 
 using namespace Fluxions;
 
-extern shared_ptr<SSPHH::SSPHH_Application> ssphhPtr;
+extern std::shared_ptr<SSPHH::SSPHH_Application> ssphhPtr;
 Unicornfish ssphhUf;
 
-void Unicornfish::StartClient(const string & endpoint)
+void Unicornfish::StartClient(const std::string & endpoint)
 {
-	client_thread = thread(DoClient, endpoint.c_str(), this);
+	client_thread = std::thread(Uf::DoClient, endpoint.c_str(), this);
 }
 
-void Unicornfish::StartWorker(const string & endpoint, const string & service)
+void Unicornfish::StartWorker(const std::string & endpoint, const std::string & service)
 {
-	worker_thread = thread(DoWorker, endpoint.c_str(), service.c_str(), this);
+	worker_thread = std::thread(Uf::DoWorker, endpoint.c_str(), service.c_str(), this);
 }
 
 void Unicornfish::StartBroker()
 {
-	broker_thread = thread(DoBroker, broker_endpoint.c_str(), this);
+	broker_thread = std::thread(Uf::DoBroker, broker_endpoint.c_str(), this);
 }
 
 void Unicornfish::StartStandalone(bool client, bool broker, bool worker)
@@ -49,11 +49,11 @@ void Unicornfish::StartStandalone(bool client, bool broker, bool worker)
 	stopped = false;
 	HFLOGINFO("Starting standalone...");
 	if (broker)
-		broker_thread = thread(DoBroker, "tcp://*:9081", this);
+		broker_thread = std::thread(Uf::DoBroker, "tcp://*:9081", this);
 	if (client)
-		client_thread = thread(DoClient, "tcp://127.0.0.1:9081", this);
+		client_thread = std::thread(Uf::DoClient, "tcp://127.0.0.1:9081", this);
 	if (worker)
-		worker_thread = thread(DoWorker, "tcp://127.0.0.1:9081", ssphhPtr->GetSceneName().c_str(), this);
+		worker_thread = std::thread(Uf::DoWorker, "tcp://127.0.0.1:9081", ssphhPtr->GetSceneName().c_str(), this);
 }
 
 void Unicornfish::Join()
@@ -78,7 +78,7 @@ int Unicornfish::GetNumFinishedJobs() const
 }
 
 
-void Unicornfish::GetFinishedJobs(map<string, Fluxions::CoronaJob> & jobs)
+void Unicornfish::GetFinishedJobs(std::map<std::string, Fluxions::CoronaJob> & jobs)
 {
 	LockWrite();
 	jobs = finished_jobs;
@@ -96,13 +96,12 @@ void Unicornfish::ScatterJob(CoronaJob & job)
 }
 
 
-int Unicornfish::PushScatteredJobs(map<string, Fluxions::CoronaJob> & jobs)
+int Unicornfish::PushScatteredJobs(std::map<std::string, Fluxions::CoronaJob> & jobs)
 {
 	LockWrite();
 	int count = (int)incoming_jobs.size();
 	numScattered += count;
-	for (auto & job : incoming_jobs)
-	{
+	for (auto & job : incoming_jobs) {
 		job.second.MarkJobUnfinished();
 		jobs[job.first] = job.second;
 	}
@@ -112,17 +111,14 @@ int Unicornfish::PushScatteredJobs(map<string, Fluxions::CoronaJob> & jobs)
 }
 
 
-void Unicornfish::PullFinishedJobs(map<string, Fluxions::CoronaJob> & jobs)
+void Unicornfish::PullFinishedJobs(std::map<std::string, Fluxions::CoronaJob> & jobs)
 {
 	LockWrite();
 	bool finishedJobFound;
-	do
-	{
+	do {
 		finishedJobFound = false;
-		for (auto & job : jobs)
-		{
-			if (job.second.IsFinished())
-			{
+		for (auto & job : jobs) {
+			if (job.second.IsFinished()) {
 				finished_jobs[job.first] = job.second;
 				finishedJobFound = true;
 				jobs.erase(job.first);
@@ -134,11 +130,10 @@ void Unicornfish::PullFinishedJobs(map<string, Fluxions::CoronaJob> & jobs)
 }
 
 
-void Unicornfish::SetMessage(Unicornfish::NodeType type, const string & message)
+void Unicornfish::SetUIMessage(Unicornfish::NodeType type, const std::string & message)
 {
 	LockWrite();
-	switch (type)
-	{
+	switch (type) {
 	case Unicornfish::NodeType::Client:
 		client_message = message;
 		break;
@@ -153,12 +148,11 @@ void Unicornfish::SetMessage(Unicornfish::NodeType type, const string & message)
 }
 
 
-const string & Unicornfish::GetMessage(Unicornfish::NodeType type)
+const std::string & Unicornfish::GetUIMessage(Unicornfish::NodeType type)
 {
-	string & s = client_message;
+	std::string & s = client_message;
 	LockRead();
-	switch (type)
-	{
+	switch (type) {
 	case Unicornfish::NodeType::Client:
 		s = client_message;
 		break;

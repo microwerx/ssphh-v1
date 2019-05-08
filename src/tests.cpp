@@ -24,21 +24,15 @@
 #include <fluxions_gte.hpp>
 
 
-using namespace std;
-
-
-
-
-
-
-
-template <typename T=int> class Outer {
+template <typename T = int> class Outer
+{
 public:
-	struct Inner {
+	struct Inner
+	{
 		float t = 0.0f;
 	};
 
-	Outer() { }
+	Outer() {}
 };
 
 
@@ -51,46 +45,43 @@ void test_nested_template_structs()
 }
 
 
-void test_json() {
-	string test_json = "{\"projects\":[{\"id\":\"1\", \"name\" : \"Outside scene\", \"description\" : \"A scene with a floor, teapot, bunny, and dragon.\"}, { \"id\":\"2\",\"name\" : \"test1\",\"description\" : \"this is a description for test1\" }, { \"id\":\"3\",\"name\" : \"test2\",\"description\" : \"this is a description for test2\" }, { \"id\":\"4\",\"name\" : \"a project\",\"description\" : \"a description about a project\" }, { \"id\":\"32\",\"name\" : \"test\",\"description\" : \"test description\" }, { \"id\":\"114\",\"name\" : \"test8141\",\"description\" : \"this is a description for test1\" }, { \"id\":\"119\",\"name\" : \"project 1\",\"description\" : \"project 1 description\" }, { \"id\":\"120\",\"name\" : \"project 2\",\"description\" : \"project 2 description\" }, { \"id\":\"121\",\"name\" : \"project 3\",\"description\" : \"project 3 description\" }, { \"id\":\"122\",\"name\" : \"project 4\",\"description\" : \"project 4 description\" }, { \"id\":\"123\",\"name\" : \"project 5\",\"description\" : \"project 5 description\" }]}";
+void test_json()
+{
+	std::string test_json = "{\"projects\":[{\"id\":\"1\", \"name\" : \"Outside scene\", \"description\" : \"A scene with a floor, teapot, bunny, and dragon.\"}, { \"id\":\"2\",\"name\" : \"test1\",\"description\" : \"this is a description for test1\" }, { \"id\":\"3\",\"name\" : \"test2\",\"description\" : \"this is a description for test2\" }, { \"id\":\"4\",\"name\" : \"a project\",\"description\" : \"a description about a project\" }, { \"id\":\"32\",\"name\" : \"test\",\"description\" : \"test description\" }, { \"id\":\"114\",\"name\" : \"test8141\",\"description\" : \"this is a description for test1\" }, { \"id\":\"119\",\"name\" : \"project 1\",\"description\" : \"project 1 description\" }, { \"id\":\"120\",\"name\" : \"project 2\",\"description\" : \"project 2 description\" }, { \"id\":\"121\",\"name\" : \"project 3\",\"description\" : \"project 3 description\" }, { \"id\":\"122\",\"name\" : \"project 4\",\"description\" : \"project 4 description\" }, { \"id\":\"123\",\"name\" : \"project 5\",\"description\" : \"project 5 description\" }]}";
 
 	KASL::JSONPtr json = KASL::JSON::New();
-	if (json)
-	{
+	if (json) {
 		bool result = json->Deserialize(test_json);
-		cout << __FUNCTION__ << " Deserialize() result was successful" << endl;
-		string str = json->Serialize();
-		cout << __FUNCTION__ << endl;
-		cout << str << endl;
+		std::cout << __FUNCTION__ << " Deserialize() result was successful\n";
+		std::string str = json->Serialize();
+		std::cout << __FUNCTION__ << "\n";
+		std::cout << str << "\n";
 		KASL::JSONPtr json2 = KASL::JSON::New();
 		json2->Deserialize(str);
 		result = false;
-		if (json == json2)
-		{
+		if (json == json2) {
 			json->Clear();
-			if (json != json2)
-			{
+			if (json != json2) {
 				result = true;
 			}
 		}
-		if (result)
-		{
-			cout << __FUNCTION__ << " == works!" << endl;
+		if (result) {
+			std::cout << __FUNCTION__ << " == works!\n";
 		}
-		else
-		{
-			cout << __FUNCTION__ << " == does not work!" << endl;
+		else {
+			std::cout << __FUNCTION__ << " == does not work!\n";
 		}
 	}
-	cout << __FUNCTION__ << " test is finished" << endl;
+	std::cout << __FUNCTION__ << " test is finished\n";
 }
 
 
-int test_curl() {
+int test_curl()
+{
 	using namespace Uf;
 	Curl curl;
 	double t0 = hflog.getSecondsElapsed();
-	string result = curl.Get("http://phd.metzgar-research.com/test_get_project.php");
+	std::string result = curl.Get("http://phd.metzgar-research.com/test_get_project.php");
 	double dt = hflog.getSecondsElapsed() - t0;
 	hflog.info("%s(): curl.GET worked! took %3.6f", __FUNCTION__, dt);
 
@@ -114,7 +105,7 @@ int test_curl() {
 	results = p.get();
 	hflog.info("%s(): curl.AsyncGET return result: %s", __FUNCTION__, results.first.c_str());
 	hflog.info("%s(): curl.AsyncGET worked! took %3.6f", __FUNCTION__, results.second);
-	return 0;	
+	return 0;
 }
 
 
@@ -153,32 +144,32 @@ void test_spherical_coordinate_conversions()
 	Vector3f v1;
 	Vector3f v2;
 
-	for (int i = 0; i < 100; i++)
-	{
+	for (int i = 0; i < 100; i++) {
 		v1.reset(randomSampler(-100.0f, 100.0f), randomSampler(-100.0f, 100.0f), randomSampler(-100.0f, 100.0f));
 		v1.normalize();
 		float theta = v1.theta();
 		float phi = v1.phi();
 		v2.from_theta_phi(theta, phi);
 		float epsilon = (v1 - v2).length();
-		cout << "normal epsilon: " << epsilon << endl;
+		std::cout << "normal epsilon: " << epsilon << std::endl;
 
 		theta = v1.to_math_theta();
 		phi = v1.to_math_phi();
 		v2.from_math_theta_phi(theta, phi);
 		epsilon = (v1 - v2).length();
-		cout << "math epsilon: " << epsilon << endl;
+		std::cout << "math epsilon: " << epsilon << std::endl;
 
 		theta = v1.to_physics_theta();
 		phi = v1.to_physics_phi();
 		v2.from_physics_theta_phi(theta, phi);
 		epsilon = (v1 - v2).length();
-		cout << "physics epsilon: " << epsilon << endl;
+		std::cout << "physics epsilon: " << epsilon << std::endl;
 	}
 }
 
 
-void do_tests() {
+void do_tests()
+{
 	//test_spherical_coordinate_conversions();
 	//exit(0);
 	//test_linear_algebra();

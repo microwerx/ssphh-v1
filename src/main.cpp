@@ -100,10 +100,9 @@ int main(int argc, char **argv)
 
 	curl_global_init(CURL_GLOBAL_ALL);
 
-	map<string, string> options = Fluxions::MakeOptionsFromArgs(argc, (const char **)argv);
+	std::map<std::string, std::string> options = Fluxions::MakeOptionsFromArgs(argc, (const char **)argv);
 
-	if (options.count("version"))
-	{
+	if (options.count("version")) {
 		printf("SSPHH by Jonathan Metzgar\nCopyright (C) 2017 Jonathan Metzgar\n\n");
 		printf("This program is free software: you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation, either version 3 of the License, or\n(at your option) any later version.\n\n");
 		printf("This program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\n\n");
@@ -111,8 +110,7 @@ int main(int argc, char **argv)
 	}
 
 	Fluxions::debugging = false;
-	if (options.count("debug"))
-	{
+	if (options.count("debug")) {
 		Fluxions::debugging = true;
 	}
 

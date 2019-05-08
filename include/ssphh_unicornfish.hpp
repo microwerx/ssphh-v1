@@ -27,8 +27,6 @@
 #include <fluxions_corona_job.hpp>
 #include <fluxions_corona_scene_file.hpp>
 
-using namespace std;
-
 enum class UfType
 {
 	None,
@@ -123,9 +121,9 @@ public:
 	Unicornfish() {}
 
 	const int port = 9081;
-	string broker_endpoint = "tcp://*:9081";
-	string worker_endpoint = "tcp://127.0.0.1:9081";
-	string client_endpoint = "tcp://127.0.0.1:9081";
+	std::string broker_endpoint = "tcp://*:9081";
+	std::string worker_endpoint = "tcp://127.0.0.1:9081";
+	std::string client_endpoint = "tcp://127.0.0.1:9081";
 
 	void Lock() { uf_mutex.lock(); }
 	bool TryLock() { return uf_mutex.try_lock(); }
@@ -147,49 +145,53 @@ public:
 
 	bool IsStopped() const { return stopped; }
 
-	void StartClient(const string &endpoint);
-	void StartWorker(const string &endpoint, const string &service);
+	void StartClient(const std::string &endpoint);
+	void StartWorker(const std::string &endpoint, const std::string &service);
 	void StartBroker();
 	void StartStandalone(bool client = true, bool broker = true, bool worker = true);
 	void Join();
 	void Stop() { stopped = true; }
 
-	void SetMessage(Unicornfish::NodeType type, const string &message);
-	const string &GetMessage(Unicornfish::NodeType type);
+	void SetUIMessage(Unicornfish::NodeType type, const std::string &message);
+	const std::string &GetUIMessage(Unicornfish::NodeType type);
 
 	void ScatterJob(Fluxions::CoronaJob &job);
 	// Move the queue of scattered jobs out. CoronaJob::IsFinished() returns false
-	int PushScatteredJobs(map<string, Fluxions::CoronaJob> &jobs);
+	int PushScatteredJobs(std::map<std::string, Fluxions::CoronaJob> &jobs);
 	// Move the queue of gathered jobs back. CoronaJob::IsFinished() returns true
-	void PullFinishedJobs(map<string, Fluxions::CoronaJob> &jobs);
+	void PullFinishedJobs(std::map<std::string, Fluxions::CoronaJob> &jobs);
 	int GetNumScatteredJobs() const;
 	int GetNumFinishedJobs() const;
 
-	void GetFinishedJobs(map<string, Fluxions::CoronaJob> &finished_jobs);
+	void GetFinishedJobs(std::map<std::string, Fluxions::CoronaJob> &finished_jobs);
 
 private:
-	mutex uf_mutex;
-	mutex uf_read_mutex;
-	mutex uf_write_mutex;
+	std::mutex uf_mutex;
+	std::mutex uf_read_mutex;
+	std::mutex uf_write_mutex;
 
 	bool stopped = true;
 
-	thread broker_thread;
-	thread worker_thread;
-	thread client_thread;
+	std::thread broker_thread;
+	std::thread worker_thread;
+	std::thread client_thread;
 
 	int numScattered = 0;
-	map<string, Fluxions::CoronaJob> incoming_jobs;
-	map<string, Fluxions::CoronaJob> finished_jobs;
+	std::map<std::string, Fluxions::CoronaJob> incoming_jobs;
+	std::map<std::string, Fluxions::CoronaJob> finished_jobs;
 
-	string broker_message;
-	string worker_message;
-	string client_message;
+	std::string broker_message;
+	std::string worker_message;
+	std::string client_message;
 };
 
-void DoClient(const char * endpoint, Unicornfish * context);
-void DoWorker(const char * endpoint, const char * service, Unicornfish * context);
-void DoBroker(const char * endpoint, Unicornfish * context);
+namespace Uf
+{
+	void DoClient(const char *endpoint, Unicornfish *context);
+	void DoBroker(const char *endpoint, Unicornfish *context);
+	void DoWorker(const char *endpoint, const char *service, Unicornfish *context);
+	void DoOldWorker(const char *endpoint, const char *service, Unicornfish * context);
+}
 
 extern Unicornfish ssphhUf;
 

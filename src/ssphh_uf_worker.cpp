@@ -17,52 +17,98 @@
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 #include "stdafx.h"
+#include <ssphh.hpp>
 #include <ssphh_unicornfish.hpp>
 
-
-void DoWorker(const char * endpoint, const char * service, Unicornfish * context)
+namespace Uf
 {
-	if (!context)
-		return;
-	context->SetMessage(Unicornfish::NodeType::Worker, "started");
-	Uf::Worker worker;
-	bool result = worker.ConnectToBroker(endpoint, service);
-	while (result && !context->IsStopped())
+	void DoOldWorker(const char * endpoint, const char * service, Unicornfish * context)
 	{
-		Uf::Message reply;
-		if (worker.WaitRequest())
-		{
-			Uf::Message request = worker.GetRequest();
-			string jobName = request.PopString();
-			CoronaJob job;
-			request.PopMem(&job, sizeof(CoronaJob));
-			auto & frame = request.PopFrame();
-			memcpy(&job, frame.GetData(), frame.SizeInBytes());
+		if (!context)
+			return;
+		context->SetUIMessage(Unicornfish::NodeType::Worker, "started");
+		Uf::Worker worker;
+		bool result = worker.ConnectToBroker(endpoint, service);
+		while (result && !context->IsStopped()) {
+			Uf::Message reply;
+			if (worker.WaitRequest()) {
+				Uf::Message request = worker.GetRequest();
+				std::string jobName = request.PopString();
+				Fluxions::CoronaJob job;
+				request.PopMem(&job, sizeof(Fluxions::CoronaJob));
+				auto & frame = request.PopFrame();
+				memcpy(&job, frame.GetData(), frame.SizeInBytes());
 
-			reply = request;
-			reply.Push("working");
-			reply.Push(jobName);
-			worker.SendReply(reply);
+				reply = request;
+				reply.Push("working");
+				reply.Push(jobName);
+				worker.SendReply(reply);
 
-			string messageStr = "working ";
-			messageStr += jobName;
-			context->SetMessage(Unicornfish::NodeType::Worker, messageStr);
+				std::string messageStr = "working ";
+				messageStr += jobName;
+				context->SetUIMessage(Unicornfish::NodeType::Worker, messageStr);
 
-			// do the job!
-			ssphhPtr->RunJob(job);
-			job.MarkJobFinished();
+				// do the job!
+				ssphhPtr->RunJob(job);
+				job.MarkJobFinished();
 
-			reply = request;
-			reply.Push(&job, sizeof(CoronaJob));
-			reply.Push("finished");
-			reply.Push(jobName);
-			worker.SendReply(reply);
-			memset(&job, 0, sizeof(CoronaJob));
+				reply = request;
+				reply.Push(&job, sizeof(Fluxions::CoronaJob));
+				reply.Push("finished");
+				reply.Push(jobName);
+				worker.SendReply(reply);
+				memset(&job, 0, sizeof(Fluxions::CoronaJob));
 
-			context->SetMessage(Unicornfish::NodeType::Worker, "waiting");
+				context->SetUIMessage(Unicornfish::NodeType::Worker, "waiting");
+			}
 		}
+		worker.Disconnect();
+		HFLOGINFO("worker: okay, quitting -- was doing \"%s\"", service);
+		context->SetUIMessage(Unicornfish::NodeType::Worker, "stopped");
 	}
-	worker.Disconnect();
-	HFLOGINFO("worker: okay, quitting -- was doing \"%s\"", service);
-	context->SetMessage(Unicornfish::NodeType::Worker, "stopped");
+
+	void DoWorker(const char * endpoint, const char *service, Unicornfish *context)
+	{
+		if (!context)
+			return;
+		context->SetUIMessage(Unicornfish::NodeType::Worker, "started");
+		Uf::Worker worker;
+		bool result = worker.ConnectToBroker(endpoint, service);
+		while (result && !context->IsStopped()) {
+			Uf::Message reply;
+			if (worker.WaitRequest()) {
+				Uf::Message request = worker.GetRequest();
+				std::string jobName = request.PopString();
+				Fluxions::CoronaJob job;
+				request.PopMem(&job, sizeof(Fluxions::CoronaJob));
+				auto & frame = request.PopFrame();
+				memcpy(&job, frame.GetData(), frame.SizeInBytes());
+
+				reply = request;
+				reply.Push("working");
+				reply.Push(jobName);
+				worker.SendReply(reply);
+
+				std::string messageStr = "working ";
+				messageStr += jobName;
+				context->SetUIMessage(Unicornfish::NodeType::Worker, messageStr);
+
+				// do the job!
+				ssphhPtr->RunJob(job);
+				job.MarkJobFinished();
+
+				reply = request;
+				reply.Push(&job, sizeof(Fluxions::CoronaJob));
+				reply.Push("finished");
+				reply.Push(jobName);
+				worker.SendReply(reply);
+				memset(&job, 0, sizeof(Fluxions::CoronaJob));
+
+				context->SetUIMessage(Unicornfish::NodeType::Worker, "waiting");
+			}
+		}
+		worker.Disconnect();
+		HFLOGINFO("worker: okay, quitting -- was doing \"%s\"", service);
+		context->SetUIMessage(Unicornfish::NodeType::Worker, "stopped");
+	}
 }

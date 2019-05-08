@@ -5,8 +5,7 @@ namespace SSPHH
 {
 	void SSPHH_Application::Test()
 	{
-		if (Interface.tests.bTestSPHLs)
-		{
+		if (Interface.tests.bTestSPHLs) {
 			TestSPHLs();
 			Interface.tests.bTestSPHLs = false;
 		}
@@ -27,7 +26,7 @@ namespace SSPHH
 		test = 0;
 		size_t count = 0;
 		for (auto &sphl : ssg.ssphhLights) {
-			ostringstream ostr;
+			std::ostringstream ostr;
 			ostr << ssg.name << "_sphl" << count;
 			if (!sphl.SaveOBJ("output", ostr.str())) {
 				hflog.warningfn(__FUNCTION__, "sphl.SaveOBJ() failed to save %s", ostr.str().c_str());

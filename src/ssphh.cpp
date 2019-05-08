@@ -28,7 +28,7 @@ namespace Fluxions
 } // namespace Fluxions
 
 std::shared_ptr<SSPHH::SSPHH_Application> ssphhPtr;
-extern vector<string> g_args;
+extern std::vector<std::string> g_args;
 
 extern void PrintBitmapStringJustified(float x, float y, int justification, void *font, const char *format, ...);
 extern void PrintString9x15(float x, float y, int justification, const char *format, ...);
@@ -113,8 +113,7 @@ namespace SSPHH
 		rectShadowRenderConfig.fbo.SetDimensions(rectShadowRenderConfig.viewportRect.w, rectShadowRenderConfig.viewportRect.h);
 		rectShadowRenderConfig.fbo.AddTexture2D(GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GL_RGBA8, true);
 		rectShadowRenderConfig.fbo.AddTexture2D(GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, GL_DEPTH_COMPONENT32F, false);
-		if (!rectShadowRenderConfig.fbo.Make())
-		{
+		if (!rectShadowRenderConfig.fbo.Make()) {
 			hflog.error("%s(): Could not make rect shadow map FBO.", __FUNCTION__);
 		}
 
@@ -151,8 +150,7 @@ namespace SSPHH
 		renderer2.Reset();
 
 		const char *renderconfig_filename = "resources/config/pb_monolithic_2017.renderconfig";
-		if (!renderer2.LoadConfig(renderconfig_filename))
-		{
+		if (!renderer2.LoadConfig(renderconfig_filename)) {
 			hflog.error("%s(): %s file not found.", __FUNCTION__, renderconfig_filename);
 		}
 
@@ -174,8 +172,7 @@ namespace SSPHH
 
 	void SSPHH_Application::LoadScene()
 	{
-		if (Interface.uf.uf_type == UfType::Broker)
-		{
+		if (Interface.uf.uf_type == UfType::Broker) {
 			hflog.info("configured to be a broker, so not loading scene");
 			return;
 		}
@@ -201,13 +198,13 @@ namespace SSPHH
 
 		float distanceToBoxCenter = (position - bbox.Center()).length() + 1.0f;
 		float boxRadius = bbox.RadiusRounded();
-		znear = max(0.1f, distanceToBoxCenter - boxRadius);
+		znear = std::max(0.1f, distanceToBoxCenter - boxRadius);
 		zfar = distanceToBoxCenter + 2 * boxRadius; // min(1000.0f, distanceToBoxCenter + boxRadius);
 
 		defaultRenderConfig.znear = znear;
 		defaultRenderConfig.zfar = zfar;
-		rectShadowRenderConfig.znear = max(0.1f, ssg.environment.sunShadowMapNearZ);
-		rectShadowRenderConfig.zfar = min(1000.0f, ssg.environment.sunShadowMapFarZ);
+		rectShadowRenderConfig.znear = std::max(0.1f, ssg.environment.sunShadowMapNearZ);
+		rectShadowRenderConfig.zfar = std::min(1000.0f, ssg.environment.sunShadowMapFarZ);
 	}
 
 	void SSPHH_Application::ReloadRenderConfigs()
@@ -230,55 +227,46 @@ namespace SSPHH
 		Interface.lastScenegraphLoadTime = stopwatch.GetMillisecondsElapsed();
 	}
 
-	void SSPHH_Application::ParseCommandArguments(const vector<string> &cmdargs)
+	void SSPHH_Application::ParseCommandArguments(const std::vector<std::string> &cmdargs)
 	{
 		if (cmdargs.size() <= 1)
 			return;
 
 		size_t count = cmdargs.size();
 		int i = 1;
-		for (size_t j = 1; j < count; j++)
-		{
+		for (size_t j = 1; j < count; j++) {
 			bool nextArgExists = j < count - 1;
-			if ((cmdargs[j] == "-scene") && nextArgExists)
-			{
+			if ((cmdargs[j] == "-scene") && nextArgExists) {
 				// next argument is the path
 				FilePathInfo fpi(cmdargs[j + 1]);
-				if (fpi.Exists())
-				{
+				if (fpi.Exists()) {
 					sceneFilename = cmdargs[j + 1];
 					hflog.info("%s(): loading scene file %s", __FUNCTION__, sceneFilename.c_str());
 				}
-				else
-				{
+				else {
 					hflog.error("%s(): scene file %s does not exist.", __FUNCTION__, sceneFilename.c_str());
 				}
 				j++;
 			}
 
-			if (cmdargs[j] == "-broker")
-			{
+			if (cmdargs[j] == "-broker") {
 				Interface.uf.uf_type = UfType::Broker;
 				hflog.info("Unicornfish: starting in broker mode");
 			}
-			if (cmdargs[j] == "-worker")
-			{
+			if (cmdargs[j] == "-worker") {
 				Interface.uf.uf_type = UfType::Worker;
 				hflog.info("Unicornfish: starting in client mode");
 			}
-			if (cmdargs[j] == "-client")
-			{
+			if (cmdargs[j] == "-client") {
 				Interface.uf.uf_type = UfType::Client;
 				hflog.info("Unicornfish: starting in worker mode");
 			}
-			if ((cmdargs[j] == "-endpoint") && nextArgExists)
-			{
+			if ((cmdargs[j] == "-endpoint") && nextArgExists) {
 				Interface.uf.endpoint = cmdargs[j + 1];
 				j++;
 				hflog.info("Unicornfish: using endpoint %s", Interface.uf.endpoint.c_str());
 			}
-			if ((cmdargs[j] == "-service") && nextArgExists)
-			{
+			if ((cmdargs[j] == "-service") && nextArgExists) {
 				Interface.uf.service = cmdargs[j + 1];
 				hflog.info("Unicornfish: using service %s", Interface.uf.service.c_str());
 				j++;
@@ -288,8 +276,7 @@ namespace SSPHH
 
 	void SSPHH_Application::InitUnicornfish()
 	{
-		if (Interface.uf.uf_type != UfType::None)
-		{
+		if (Interface.uf.uf_type != UfType::None) {
 			Interface.tools.showMaterialEditor = false;
 			Interface.tools.showSphlEditor = false;
 			Interface.tools.showScenegraphEditor = false;
@@ -314,7 +301,7 @@ namespace SSPHH
 	}
 
 	int init_count = 0;
-	void SSPHH_Application::OnInit(const vector<string> &args)
+	void SSPHH_Application::OnInit(const std::vector<std::string> &args)
 	{
 		init_count++;
 		// TODO: I would like to make the following code work:
@@ -355,12 +342,10 @@ namespace SSPHH
 		my_hud_info.glVendorString = glvendor ? glvendor : "Unknown Vendor";
 		my_hud_info.glVersionString = glversion ? glversion : "Unknown Version";
 
-		if (!enviroCubeTexture3.LoadTextureCoronaCubeMap("export_cubemap.png", true))
-		{
+		if (!enviroCubeTexture3.LoadTextureCoronaCubeMap("export_cubemap.png", true)) {
 			hflog.error("%s(): enviroCubeTexture3...Could not load export_cubemap.png", __FUNCTION__);
 		}
-		else
-		{
+		else {
 			hflog.info("Loaded enviroCubeTexture3...loaded export_cubemap.png");
 		}
 
@@ -586,130 +571,108 @@ namespace SSPHH
 	//	if (key == GLUT_KEY_DOWN) Interface.pitchDown = false;
 	//}
 
-	void SSPHH_Application::OnKeyDown(const string &key, int keymod)
+	void SSPHH_Application::OnKeyDown(const std::string &key, int keymod)
 	{
 		Widget::OnKeyDown(key, keymod);
 
-		if (keymod == keyboard.CtrlKeyBit)
-		{
+		if (keymod == keyboard.CtrlKeyBit) {
 			if (key == "F5")
 				Interface.renderCoronaSCN = true;
 			if (key == "F6")
 				Interface.renderCoronaCubeMapSCN = true;
 		}
 
-		if (keymod == keyboard.ShiftKeyBit)
-		{
+		if (keymod == keyboard.ShiftKeyBit) {
 		}
 
 		if (Interface.showImGui) {
 			short c = (key.size() == 1) ? key[0] : 0;
 			ImGuiIO &io = ImGui::GetIO();
-			if (isalnum(c) || c == ' ' || c == '-' || c == '_' || c == '.')
-			{
+			if (isalnum(c) || c == ' ' || c == '-' || c == '_' || c == '.') {
 				io.AddInputCharacter(c);
 				return;
 			}
 		}
 
-		if (keymod == 0)
-		{
-			if (Interface.showImGui == false && key == "Escape")
-			{
+		if (keymod == 0) {
+			if (Interface.showImGui == false && key == "Escape") {
 				glutLeaveMainLoop();
 			}
-			else if (Interface.showImGui == true && key == "Escape")
-			{
+			else if (Interface.showImGui == true && key == "Escape") {
 				return;
 			}
 
-			if (key == "1")
-			{
+			if (key == "1") {
 				ReloadRenderConfigs();
 			}
 
-			if (key == "2")
-			{
+			if (key == "2") {
 				ReloadScenegraph();
 			}
 
-			if (key == "3")
-			{
+			if (key == "3") {
 				counter++;
 				if (counter > 3)
 					counter = -1;
 			}
 
-			if (key == "4")
-			{
+			if (key == "4") {
 				Interface.tools.shaderDebugChoice = Fluxions::clamp(Interface.tools.shaderDebugChoice - 1, 0, 20);
 				// python.addCommand(KASL::PythonInterpreter::Command::PyRunFile, "resources/scripts/guitest.py");
 			}
 
-			if (key == "5")
-			{
+			if (key == "5") {
 				Interface.tools.shaderDebugChoice = Fluxions::clamp(Interface.tools.shaderDebugChoice + 1, 0, 20);
 				// python.addCommand(KASL::PythonInterpreter::Command::PyRunString, "print('hello')");
 			}
 
-			if (key == "6")
-			{
+			if (key == "6") {
 				if (Interface.tools.shaderDebugSphl != SphlSunIndex)
 					Interface.tools.shaderDebugSphl = SphlSunIndex;
 				else
 					Interface.tools.shaderDebugSphl = -1;
 			}
 
-			if (key == "7")
-			{
+			if (key == "7") {
 				Interface.tools.shaderDebugSphl = Fluxions::clamp(Interface.tools.shaderDebugSphl - 1, -1, SphlSunIndex);
 			}
 
-			if (key == "8")
-			{
+			if (key == "8") {
 				Interface.tools.shaderDebugSphl = Fluxions::clamp(Interface.tools.shaderDebugSphl + 1, -1, SphlSunIndex);
 			}
 
-			if (key == "9")
-			{
+			if (key == "9") {
 				Interface.drawSkyBox = !Interface.drawSkyBox;
 			}
 
-			if (key == "r" || key == "Tab")
-			{
+			if (key == "r" || key == "Tab") {
 				Interface.cameraOrbit.reset();
 				Interface.preCameraMatrix.LoadIdentity();
 				ResetScene();
 			}
 
-			if (key == "n" || key == "N")
-			{
+			if (key == "n" || key == "N") {
 				UseCurrentTime();
 			}
 
-			if (key == " " || key == "o" || key == "O")
-			{
+			if (key == " " || key == "o" || key == "O") {
 				Interface.enableOrbit = !Interface.enableOrbit;
 			}
 
-			if (key == "i" || key == "I")
-			{
+			if (key == "i" || key == "I") {
 				imguiCoronaGenerateSphlINIT();
 				imguiCoronaGenerateSky();
 			}
 
-			if (key == "v" || key == "V")
-			{
+			if (key == "v" || key == "V") {
 				imguiCoronaGenerateSphlVIZ();
 			}
 
-			if (key == "g" || key == "G")
-			{
+			if (key == "g" || key == "G") {
 				imguiCoronaGenerateSphlGEN();
 			}
 
-			if (key == "h" || key == "H")
-			{
+			if (key == "h" || key == "H") {
 				imguiCoronaGenerateSphlHIER();
 			}
 
@@ -734,14 +697,12 @@ namespace SSPHH
 			if (key == "," || key == ".")
 				imguiCoronaGenerateSphlHIER();
 
-			if (key == "-" || key == "_")
-			{
+			if (key == "-" || key == "_") {
 				// decrease 1 hour
 				AdvanceSunClock(-3600.0, true);
 			}
 
-			if (key == "=" || key == "+")
-			{
+			if (key == "=" || key == "+") {
 				// increase 1 hour
 				AdvanceSunClock(3600.0, true);
 			}
@@ -765,13 +726,11 @@ namespace SSPHH
 			if (key == "F10")
 				Interface.showImGui = !Interface.showImGui;
 
-			if (key == "F11")
-			{
+			if (key == "F11") {
 				SavePbskyTextures();
 			}
 
-			if (key == "F12")
-			{
+			if (key == "F12") {
 				renderMode++;
 				if (renderMode >= MAX_RENDER_MODES)
 					renderMode = 0;
@@ -779,7 +738,7 @@ namespace SSPHH
 		}
 	}
 
-	void SSPHH_Application::OnKeyUp(const string &key, int keymod)
+	void SSPHH_Application::OnKeyUp(const std::string &key, int keymod)
 	{
 		Widget::OnKeyUp(key, keymod);
 	}
@@ -815,8 +774,7 @@ namespace SSPHH
 	void SSPHH_Application::OnMouseDrag(int button, const MouseDragState &mds)
 	{
 		Widget::OnMouseDrag(button, mds);
-		if (button == 2)
-		{
+		if (button == 2) {
 			renderer2.SetDeferredSplit(mds.currentPosition);
 		}
 	}
@@ -835,8 +793,7 @@ namespace SSPHH
 		Viperfish::StopWatch stopwatch;
 		DoInterfaceUpdate(deltaTime);
 
-		if (Interface.enableSunCycle)
-		{
+		if (Interface.enableSunCycle) {
 			// one day in five minutes
 			AdvanceSunClock(deltaTime * 288.0);
 		}
@@ -847,15 +804,13 @@ namespace SSPHH
 		//	pbskyAge = 0.0;
 		//}
 
-		if (Interface.recomputeSky)
-		{
+		if (Interface.recomputeSky) {
 			ssg.environment.Update(ssg.GetBoundingBox());
 			ssg.environment.ComputePBSky();
 			Interface.recomputeSky = false;
 		}
 
-		if (Interface.enableOrbit)
-		{
+		if (Interface.enableOrbit) {
 			rotX += (float)deltaTime;
 			rotY += (float)deltaTime;
 			rotZ += (float)deltaTime;
@@ -899,21 +854,18 @@ namespace SSPHH
 		my_hud_info.onUpdateTime = stopwatch.GetMillisecondsElapsed();
 		my_hud_info.pbskyTime = ssg.environment.LastSkyGenTime();
 
-		if (Interface.saveCoronaSCN)
-		{
+		if (Interface.saveCoronaSCN) {
 			Interface.saveCoronaSCN = false;
 			coronaScene.WriteSCN("output.scn", ssg);
 		}
 
-		if (Interface.saveCoronaCubeMapSCN)
-		{
+		if (Interface.saveCoronaCubeMapSCN) {
 			Interface.saveCoronaCubeMapSCN = false;
 			Vector3f cameraPosition = ssg.camera.viewMatrix.col4().xyz();
 			coronaScene.WriteCubeMapSCN("output_cubemap.scn", ssg, cameraPosition);
 		}
 
-		if (Interface.renderCoronaCubeMapSCN)
-		{
+		if (Interface.renderCoronaCubeMapSCN) {
 			Interface.renderCoronaCubeMapSCN = false;
 		}
 
@@ -955,20 +907,16 @@ namespace SSPHH
 			Interface.rollLeft = gamepads[0].r2Pressed() || kbgamepad.r2Pressed();
 			Interface.rollRight = gamepads[0].l2Pressed() || kbgamepad.l2Pressed();
 
-			if (gamepads[0].lthumbAmount() > 0.0f)
-			{
+			if (gamepads[0].lthumbAmount() > 0.0f) {
 				gpMoveRate = gamepads[0].lthumbAmount();
 			}
-			else
-			{
+			else {
 				gpMoveRate = 1.0;
 			}
-			if (gamepads[0].rthumbAmount() > 0.0f)
-			{
+			if (gamepads[0].rthumbAmount() > 0.0f) {
 				gpTurnRate = gamepads[0].rthumbAmount();
 			}
-			else
-			{
+			else {
 				gpTurnRate = 1.0;
 			}
 		}
@@ -1057,25 +1005,20 @@ namespace SSPHH
 		float pbskyLatitude = ssg.environment.pbsky.GetLatitude();
 		float pbskyLongitude = ssg.environment.pbsky.GetLongitude();
 
-		if (Interface.increaseLatitude)
-		{
+		if (Interface.increaseLatitude) {
 			pbskyLatitude += 5.0f * (float)deltaTime;
 		}
-		if (Interface.increaseLongitude)
-		{
+		if (Interface.increaseLongitude) {
 			pbskyLongitude += 5.0f * (float)deltaTime;
 		}
-		if (Interface.decreaseLatitude)
-		{
+		if (Interface.decreaseLatitude) {
 			pbskyLatitude -= 5.0f * (float)deltaTime;
 		}
-		if (Interface.decreaseLongitude)
-		{
+		if (Interface.decreaseLongitude) {
 			pbskyLongitude -= 5.0f * (float)deltaTime;
 		}
 
-		if (Interface.increaseLatitude || Interface.decreaseLatitude || Interface.increaseLongitude || Interface.decreaseLongitude)
-		{
+		if (Interface.increaseLatitude || Interface.decreaseLatitude || Interface.increaseLongitude || Interface.decreaseLongitude) {
 			ssg.environment.pbsky.SetLocation(pbskyLatitude, pbskyLongitude);
 			AdvanceSunClock(0.0, true);
 		}
@@ -1097,8 +1040,7 @@ namespace SSPHH
 		if (Interface.uf.uf_type == UfType::Broker)
 			return;
 
-		if (rectShadowRenderConfig.viewportRect.w != Interface.renderconfig.sunShadowMapSize)
-		{
+		if (rectShadowRenderConfig.viewportRect.w != Interface.renderconfig.sunShadowMapSize) {
 			InitRenderConfigs();
 		}
 		//glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -1115,16 +1057,13 @@ namespace SSPHH
 		// r.Render();
 
 		double renderT0 = hflog.getSecondsElapsed();
-		if (renderMode == 0)
-		{
+		if (renderMode == 0) {
 			RenderFixedFunctionGL();
 		}
-		else if (renderMode == 1)
-		{
+		else if (renderMode == 1) {
 			RenderGLES20();
 		}
-		else if (renderMode == 2)
-		{
+		else if (renderMode == 2) {
 			RenderGLES30();
 		}
 		my_hud_info.totalRenderTime = hflog.getSecondsElapsed() - renderT0;
@@ -1147,23 +1086,19 @@ namespace SSPHH
 
 		RenderDeferredHUD();
 
-		if (Interface.showMainHUD)
-		{
+		if (Interface.showMainHUD) {
 			RenderMainHUD();
 		}
 
-		if (Interface.showHelp)
-		{
+		if (Interface.showHelp) {
 			RenderHelp();
 		}
 
-		if (Interface.showHUD)
-		{
+		if (Interface.showHUD) {
 			RenderHUD();
 		}
 
-		if (Interface.showDeferredHUD)
-		{
+		if (Interface.showDeferredHUD) {
 			// Vector2i split = renderer2.GetDeferredSplitPoint();
 			// Recti rect = renderer2.GetDeferredRect();
 
@@ -1185,8 +1120,7 @@ namespace SSPHH
 
 	void SSPHH_Application::OnRenderDearImGui()
 	{
-		if (Interface.showImGui)
-		{
+		if (Interface.showImGui) {
 			RenderImGuiHUD();
 		}
 	}
@@ -1339,22 +1273,18 @@ namespace SSPHH
 		y += 15.0f;
 		PrintString9x15(0, y, 0, "screen split position: %i, %i", renderer2.GetDeferredSplitPoint().x, renderer2.GetDeferredSplitPoint().y);
 
-		const vector<string> &history = hflog.getHistory();
-		for (int i = 0; i < history.size(); i++)
-		{
-			string m = history[i];
-			istringstream istr(m);
-			string line;
+		const std::vector<std::string> &history = hflog.getHistory();
+		for (int i = 0; i < history.size(); i++) {
+			std::string m = history[i];
+			std::istringstream istr(m);
+			std::string line;
 			int j = 0;
-			while (getline(istr, line))
-			{
-				if (j == 0)
-				{
+			while (getline(istr, line)) {
+				if (j == 0) {
 					y += 15.0f;
 					PrintString9x15(0, y, 0, "debug[%02i]: %s", i, line.c_str());
 				}
-				else
-				{
+				else {
 					y += 15.0f;
 					PrintString9x15(0, y, 0, "debug[%02i]: > %s", i, line.c_str());
 				}
@@ -1457,8 +1387,7 @@ namespace SSPHH
 			"Upper Right",
 			"Lower Left",
 			"Lower Right" };
-		for (int i = 0; i < 4; i++)
-		{
+		for (int i = 0; i < 4; i++) {
 			if (q[i].h < 15)
 				break;
 			float y = (float)q[i].y + 15.0f;
@@ -1548,8 +1477,7 @@ namespace SSPHH
 		glutSixAxis(2.0);
 
 		// Spheres
-		for (auto s = ssg.spheres.begin(); s != ssg.spheres.end(); s++)
-		{
+		for (auto s = ssg.spheres.begin(); s != ssg.spheres.end(); s++) {
 			glPushMatrix();
 			glMultMatrixf(s->second.transform.const_ptr());
 			glutSolidSphere(0.5, 16, 16);
@@ -1557,8 +1485,7 @@ namespace SSPHH
 		}
 
 		// Geometry
-		for (auto g = ssg.geometry.begin(); g != ssg.geometry.end(); g++)
-		{
+		for (auto g = ssg.geometry.begin(); g != ssg.geometry.end(); g++) {
 			glPushMatrix();
 			glMultMatrixf(g->second.transform.const_ptr());
 			glMultMatrixf(g->second.addlTransform.const_ptr());
@@ -1586,8 +1513,7 @@ namespace SSPHH
 
 		// Point Lights
 		glEnable(GL_BLEND);
-		for (auto pl = ssg.pointLights.begin(); pl != ssg.pointLights.end(); pl++)
-		{
+		for (auto pl = ssg.pointLights.begin(); pl != ssg.pointLights.end(); pl++) {
 			glPushMatrix();
 			glTranslatef(pl->position.x, pl->position.y, pl->position.z);
 			glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
@@ -1615,8 +1541,7 @@ namespace SSPHH
 	void SSPHH_Application::DirtySPHLs()
 	{
 		int i = 0;
-		for (auto &sphl : ssg.ssphhLights)
-		{
+		for (auto &sphl : ssg.ssphhLights) {
 			sphls[i++];
 			sphl.dirty = true;
 		}
@@ -1624,8 +1549,7 @@ namespace SSPHH
 
 	void SSPHH_Application::UpdateSPHLs()
 	{
-		if (!coefs_init)
-		{
+		if (!coefs_init) {
 			geosphere.load("resources/models/icos4.txt");
 			//sphl.randomize();
 			//sphl.createMesh(geosphere);
@@ -1634,23 +1558,19 @@ namespace SSPHH
 			coefs_init = true;
 		}
 
-		if (ssg.ssphhLights.size() != sphls.size())
-		{
+		if (ssg.ssphhLights.size() != sphls.size()) {
 			sphls.clear();
 			DirtySPHLs();
 		}
 
 		// Determine which sphls we need to recalculate and actually draw
-		for (auto &sphl : sphls)
-		{
+		for (auto &sphl : sphls) {
 			sphl.second.enabled = false;
 		}
 
 		int i = 0;
-		for (auto &sphl : ssg.ssphhLights)
-		{
-			if (sphl.randomize)
-			{
+		for (auto &sphl : ssg.ssphhLights) {
+			if (sphl.randomize) {
 				//sphls[i].randomize();
 				//for (int lm = 0; lm < sphl.GetMaxCoefficients(); lm++)
 				//{
@@ -1663,14 +1583,12 @@ namespace SSPHH
 				sphl.randomize = false;
 				sphl.dirty = true;
 			}
-			if (sphl.randomizePosition)
-			{
+			if (sphl.randomizePosition) {
 				sphl.position.reset(randomSampler(-5.0f, 5.0f), randomSampler(2.0f, 3.0f), randomSampler(-6.0f, 6.0f));
 				sphl.randomizePosition = false;
 				sphl.depthSphlMap.dirty = true;
 			}
-			if (sphl.dirty)
-			{
+			if (sphl.dirty) {
 				// Copy coefficients from the scene graph SPHL list
 				sphls[i].copyCoefficients(sphl, Interface.ssphh.MaxDegrees, Interface.ssphh.enableBasicShowSPHLs);
 				sphls[i].createMesh(geosphere);
@@ -1690,21 +1608,17 @@ namespace SSPHH
 		UpdateSPHLs();
 
 		int i = 0;
-		for (auto &sphl : ssg.ssphhLights)
-		{
-			if (sphl.lightProbe_corona.empty())
-			{
+		for (auto &sphl : ssg.ssphhLights) {
+			if (sphl.lightProbe_corona.empty()) {
 				sphl.UploadLightProbe(sphl.lightProbe_corona, sphl.coronaLightProbeTexture);
 				sphl.UploadLightProbe(sphl.lightProbe_sph, sphl.sphLightProbeTexture);
 				sphl.UploadLightProbe(sphl.lightProbe_hier, sphl.hierLightProbeTexture);
 			}
 
-			if (Interface.ssphh.enableShadowColorMap)
-			{
+			if (Interface.ssphh.enableShadowColorMap) {
 				sphls[i].lightProbeTexIds[0] = sphl.colorSphlMap.texture.GetTexture();
 			}
-			else
-			{
+			else {
 				sphls[i].lightProbeTexIds[0] = sphl.hierLightProbeTexture.GetTexture();
 			}
 			sphls[i].lightProbeTexIds[1] = sphl.coronaLightProbeTexture.GetTexture();
@@ -1758,8 +1672,7 @@ namespace SSPHH
 		ssg.AdvancedRender(defaultRenderConfig);
 		ssg.camera.actualViewMatrix = defaultRenderConfig.cameraMatrix;
 
-		if (Interface.drawSkyBox)
-		{
+		if (Interface.drawSkyBox) {
 			glutSetErrorMessage(__FILE__, __LINE__, "skybox");
 			glEnable(GL_DEPTH_TEST);
 			RenderSkyBox();
@@ -1771,7 +1684,7 @@ namespace SSPHH
 		glDisable(GL_DEPTH_TEST);
 	}
 
-	bool SaveTextureMap(GLenum target, GLuint id, const string &path);
+	bool SaveTextureMap(GLenum target, GLuint id, const std::string &path);
 	void ConvertBuffer(GLenum srccomponents, GLenum srctype, const void *srcdata, GLenum dstcomponents, GLenum dsttype, void *dstdata, GLsizei w, GLsizei h, GLsizei layers = 1);
 
 	void ConvertBuffer(GLenum srccomponents, GLenum srctype, const void *srcdata, GLenum dstcomponents, GLenum dsttype, void *dstdata, GLsizei w, GLsizei h, GLsizei layers)
@@ -1782,67 +1695,51 @@ namespace SSPHH
 		float *dstfpixels = nullptr;
 		unsigned char *dstubpixels = nullptr;
 
-		if (srctype == GL_UNSIGNED_BYTE)
-		{
+		if (srctype == GL_UNSIGNED_BYTE) {
 			srcubpixels = (unsigned char *)srcdata;
 		}
-		else if (srctype == GL_FLOAT)
-		{
+		else if (srctype == GL_FLOAT) {
 			srcfpixels = (float *)srcdata;
 		}
-		else
-		{
+		else {
 			hflog.warning("%s(): Unsupported source format", __FUNCTION__);
 		}
 
-		if (dsttype == GL_UNSIGNED_BYTE)
-		{
+		if (dsttype == GL_UNSIGNED_BYTE) {
 			dstubpixels = (unsigned char *)dstdata;
 		}
-		else if (dsttype == GL_FLOAT)
-		{
+		else if (dsttype == GL_FLOAT) {
 			dstfpixels = (float *)dstdata;
 		}
-		else
-		{
+		else {
 			hflog.warning("%s(): Unsupported destination format", __FUNCTION__);
 		}
 
 		size_t size = w * h * layers;
 		size_t addr = 0;
-		for (int addr = 0; addr < size; addr++)
-		{
-			for (int i = 0; i < (int)dstcomponents; i++)
-			{
-				if (i >= (int)srccomponents)
-				{
-					if (dstubpixels)
-					{
+		for (int addr = 0; addr < size; addr++) {
+			for (int i = 0; i < (int)dstcomponents; i++) {
+				if (i >= (int)srccomponents) {
+					if (dstubpixels) {
 						*dstubpixels++ = 0;
 					}
-					else if (dstfpixels)
-					{
+					else if (dstfpixels) {
 						*dstfpixels++ = 0.0f;
 					}
 				}
-				else
-				{
-					if (dstubpixels && srcubpixels)
-					{
+				else {
+					if (dstubpixels && srcubpixels) {
 						*dstubpixels++ = *srcubpixels++;
 					}
-					else if (dstubpixels && srcfpixels)
-					{
+					else if (dstubpixels && srcfpixels) {
 						float v = *srcfpixels++;
 						*dstubpixels++ = Fluxions::clamp((int)(v * 255.99f), 0, 255);
 					}
-					else if (dstfpixels && srcubpixels)
-					{
+					else if (dstfpixels && srcubpixels) {
 						float v = *srcubpixels++;
 						*dstfpixels++ = Fluxions::clamp(v / 255.0f, 0.0f, 1.0f);
 					}
-					else if (dstfpixels && srcfpixels)
-					{
+					else if (dstfpixels && srcfpixels) {
 						*dstfpixels++ = *srcfpixels++;
 					}
 				}
@@ -1850,7 +1747,7 @@ namespace SSPHH
 		}
 	}
 
-	bool SaveTextureMap(GLenum target, GLuint id, const string &path)
+	bool SaveTextureMap(GLenum target, GLuint id, const std::string &path)
 	{
 		glActiveTexture(GL_TEXTURE0);
 		glutDebugBindTexture(target, id);
@@ -1871,8 +1768,7 @@ namespace SSPHH
 		int depthType = 0;
 		int components = 0;
 
-		if (target == GL_TEXTURE_CUBE_MAP)
-		{
+		if (target == GL_TEXTURE_CUBE_MAP) {
 			glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_TEXTURE_WIDTH, &w);
 			glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_TEXTURE_HEIGHT, &h);
 			glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_TEXTURE_INTERNAL_FORMAT, &internalformat);
@@ -1889,8 +1785,7 @@ namespace SSPHH
 			glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_TEXTURE_COMPONENTS, &components);
 			layers = 6;
 		}
-		else if (target == GL_TEXTURE_2D)
-		{
+		else if (target == GL_TEXTURE_2D) {
 			glGetTexLevelParameteriv(target, 0, GL_TEXTURE_WIDTH, &w);
 			glGetTexLevelParameteriv(target, 0, GL_TEXTURE_HEIGHT, &h);
 			glGetTexLevelParameteriv(target, 0, GL_TEXTURE_INTERNAL_FORMAT, &internalformat);
@@ -1906,42 +1801,35 @@ namespace SSPHH
 			glGetTexLevelParameteriv(target, 0, GL_TEXTURE_DEPTH_TYPE, &depthType);
 			glGetTexLevelParameteriv(target, 0, GL_TEXTURE_COMPONENTS, &components);
 		}
-		else
-		{
+		else {
 			return false;
 		}
 
 		int stride = w * h;
 		int bytesPerPixel = 1;
-		if (internalformat == GL_RGB)
-		{
+		if (internalformat == GL_RGB) {
 			bytesPerPixel = 3;
 			type = GL_UNSIGNED_BYTE;
 		}
-		else if (internalformat == GL_RGBA)
-		{
+		else if (internalformat == GL_RGBA) {
 			bytesPerPixel = 4;
 			type = GL_UNSIGNED_BYTE;
 		}
-		else if (internalformat == GL_RGBA8)
-		{
+		else if (internalformat == GL_RGBA8) {
 			bytesPerPixel = 4;
 			internalformat = GL_RGBA;
 			type = GL_UNSIGNED_BYTE;
 		}
-		else if (internalformat == GL_DEPTH_COMPONENT32F)
-		{
+		else if (internalformat == GL_DEPTH_COMPONENT32F) {
 			bytesPerPixel = 4;
 			internalformat = GL_DEPTH_COMPONENT;
 			type = GL_FLOAT;
 		}
-		else if (internalformat == GL_DEPTH_COMPONENT)
-		{
+		else if (internalformat == GL_DEPTH_COMPONENT) {
 			bytesPerPixel = 3;
 			type = GL_UNSIGNED_BYTE;
 		}
-		else
-		{
+		else {
 			hflog.warning("%s(): unknown internal format %04x / %d / %s", __FUNCTION__, internalformat, internalformat, glNameTranslator.GetString(internalformat));
 			hflog.warning("%s(): unknown type %d/%s/%s/%s", __FUNCTION__, depthSize, glNameTranslator.GetString(depthType), glNameTranslator.GetString(type), glNameTranslator.GetString(components));
 			return false;
@@ -1949,24 +1837,21 @@ namespace SSPHH
 
 		stride *= bytesPerPixel;
 
-		vector<unsigned char> pixels;
+		std::vector<unsigned char> pixels;
 		pixels.resize(layers * stride);
 		GLenum error = glGetError();
 		Image4f i4f;
 		Image4ub i4ub;
 
-		if (target == GL_TEXTURE_CUBE_MAP)
-		{
+		if (target == GL_TEXTURE_CUBE_MAP) {
 			i4f.resize(w, h, 6);
-			for (int face = 0; face < 6; face++)
-			{
+			for (int face = 0; face < 6; face++) {
 				glGetTexImage(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, internalformat, type, &pixels[face * stride]);
 				error = glGetError();
 				if (error != 0)
 					break;
 			}
-			if (!error)
-			{
+			if (!error) {
 				int srccomponents = 0;
 				if (internalformat == GL_DEPTH_COMPONENT)
 					srccomponents = 1;
@@ -1981,12 +1866,10 @@ namespace SSPHH
 				i4f.savePPMi(path, 255.99f, 0, 255);
 			}
 		}
-		else if (target == GL_TEXTURE_2D)
-		{
+		else if (target == GL_TEXTURE_2D) {
 			glGetTexImage(GL_TEXTURE_2D, 0, internalformat, type, &pixels[0]);
 			error = glGetError();
-			if (!error)
-			{
+			if (!error) {
 				int srccomponents = 0;
 				if (internalformat == GL_DEPTH_COMPONENT)
 					srccomponents = 1;
@@ -2001,8 +1884,7 @@ namespace SSPHH
 			}
 		}
 
-		if (error != 0)
-		{
+		if (error != 0) {
 			hflog.warning("%s(): glError() -> %s [%s/%s/%s] (R: %d/%s, G: %d/%s, B: %d/%s, A: %d/%s, Z: %d/%s)", __FUNCTION__,
 				glNameTranslator.GetString(error),
 				glNameTranslator.GetString(internalformat), glNameTranslator.GetString(type), glNameTranslator.GetString(components),
@@ -2014,10 +1896,8 @@ namespace SSPHH
 		}
 
 		bool iszero = true;
-		for (auto i = 0; i < pixels.size(); i++)
-		{
-			if (pixels[i] != '\0')
-			{
+		for (auto i = 0; i < pixels.size(); i++) {
+			if (pixels[i] != '\0') {
 				iszero = false;
 				break;
 			}
@@ -2031,7 +1911,7 @@ namespace SSPHH
 	{
 		glutSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
 
-		map<GLenum, RenderTarget *> rts;
+		std::map<GLenum, RenderTarget *> rts;
 
 		double t0 = hflog.getSecondsElapsed();
 		rectShadowRenderConfig.renderSkyBox = false;
@@ -2052,8 +1932,7 @@ namespace SSPHH
 
 		// Sun Shadow Map is rendered, now let's bind it to a texture_ map...
 
-		for (auto &rt : rectShadowRenderConfig.fbo.renderTargets)
-		{
+		for (auto &rt : rectShadowRenderConfig.fbo.renderTargets) {
 			if (rt.second.attachment == GL_COLOR_ATTACHMENT0)
 				ssg.environment.sunColorMapId = rt.second.object;
 			if (rt.second.attachment == GL_DEPTH_ATTACHMENT)
@@ -2099,15 +1978,13 @@ namespace SSPHH
 		//}
 		ssg.environment.sunShadowMapTime = (float)(1000.0f * (hflog.getSecondsElapsed() - t0));
 
-		if (Interface.captureShadows)
-		{
+		if (Interface.captureShadows) {
 			SaveTextureMap(GL_TEXTURE_2D, ssg.environment.sunColorMapId, "sun_color.ppm");
 			SaveTextureMap(GL_TEXTURE_2D, ssg.environment.sunDepthMapId, "sun_depth.ppm");
 		}
 
 		// Render cube shadow map for light 0
-		for (int i = 0; i < ssg.pointLights.size(); i++)
-		{
+		for (int i = 0; i < ssg.pointLights.size(); i++) {
 			auto &spl = ssg.pointLights[i];
 			auto &scs = ssg.pointLights[i].scs;
 
@@ -2123,21 +2000,18 @@ namespace SSPHH
 			glutSetErrorMessage("ssphh.cpp", __LINE__, __FUNCTION__);
 		}
 
-		for (int i = 0; i < ssg.ssphhLights.size(); i++)
-		{
+		for (int i = 0; i < ssg.ssphhLights.size(); i++) {
 			auto &sphl = ssg.ssphhLights[i];
 			auto &scs = sphl.depthSphlMap;
 
 			scs.zfar = cubeShadowRenderConfig.zfar;
-			if (Interface.ssphh.enableShadowColorMap)
-			{
+			if (Interface.ssphh.enableShadowColorMap) {
 				sphl.colorSphlMap.texture.CreateTextureCube();
 				cubeShadowRenderConfig.clearColor.reset(0.2f, 0.4f, 0.6f, 1.0f);
 				cubeShadowRenderConfig.fbo_gen_color = true;
 				cubeShadowRenderConfig.fbo_color_map = sphl.colorSphlMap.texture.GetTexture();
 			}
-			else
-			{
+			else {
 				cubeShadowRenderConfig.fbo_gen_color = false;
 				cubeShadowRenderConfig.fbo_color_map = 0;
 			}
@@ -2149,10 +2023,9 @@ namespace SSPHH
 			RenderCubeShadowMap(ssg, sphl.depthSphlMap, cubeShadowRenderConfig);
 			glutSetErrorMessage("ssphh.cpp", __LINE__, __FUNCTION__);
 
-			if (Interface.captureShadows)
-			{
-				ostringstream ostr;
-				ostr << "sphl" << setw(2) << setfill('0') << i;
+			if (Interface.captureShadows) {
+				std::ostringstream ostr;
+				ostr << "sphl" << std::setw(2) << std::setfill('0') << i;
 				SaveTextureMap(GL_TEXTURE_CUBE_MAP, sphl.colorSphlMap.texture.GetTexture(), ostr.str() + "_color.ppm");
 				SaveTextureMap(GL_TEXTURE_CUBE_MAP, sphl.depthSphlMap.texture.GetTexture(), ostr.str() + "_depth.ppm");
 			}
@@ -2174,8 +2047,7 @@ namespace SSPHH
 		rc.blendFuncSrcFactor = GL_SRC_ALPHA;
 		rc.blendFuncDstFactor = GL_ONE;
 
-		if (!rc.shaderProgram)
-		{
+		if (!rc.shaderProgram) {
 			//hflog.info("%s(): sphl shader not found", __FUNCTION__);
 			return;
 		}
@@ -2188,11 +2060,9 @@ namespace SSPHH
 		//auto program1 = rc.shaderProgram = renderer2.FindProgram("sphl", "sphl");
 		//auto program2 = rc.shaderProgram = renderer2.FindProgram("glut", "cubemap");
 		sph_renderer.SaveGLState();
-		if (sph_renderer.ApplyRenderConfig())
-		{
+		if (sph_renderer.ApplyRenderConfig()) {
 			glActiveTexture(GL_TEXTURE0);
-			for (auto &it : sphls)
-			{
+			for (auto &it : sphls) {
 				auto &sphl = it.second;
 
 				if (!sphl.enabled)
@@ -2209,8 +2079,7 @@ namespace SSPHH
 				worldMatrix.Translate(sphl.position.x, sphl.position.y, sphl.position.z);
 				sph_renderer.RenderMesh(sphl.sph_model, worldMatrix);
 
-				if (!Interface.ssphh.enableBasicShowSPHLs)
-				{
+				if (!Interface.ssphh.enableBasicShowSPHLs) {
 					Matrix4f identityMatrix;
 					rc.shaderProgram->ApplyUniform("SPHL_LightProbeMode", (SimpleUniform)1);
 					rc.shaderProgram->ApplyUniform("WorldMatrix", (SimpleUniform)identityMatrix);
@@ -2222,8 +2091,7 @@ namespace SSPHH
 					float S = 0.5f;
 					Matrix4f lpWorldMatrix[3];
 					rc.shaderProgram->Use();
-					for (int i = 0; i < 3; i++)
-					{
+					for (int i = 0; i < 3; i++) {
 
 						// glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.lightProbeTexIds[i]);
 						//if (i == 0)
@@ -2250,8 +2118,7 @@ namespace SSPHH
 
 		if (0) //(!Interface.ssphh.enableBasicShowSPHLs)
 		{
-			for (auto &sphl : ssg.ssphhLights)
-			{
+			for (auto &sphl : ssg.ssphhLights) {
 				double S = 0.25;
 				double R = 1.0;
 				glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.coronaLightProbeTexture.GetTexture());
@@ -2320,8 +2187,7 @@ namespace SSPHH
 
 	void SSPHH_Application::RenderGL11Hierarchies()
 	{
-		if (Interface.ssphh.enableShowHierarchies)
-		{
+		if (Interface.ssphh.enableShowHierarchies) {
 			glMatrixMode(GL_PROJECTION);
 			glPushMatrix();
 			glLoadIdentity();
@@ -2332,9 +2198,8 @@ namespace SSPHH
 			glPushMatrix();
 			glLoadIdentity();
 
-			vector<SimpleVertex> vertices;
-			for (int i = 0; i < ssg.ssphhLights.size(); i++)
-			{
+			std::vector<SimpleVertex> vertices;
+			for (int i = 0; i < ssg.ssphhLights.size(); i++) {
 				auto &sphl = ssg.ssphhLights[i];
 				if (!sphl.enabled)
 					continue;
@@ -2342,8 +2207,7 @@ namespace SSPHH
 				Color3f color1;
 				Color3f color2;
 
-				for (int j = 0; j < ssg.ssphhLights.size(); j++)
-				{
+				for (int j = 0; j < ssg.ssphhLights.size(); j++) {
 					if (i == j || j < 0)
 						continue;
 
@@ -2379,8 +2243,7 @@ namespace SSPHH
 			//glLineWidth(4.0f);
 			glEnable(GL_LINE_SMOOTH);
 			glBegin(GL_LINES);
-			for (auto &v : vertices)
-			{
+			for (auto &v : vertices) {
 				glColor4fv(v.color.const_ptr());
 				glVertex3fv(v.position.const_ptr());
 			}
@@ -2468,8 +2331,7 @@ namespace SSPHH
 		glutSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
 
 		SimpleProgramPtr program = renderer2.FindProgram("glut", "UnwrappedCubeMap");
-		if (program != nullptr)
-		{
+		if (program != nullptr) {
 			program->Use();
 			GLint tloc = program->GetAttribLocation("aTexCoord");
 			GLint vloc = program->GetAttribLocation("aPosition");
@@ -2575,8 +2437,7 @@ namespace SSPHH
 		GLint uToneMapGamma = -1;
 
 		auto p = renderer2.FindProgram("skybox", "skybox");
-		if (p)
-		{
+		if (p) {
 			program = p->GetProgram();
 			uCubeTexture = p->GetUniformLocation("uCubeTexture");
 			uWorldMatrix = p->GetUniformLocation("WorldMatrix");
@@ -2597,8 +2458,7 @@ namespace SSPHH
 		vloc = glGetAttribLocation(program, "aPosition");
 		tloc = glGetAttribLocation(program, "aTexCoord");
 
-		if (abo == 0)
-		{
+		if (abo == 0) {
 			glGenBuffers(1, &abo);
 			glGenBuffers(1, &eabo);
 			glBindBuffer(GL_ARRAY_BUFFER, abo);
@@ -2614,24 +2474,20 @@ namespace SSPHH
 			glUniform1f(uToneMapExposure, 2.5f * powf(2.0f, ssg.environment.toneMapExposure));
 		if (uToneMapGamma >= 0)
 			glUniform1f(uToneMapGamma, ssg.environment.toneMapGamma);
-		if (uCubeTexture >= 0)
-		{
+		if (uCubeTexture >= 0) {
 			glutBindTextureAndSampler(ssg.environment.pbskyColorMapUnit, GL_TEXTURE_CUBE_MAP, ssg.environment.pbskyColorMapId, ssg.environment.pbskyColorMapSamplerId);
 			glUniform1i(uCubeTexture, ssg.environment.pbskyColorMapUnit);
 		}
-		if (uProjectionMatrix >= 0)
-		{
+		if (uProjectionMatrix >= 0) {
 			Matrix4f projectionMatrix = ssg.camera.projectionMatrix;
 			glUniformMatrix4fv(uProjectionMatrix, 1, GL_FALSE, projectionMatrix.const_ptr());
 		}
-		if (uCameraMatrix >= 0)
-		{
+		if (uCameraMatrix >= 0) {
 			Matrix4f viewMatrix = Interface.inversePreCameraMatrix * ssg.camera.viewMatrix;
 			viewMatrix.m14 = viewMatrix.m24 = viewMatrix.m34 = viewMatrix.m41 = viewMatrix.m42 = viewMatrix.m43 = 0.0f;
 			glUniformMatrix4fv(uCameraMatrix, 1, GL_FALSE, viewMatrix.const_ptr());
 		}
-		if (uWorldMatrix >= 0)
-		{
+		if (uWorldMatrix >= 0) {
 			Matrix4f worldMatrix;
 			glUniformMatrix4fv(uWorldMatrix, 1, GL_FALSE, worldMatrix.const_ptr());
 		}
@@ -2665,14 +2521,13 @@ namespace SSPHH
 
 	void SSPHH_Application::SaveScreenshot()
 	{
-		if (Interface.saveScreenshot)
-		{
+		if (Interface.saveScreenshot) {
 			Interface.saveScreenshot = false;
 			glFinish();
 
 			Image3ub image((int)screenWidth, (int)screenHeight);
 
-			string filename = GetPathTracerSphlRenderName(
+			std::string filename = GetPathTracerSphlRenderName(
 				Interface.sceneName,
 				Interface.ssphh.enableKs,
 				Interface.ssphh.REF_MaxRayDepth,
@@ -2711,47 +2566,47 @@ namespace SSPHH
 		}
 	}
 
-	string SSPHH_Application::GetPathTracerName(const string &sceneName, bool ks, int mrd, int pl)
+	std::string SSPHH_Application::GetPathTracerName(const std::string &sceneName, bool ks, int mrd, int pl)
 	{
-		ostringstream ostr;
+		std::ostringstream ostr;
 		ostr << sceneName;
-		ostr << "_" << setw(2) << setfill('0') << mrd;
-		ostr << "_" << setw(2) << setfill('0') << pl;
+		ostr << "_" << std::setw(2) << std::setfill('0') << mrd;
+		ostr << "_" << std::setw(2) << std::setfill('0') << pl;
 		if (ks)
 			ostr << "_Ks";
 		return ostr.str();
 	}
 
-	string SSPHH_Application::GetSphlRenderName(const string &sceneName, int md)
+	std::string SSPHH_Application::GetSphlRenderName(const std::string &sceneName, int md)
 	{
-		ostringstream ostr;
+		std::ostringstream ostr;
 		ostr << sceneName;
-		ostr << "_sphlrender_" << setw(2) << setfill('0') << md;
+		ostr << "_sphlrender_" << std::setw(2) << std::setfill('0') << md;
 		return ostr.str();
 	}
 
-	string SSPHH_Application::GetPathTracerSphlRenderName(const string &sceneName, bool ks, int mrd, int pl, int md)
+	std::string SSPHH_Application::GetPathTracerSphlRenderName(const std::string &sceneName, bool ks, int mrd, int pl, int md)
 	{
-		ostringstream ostr;
+		std::ostringstream ostr;
 		ostr << sceneName;
-		ostr << "_" << setw(2) << setfill('0') << mrd;
-		ostr << "_" << setw(2) << setfill('0') << pl;
+		ostr << "_" << std::setw(2) << std::setfill('0') << mrd;
+		ostr << "_" << std::setw(2) << std::setfill('0') << pl;
 		if (ks)
 			ostr << "_Ks";
 		ostr << "_sphlrender_";
-		ostr << setw(2) << setfill('0') << md;
+		ostr << std::setw(2) << std::setfill('0') << md;
 		return ostr.str();
 	}
 
-	string SSPHH_Application::GetStatsName(const string &sceneName, bool ks, int mrd, int pl, int md)
+	std::string SSPHH_Application::GetStatsName(const std::string &sceneName, bool ks, int mrd, int pl, int md)
 	{
-		ostringstream ostr;
+		std::ostringstream ostr;
 		ostr << sceneName;
 		if (ks)
 			ostr << "_Ks";
-		ostr << "_" << setw(2) << setfill('0') << mrd;
-		ostr << "_" << setw(2) << setfill('0') << pl;
-		ostr << "_" << setw(2) << setfill('0') << md;
+		ostr << "_" << std::setw(2) << std::setfill('0') << mrd;
+		ostr << "_" << std::setw(2) << std::setfill('0') << pl;
+		ostr << "_" << std::setw(2) << std::setfill('0') << md;
 		return ostr.str();
 	}
 
@@ -2763,24 +2618,21 @@ namespace SSPHH
 	{
 		int numScattered = ssphhUf.GetNumScatteredJobs();
 		int numFinished = ssphhUf.GetNumFinishedJobs();
-		ostringstream ostr;
-		ostr << "Scattered " << setw(2) << numScattered << "/";
-		ostr << "Finished  " << setw(2) << numFinished;
+		std::ostringstream ostr;
+		ostr << "Scattered " << std::setw(2) << numScattered << "/";
+		ostr << "Finished  " << std::setw(2) << numFinished;
 		Interface.ssphh.gi_status = ostr.str();
-		if (numFinished > 0)
-		{
-			if (numScattered > 0)
-			{
+		if (numFinished > 0) {
+			if (numScattered > 0) {
 				return 0;
 			}
-			map<string, CoronaJob> jobs;
+			std::map<std::string, CoronaJob> jobs;
 			ssphhUf.GetFinishedJobs(jobs);
 
 			int numVIZ = 0;
 			int numGEN = 0;
 			int numREF = 0;
-			for (auto &job : jobs)
-			{
+			for (auto &job : jobs) {
 				if (job.second.IsVIZ())
 					numVIZ++;
 				if (job.second.IsGEN())
@@ -2805,28 +2657,24 @@ namespace SSPHH
 	{
 		bool useEXR = true;
 		FilePathInfo fpi(job.GetOutputPath(useEXR));
-		if (fpi.DoesNotExist())
-		{
+		if (fpi.DoesNotExist()) {
 			hflog.errorfn(__FUNCTION__, "Could not find rendered light probe %s", job.GetOutputPath(useEXR).c_str());
 			return false;
 		}
 
 		int sendLight = -1;
 		int recvLight = -1;
-		if (job.IsGEN())
-		{
+		if (job.IsGEN()) {
 			sendLight = job.GetGENLightIndex();
 		}
-		else if (job.IsVIZ())
-		{
+		else if (job.IsVIZ()) {
 			sendLight = job.GetVIZSendLightIndex();
 			recvLight = job.GetVIZRecvLightIndex();
 		}
 
 		SimpleSSPHHLight &sphl = ssg.ssphhLights[sendLight];
 		Sph4f sph;
-		if (job.IsVIZ())
-		{
+		if (job.IsVIZ()) {
 			if (useEXR) {
 				sphl.vizgenLightProbes[recvLight].loadEXR(fpi.path);
 			}
@@ -2838,8 +2686,7 @@ namespace SSPHH
 			job.CopySPH(sph);
 			return true;
 		}
-		else if (job.IsGEN())
-		{
+		else if (job.IsGEN()) {
 			sphl.ReadCoronaLightProbe(job.GetOutputPath(useEXR));
 			sphl.SaveCoronaLightProbe(job.GetName() + "_sph.ppm");
 			if (ssg.ssphh.saveJSONs)
@@ -2865,12 +2712,10 @@ namespace SSPHH
 	{
 		int sendLight = -1;
 		int recvLight = -1;
-		if (job.IsGEN())
-		{
+		if (job.IsGEN()) {
 			sendLight = job.GetGENLightIndex();
 		}
-		else if (job.IsVIZ())
-		{
+		else if (job.IsVIZ()) {
 			sendLight = job.GetVIZSendLightIndex();
 			recvLight = job.GetVIZRecvLightIndex();
 		}
@@ -2878,13 +2723,11 @@ namespace SSPHH
 		SimpleSSPHHLight &sphl = ssg.ssphhLights[sendLight];
 		Sph4f sph;
 		job.CopySPHToSph4f(sph);
-		if (job.IsVIZ())
-		{
+		if (job.IsVIZ()) {
 			sphl.SphToLightProbe(sph.msph, sphl.vizgenLightProbes[recvLight]);
 			return true;
 		}
-		else if (job.IsGEN())
-		{
+		else if (job.IsGEN()) {
 			sphl.SphToLightProbe(sph.msph, sphl.vizgenLightProbes[sendLight]);
 			sphl.UploadLightProbe(sphl.vizgenLightProbes[sendLight], sphl.hierLightProbeTexture);
 			return true;

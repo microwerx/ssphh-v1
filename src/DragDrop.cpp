@@ -32,14 +32,13 @@ private:
 	std::vector<FORMATETC> pFormatEtcs_;
 	std::vector<STGMEDIUM> pStgMediums_;
 
-	int LookupFormatEtc(FORMATETC *pFormatEtc) {
+	int LookupFormatEtc(FORMATETC *pFormatEtc)
+	{
 		// check each of our formats in turn to see if one matches
-		for (int i = 0; i < numFormats_; i++)
-		{
+		for (int i = 0; i < numFormats_; i++) {
 			if ((pFormatEtcs_[i].tymed & pFormatEtc->tymed) &&
 				pFormatEtcs_[i].cfFormat == pFormatEtc->cfFormat &&
-				pFormatEtcs_[i].dwAspect == pFormatEtc->dwAspect)
-			{
+				pFormatEtcs_[i].dwAspect == pFormatEtc->dwAspect) {
 				// return index of stored format
 				return i;
 			}
@@ -49,7 +48,8 @@ private:
 		return -1;
 	}
 public:
-	MyDataObject(FORMATETC *pformatetc, STGMEDIUM *pmedium, int count) {
+	MyDataObject(FORMATETC *pformatetc, STGMEDIUM *pmedium, int count)
+	{
 		referenceCount_ = 1;
 		numFormats_ = count;
 
@@ -62,7 +62,8 @@ public:
 		}
 	}
 
-	~MyDataObject() {
+	~MyDataObject()
+	{
 
 	}
 
@@ -72,8 +73,7 @@ public:
 		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR *__RPC_FAR *ppvObject) override
 	{
 		// tell other objects about our capabilities 
-		if (riid == IID_IUnknown || riid == IID_IDropTarget)
-		{
+		if (riid == IID_IUnknown || riid == IID_IDropTarget) {
 			*ppvObject = this;
 			AddRef();
 			return NOERROR;
@@ -97,7 +97,8 @@ public:
 	}
 
 	// IDataObject members
-	HRESULT STDMETHODCALLTYPE GetData(FORMATETC *pFormatEtc, STGMEDIUM *pStgMedium) override {
+	HRESULT STDMETHODCALLTYPE GetData(FORMATETC *pFormatEtc, STGMEDIUM *pStgMedium) override
+	{
 		int idx;
 
 		// try to match the specified FORMATETC with one of our supported formats
@@ -109,8 +110,7 @@ public:
 		pStgMedium->pUnkForRelease = 0;
 
 		// copy the data into the caller's storage medium
-		switch (pFormatEtcs_[idx].tymed)
-		{
+		switch (pFormatEtcs_[idx].tymed) {
 		case TYMED_HGLOBAL:
 			pStgMedium->hGlobal = DupGlobalMem(pStgMediums_[idx].hGlobal);
 			break;
@@ -120,31 +120,39 @@ public:
 		}
 		return S_OK;
 	}
-	HRESULT STDMETHODCALLTYPE GetDataHere(FORMATETC *pFormatEtc, STGMEDIUM *pmedium) override {
+	HRESULT STDMETHODCALLTYPE GetDataHere(FORMATETC *pFormatEtc, STGMEDIUM *pmedium) override
+	{
 		return DATA_E_FORMATETC;
 	}
-	HRESULT STDMETHODCALLTYPE QueryGetData(FORMATETC *pFormatEtc) override {
+	HRESULT STDMETHODCALLTYPE QueryGetData(FORMATETC *pFormatEtc) override
+	{
 		return (LookupFormatEtc(pFormatEtc) == -1) ? DV_E_FORMATETC : S_OK;
 	}
-	HRESULT STDMETHODCALLTYPE GetCanonicalFormatEtc(FORMATETC *pFormatEct, FORMATETC *pFormatEtcOut) override {
+	HRESULT STDMETHODCALLTYPE GetCanonicalFormatEtc(FORMATETC *pFormatEct, FORMATETC *pFormatEtcOut) override
+	{
 		return DATA_S_SAMEFORMATETC;
 	}
-	HRESULT STDMETHODCALLTYPE SetData(FORMATETC *pFormatEtc, STGMEDIUM *pMedium, BOOL fRelease) override {
+	HRESULT STDMETHODCALLTYPE SetData(FORMATETC *pFormatEtc, STGMEDIUM *pMedium, BOOL fRelease) override
+	{
 		return E_NOTIMPL;
 	}
-	HRESULT STDMETHODCALLTYPE EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC **ppEnumFormatEtc) override {
+	HRESULT STDMETHODCALLTYPE EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC **ppEnumFormatEtc) override
+	{
 		if (dwDirection != DATADIR_GET) {
 			return E_NOTIMPL;
 		}
 		return SHCreateStdEnumFmtEtc((int)pFormatEtcs_.size(), pFormatEtcs_.data(), ppEnumFormatEtc);
 	}
-	HRESULT STDMETHODCALLTYPE DAdvise(FORMATETC *pFormatEtc, DWORD advf, IAdviseSink *, DWORD *) override {
+	HRESULT STDMETHODCALLTYPE DAdvise(FORMATETC *pFormatEtc, DWORD advf, IAdviseSink *, DWORD *) override
+	{
 		return E_NOTIMPL;
 	}
-	HRESULT STDMETHODCALLTYPE DUnadvise(DWORD dwConnection) override {
+	HRESULT STDMETHODCALLTYPE DUnadvise(DWORD dwConnection) override
+	{
 		return E_NOTIMPL;
 	}
-	HRESULT STDMETHODCALLTYPE EnumDAdvise(IEnumSTATDATA **ppEnumAdvise) override {
+	HRESULT STDMETHODCALLTYPE EnumDAdvise(IEnumSTATDATA **ppEnumAdvise) override
+	{
 		return E_NOTIMPL;
 	}
 };
@@ -160,7 +168,8 @@ private:
 	DWORD dropEffect;
 	DragDrop *dragDrop_ = nullptr;
 
-	bool QueryDataObject(IDataObject *pDataObject) {
+	bool QueryDataObject(IDataObject *pDataObject)
+	{
 		acceptFormat = false;
 		if (!pDataObject) return false;
 
@@ -217,7 +226,8 @@ private:
 		return dwAllowed & DROPEFFECT_COPY;
 	}
 
-	void CopyPaths(FORMATETC *fmt, STGMEDIUM *medium) {
+	void CopyPaths(FORMATETC *fmt, STGMEDIUM *medium)
+	{
 		std::vector<std::string> &paths_ = dragDrop_->paths_;
 		if (!fmt || fmt->cfFormat != CF_HDROP) return;
 		SIZE_T bytes = GlobalSize(medium->hGlobal);
@@ -237,14 +247,14 @@ private:
 				HFLOGINFO("%s", path.c_str());
 			}
 			dragDrop_->gotPaths_ = true;
-			HFLOGINFO("%S", unicodeText_.c_str());
 		}
 		else {
 			dragDrop_->gotPaths_ = false;
 		}
 	}
 
-	void CopyText(FORMATETC *fmt, STGMEDIUM *medium) {
+	void CopyText(FORMATETC *fmt, STGMEDIUM *medium)
+	{
 		std::string &text_ = dragDrop_->text_;
 
 		if (!fmt || fmt->cfFormat != CF_TEXT) return;
@@ -262,7 +272,8 @@ private:
 		}
 	}
 
-	void CopyUnicode(FORMATETC *fmt, STGMEDIUM *medium) {
+	void CopyUnicode(FORMATETC *fmt, STGMEDIUM *medium)
+	{
 		std::wstring &unicodeText_ = dragDrop_->unicodeText_;
 
 		if (!fmt || fmt->cfFormat != CF_UNICODETEXT) return;
@@ -322,8 +333,7 @@ public:
 		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR *__RPC_FAR *ppvObject) override
 	{
 		// tell other objects about our capabilities 
-		if (riid == IID_IUnknown || riid == IID_IDropTarget)
-		{
+		if (riid == IID_IUnknown || riid == IID_IDropTarget) {
 			*ppvObject = this;
 			AddRef();
 			return NOERROR;
@@ -456,8 +466,7 @@ public:
 		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR *__RPC_FAR *ppvObject) override
 	{
 		// tell other objects about our capabilities 
-		if (riid == IID_IUnknown || riid == IID_IDropTarget)
-		{
+		if (riid == IID_IUnknown || riid == IID_IDropTarget) {
 			*ppvObject = this;
 			AddRef();
 			return NOERROR;
@@ -493,15 +502,13 @@ public:
 	) override
 	{
 		// ESCAPE key or right mouse button pressed causes cancel
-		if (fEscapePressed || (grfKeyState & MK_RBUTTON))
-		{
+		if (fEscapePressed || (grfKeyState & MK_RBUTTON)) {
 			return DRAGDROP_S_CANCEL;
 			HFLOGINFO("Cancelling drop");
 		}
 
 		// Left mouse button released causes drop
-		if ((grfKeyState & MK_LBUTTON) == 0)
-		{
+		if ((grfKeyState & MK_LBUTTON) == 0) {
 			HFLOGINFO("Dropping");
 			return DRAGDROP_S_DROP;
 		}
@@ -550,7 +557,8 @@ void DragDrop::Kill()
 }
 
 
-void DragDrop::Reset() {
+void DragDrop::Reset()
+{
 	gotText_ = false;
 	gotUnicodeText_ = false;
 	gotPaths_ = false;
