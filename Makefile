@@ -32,7 +32,8 @@ DEPOBJECTS = $(patsubst $(DEP_SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(DEPCXXSOURCES)) $(pa
 # DEPCOBJECTS= $(patsubst $(DEP_SRCDIR)/%.c,$(OBJDIR)/%.o,$(DEPCSOURCES))
 OBJECTS = $(SRCOBJECTS) $(DEPOBJECTS)
 TARGET = build/ssphh
-GCH = $(SRCDIR)/stdafx.h.gch
+GCH = $(SRCDIR)/pch.h.gch
+GCH_SRC = $(SRCDIR)/pch.h
 
 CC = gcc
 CCFLAGS = -Wall -I$(INCDIR) -I$(DEP_INCDIR) `python3-config --includes`
@@ -57,7 +58,7 @@ cobjects: $(DEPCOBJECTS)
 $(TARGET): $(OBJECTS) ../fluxions/build/libfluxions.a
 	$(CXX) -o $@ $(OBJECTS) $(LDFLAGS)
 
-$(GCH): $(SRCDIR)/stdafx.h $(HEADERS)
+$(GCH): $(GCH_SRC) $(HEADERS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(FLUXIONS): $(FLUXIONS_HEADERS) $(FLUXIONS_SOURCES)
