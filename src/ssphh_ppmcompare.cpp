@@ -16,7 +16,7 @@
 // along with this program.If not, see <https://www.gnu.org/licenses/>.
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
-#include "stdafx.h"
+#include "pch.h"
 #ifdef __unix__
 #include <unistd.h>
 #endif

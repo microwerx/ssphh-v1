@@ -18,7 +18,7 @@
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 
-#include "stdafx.h"
+#include "pch.h"
 #include <DragDrop.hpp>
 
 #ifdef WIN32

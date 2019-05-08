@@ -16,7 +16,7 @@
 // along with this program.If not, see <https://www.gnu.org/licenses/>.
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
-#include "stdafx.h"
+#include "pch.h"
 #include <ssphh.hpp>
 #include <ssphh_unicornfish.hpp>
 
@@ -25,8 +25,7 @@ namespace SSPHH
 	void SSPHH_Application::imguiUfBrokerControls()
 	{
 		InterfaceInfo::UNICORNFISHWINDOW & uf = Interface.uf;
-		if (!uf.uf_isinit)
-		{
+		if (!uf.uf_isinit) {
 			uf.uf_isinit = true;
 		}
 	}
@@ -35,8 +34,7 @@ namespace SSPHH
 	void SSPHH_Application::imguiUfClientGLES20Controls()
 	{
 		InterfaceInfo::UNICORNFISHWINDOW & uf = Interface.uf;
-		if (!uf.uf_isinit)
-		{
+		if (!uf.uf_isinit) {
 			uf.uf_isinit = true;
 		}
 
@@ -46,8 +44,7 @@ namespace SSPHH
 	void SSPHH_Application::imguiUfClientGLES30Controls()
 	{
 		InterfaceInfo::UNICORNFISHWINDOW & uf = Interface.uf;
-		if (!uf.uf_isinit)
-		{
+		if (!uf.uf_isinit) {
 			uf.uf_isinit = true;
 		}
 
@@ -57,8 +54,7 @@ namespace SSPHH
 	void SSPHH_Application::imguiUfWorkerEchoControls()
 	{
 		InterfaceInfo::UNICORNFISHWINDOW & uf = Interface.uf;
-		if (!uf.uf_isinit)
-		{
+		if (!uf.uf_isinit) {
 			uf.uf_isinit = true;
 		}
 
@@ -68,8 +64,7 @@ namespace SSPHH
 	void SSPHH_Application::imguiUfWorkerCoronaControls()
 	{
 		InterfaceInfo::UNICORNFISHWINDOW & uf = Interface.uf;
-		if (!uf.uf_isinit)
-		{
+		if (!uf.uf_isinit) {
 			uf.uf_isinit = true;
 		}
 
