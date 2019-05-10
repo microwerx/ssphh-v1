@@ -19,6 +19,7 @@
 #include "pch.h"
 #include <ssphh.hpp>
 #include <ssphh_unicornfish.hpp>
+#include <SphlJob.hpp>
 
 namespace Uf
 {
@@ -50,6 +51,15 @@ namespace Uf
 					int64_t dt = cur_time - sent_times[job.first];
 					if (!job.second.IsJobWorking() && dt >= 25000) {
 						Uf::Message request(&job.second, sizeof(CoronaJob));
+						Fluxions::CoronaJob &coronaJob = job.second;
+						SphlJob sphlJob;
+						sphlJob.numChannels = 4;
+						sphlJob.resizeCoefs(5);
+						sphlJob.meta_position.reset(0.0f, 0.0f, 0.0f);
+						sphlJob.meta_scene = coronaJob.GetName();
+						sphlJob.meta_time = hflog.makeDTG();
+						sphlJob.meta_coronaJob = coronaJob.ToString();
+						request.Push(sphlJob.toJSON());
 						request.Push(job.first);
 						sent_times[job.first] = cur_time;
 						client.SendRequest(ssphh->GetSceneName().c_str(), request);
@@ -61,14 +71,23 @@ namespace Uf
 			while (client.PollReply()) {
 				if (client.WaitReply()) {
 					Uf::Message reply = client.GetReply();
+					// 1. POP SERVICE STRING
 					std::string jobName = reply.PopString();
+					// 2. POP STATUS
 					std::string status = reply.PopString();
 					if (status == "finished") {
 						// this is where we would "pop" the results
+
+						// 3. POP JSON
+						std::string jsonSphlJob = reply.PopString();
+
+						// 4. POP JOB
 						CoronaJob job;
 						reply.PopMem(&job, sizeof(CoronaJob));
 						scatteredJobs[jobName] = job;
 						memset(&job, 0, sizeof(CoronaJob));
+
+
 						//scatteredJobs[jobName].MarkJobFinished();
 					}
 					if (status == "working") {

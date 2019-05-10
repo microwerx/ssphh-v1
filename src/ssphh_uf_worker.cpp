@@ -19,6 +19,7 @@
 #include "pch.h"
 #include <ssphh.hpp>
 #include <ssphh_unicornfish.hpp>
+#include <SphlJob.hpp>
 
 namespace Uf
 {
@@ -79,8 +80,13 @@ namespace Uf
 			if (worker.WaitRequest()) {
 				Uf::Message request = worker.GetRequest();
 				std::string jobName = request.PopString();
+				std::string jsonSphlJob = request.PopString();
+				SphlJob sphlJob;
+				sphlJob.parseJSON(jsonSphlJob);
 				Fluxions::CoronaJob job;
-				request.PopMem(&job, sizeof(Fluxions::CoronaJob));
+				job.FromString(sphlJob.meta_coronaJob);
+				Fluxions::CoronaJob job1;
+				request.PopMem(&job1, sizeof(Fluxions::CoronaJob));
 				auto & frame = request.PopFrame();
 				memcpy(&job, frame.GetData(), frame.SizeInBytes());
 
