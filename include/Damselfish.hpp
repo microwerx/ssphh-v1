@@ -38,8 +38,8 @@ namespace Damselfish
 		Property<T, nItems> & advance() noexcept
 		{
 			lastItem = curItem;
-			curItem = (curItem + 1) % items.size();
-			count = std::min((count + 1), items.size());
+			curItem = (curItem + 1) % items_.size();
+			count = std::min((count + 1), items_.size());
 			return *this;
 		}
 

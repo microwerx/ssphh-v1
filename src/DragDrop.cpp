@@ -1,15 +1,18 @@
 // For Drag and Drop
 // This code incorporates ideas from http://www.catch22.net/tuts/win32/drop-source
 // and from the Microsoft documentation website
+
+#include <DragDrop.hpp>
+#include <hatchetfish.hpp>
+
+DragDrop dragDrop;
+
+#ifdef WIN32
 #include <Windows.h>
 #include <WinUser.h>
 #include <shellapi.h> // for DragAcceptFiles()
 #include <oleidl.h>		// for Drag and Drop
 #include <shlobj_core.h> // for SH...
-#include <DragDrop.hpp>
-#include <hatchetfish.hpp>
-
-DragDrop dragDrop;
 
 //////////////////////////////////////////////////////////////////////
 // H E L P E R   F U N C T I O N S ///////////////////////////////////
@@ -517,57 +520,6 @@ public:
 	}
 };
 
-
-
-DragDrop::DragDrop()
-{
-}
-
-
-DragDrop::~DragDrop()
-{
-	if (started) {
-		Kill();
-	}
-}
-
-
-void DragDrop::Init()
-{
-	started = true;
-	hflog.infofn(__FUNCTION__, "Starting Drag and Drop");
-	HRESULT oleInitialized = OleInitialize(nullptr);
-	HWND hwnd = GetActiveWindow();
-	if (!hwnd) return;
-	DragAcceptFiles(hwnd, TRUE);
-	pDropTarget = new MyDropTarget(this);
-	HRESULT result = RegisterDragDrop(hwnd, (IDropTarget *)pDropTarget);
-}
-
-
-void DragDrop::Kill()
-{
-	started = false;
-	if (pDropTarget) {
-		if (pDropTarget->Release() == 0) {
-			pDropTarget = nullptr;
-		};
-	}
-	OleUninitialize();
-}
-
-
-void DragDrop::Reset()
-{
-	gotText_ = false;
-	gotUnicodeText_ = false;
-	gotPaths_ = false;
-	text_.resize(0);
-	unicodeText_.resize(0);
-	paths_.resize(0);
-}
-
-
 //////////////////////////////////////////////////////////////////////
 // H E L P E R   F U N C T I O N S ///////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -601,4 +553,58 @@ HRESULT CreateDataObject(IDataObject **ppDataObject, FORMATETC *fmtetc, STGMEDIU
 	*ppDataObject = new MyDataObject(fmtetc, stgmeds, count);
 
 	return (*ppDataObject) ? S_OK : E_OUTOFMEMORY;
+}
+#endif
+
+
+DragDrop::DragDrop()
+{
+}
+
+
+DragDrop::~DragDrop()
+{
+	if (started) {
+		Kill();
+	}
+}
+
+
+void DragDrop::Init()
+{
+	started = true;
+#ifdef WIN32
+	hflog.infofn(__FUNCTION__, "Starting Drag and Drop");
+	HRESULT oleInitialized = OleInitialize(nullptr);
+	HWND hwnd = GetActiveWindow();
+	if (!hwnd) return;
+	DragAcceptFiles(hwnd, TRUE);
+	pDropTarget = new MyDropTarget(this);
+	HRESULT result = RegisterDragDrop(hwnd, (IDropTarget *)pDropTarget);
+#endif
+}
+
+
+void DragDrop::Kill()
+{
+	started = false;
+#ifdef WIN32
+	if (pDropTarget) {
+		if (pDropTarget->Release() == 0) {
+			pDropTarget = nullptr;
+		};
+	}
+	OleUninitialize();
+#endif
+}
+
+
+void DragDrop::Reset()
+{
+	gotText_ = false;
+	gotUnicodeText_ = false;
+	gotPaths_ = false;
+	text_.resize(0);
+	unicodeText_.resize(0);
+	paths_.resize(0);
 }
