@@ -142,11 +142,6 @@ void GlutTemplateInit(int argc, char **argv)
 	glutWindowStatusFunc(windowstatus);
 	glutJoystickFunc(joystick, gt_joystickPollInterval);
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
-
-	std::string glVendor = (char *)glGetString(GL_VENDOR);
-	std::string glVersion = (char *)glGetString(GL_VERSION);
-	hflog.infofn(__FUNCTION__, "OpenGL Vendor:  %s", glVendor.c_str());
-	hflog.infofn(__FUNCTION__, "OpenGL Version: %s", glVersion.c_str());
 }
 
 void GlutTemplateWidget(Viperfish::Widget::SharedPtr widget)
