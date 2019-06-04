@@ -9,7 +9,11 @@
 //////////////////////////////////////////////////////////////////////
 
 std::string gt_windowTitle = "Scalable Spherical Harmonics Hierarchies (SSPHH)";
+#ifdef WIN32
 int gt_displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH; // | GLUT_SRGB; // | GLUT_BORDERLESS;
+#else
+int gt_displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH;
+#endif
 int gt_screenWidth = 1280;
 int gt_screenHeight = 720;
 double gt_Fps = 0;
@@ -88,7 +92,9 @@ void GlutTemplateSetParameters(const std::string &windowTitle, int width, int he
 	gt_screenWidth = width;
 	gt_screenHeight = height;
 	gt_aspectRatio = (float)width / (float)height;
-	gt_displayMode = displayMode;
+	if (displayMode >= 0) {
+		gt_displayMode = displayMode;
+	}
 }
 
 void GlutTemplateInit(int argc, char **argv)
@@ -103,9 +109,14 @@ void GlutTemplateInit(int argc, char **argv)
 #endif
 
 	glutInit(&argc, argv);
-	glutInitContextProfile(GLUT_CORE_PROFILE);
-	glutInitContextFlags(GLUT_DEBUG);
 	glutInitDisplayMode(gt_displayMode);
+	if (glutGet(GLUT_DISPLAY_MODE_POSSIBLE) == 0) {
+		HFLOGERROR("GLUT Display Mode not supported");
+		exit(-1);
+	}
+	glutInitContextVersion(4, 0);
+	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
+	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutInitWindowSize(gt_screenWidth, gt_screenHeight);
 	glutCreateWindow(gt_windowTitle.c_str());
 	glutDisplayFunc(display);
