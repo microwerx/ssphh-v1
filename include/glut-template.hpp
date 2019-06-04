@@ -3,7 +3,7 @@
 
 #include <viperfish.hpp>
 
-void GlutTemplateSetParameters(const std::string &windowTitle, int width, int height, int displayMode = GL_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STENCIL);
+void GlutTemplateSetParameters(const std::string &windowTitle, int width, int height, int displayMode = -1);
 void GlutTemplateInit(int argc, char **argv);
 void GlutTemplateWidget(Viperfish::Widget::SharedPtr widget);
 void GlutTemplateMainLoop();
