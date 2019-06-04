@@ -9,7 +9,11 @@
 //////////////////////////////////////////////////////////////////////
 
 std::string gt_windowTitle = "Scalable Spherical Harmonics Hierarchies (SSPHH)";
+#ifdef WIN32
 int gt_displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH; // | GLUT_SRGB; // | GLUT_BORDERLESS;
+#else
+int gt_displayMode = GLUT_DOUBLE | GLUT_DEPTH | GLUT_RGBA;
+#endif
 int gt_screenWidth = 1280;
 int gt_screenHeight = 720;
 double gt_Fps = 0;
@@ -103,9 +107,14 @@ void GlutTemplateInit(int argc, char **argv)
 #endif
 
 	glutInit(&argc, argv);
+	glutInitContextVersion( 4, 5 );
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutInitContextFlags(GLUT_DEBUG);
 	glutInitDisplayMode(gt_displayMode);
+	if (glutGet(GLUT_DISPLAY_MODE_POSSIBLE) == 0) {
+		hflog.warningfn(__FUNCTION__, "GLUT Display Mode falling back to RGBA and DOUBLE only");
+		glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
+	}
 	glutInitWindowSize(gt_screenWidth, gt_screenHeight);
 	glutCreateWindow(gt_windowTitle.c_str());
 	glutDisplayFunc(display);
@@ -133,6 +142,11 @@ void GlutTemplateInit(int argc, char **argv)
 	glutWindowStatusFunc(windowstatus);
 	glutJoystickFunc(joystick, gt_joystickPollInterval);
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
+
+	std::string glVendor = (char *)glGetString(GL_VENDOR);
+	std::string glVersion = (char *)glGetString(GL_VERSION);
+	hflog.infofn(__FUNCTION__, "OpenGL Vendor:  %s", glVendor.c_str());
+	hflog.infofn(__FUNCTION__, "OpenGL Version: %s", glVersion.c_str());
 }
 
 void GlutTemplateWidget(Viperfish::Widget::SharedPtr widget)
