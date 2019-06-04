@@ -103,8 +103,19 @@ namespace Uf
 				ssphhPtr->RunJob(job);
 				job.MarkJobFinished();
 
+				// report the results
+				sphlJob.meta_coronaJob = job.ToString();
+				job.CopySPHToSph4f(sphlJob.sphl);
+
+				// The Stack is (from top)
+				// frame
+				// jobName: string
+				// status: string
+				// sphlJob: JSON string
+				// coronaJob: CoronaJob
 				reply = request;
 				reply.Push(&job, sizeof(Fluxions::CoronaJob));
+				reply.Push(sphlJob.toJSON());
 				reply.Push("finished");
 				reply.Push(jobName);
 				worker.SendReply(reply);

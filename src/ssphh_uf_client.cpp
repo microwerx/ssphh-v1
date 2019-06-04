@@ -50,7 +50,6 @@ namespace Uf
 				for (auto & job : scatteredJobs) {
 					int64_t dt = cur_time - sent_times[job.first];
 					if (!job.second.IsJobWorking() && dt >= 25000) {
-						Uf::Message request(&job.second, sizeof(CoronaJob));
 						Fluxions::CoronaJob &coronaJob = job.second;
 						SphlJob sphlJob;
 						sphlJob.numChannels = 4;
@@ -59,6 +58,13 @@ namespace Uf
 						sphlJob.meta_scene = coronaJob.GetName();
 						sphlJob.meta_time = hflog.makeDTG();
 						sphlJob.meta_coronaJob = coronaJob.ToString();
+
+						// The stack is (from bottom)
+						// coronaJob: CoronaJob
+						// sphlJob: SphlJob
+						// sceneName: string
+						// service: string [groundtruth, sph, irprobe]
+						Uf::Message request(&job.second, sizeof(CoronaJob));
 						request.Push(sphlJob.toJSON());
 						request.Push(job.first);
 						sent_times[job.first] = cur_time;
@@ -78,10 +84,10 @@ namespace Uf
 					if (status == "finished") {
 						// this is where we would "pop" the results
 
-						// 3. POP JSON
+						// 3. POP JSON SPHL JOB
 						std::string jsonSphlJob = reply.PopString();
 
-						// 4. POP JOB
+						// 4. POP CORONA JOB
 						CoronaJob job;
 						reply.PopMem(&job, sizeof(CoronaJob));
 						scatteredJobs[jobName] = job;
