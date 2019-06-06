@@ -329,6 +329,8 @@ __pycache__/
 !*.conf
 !*.ppm
 
+!*.graphml
+
 # Ignore the corona_export folder and cache files
 corona_export/
 corona_output/
