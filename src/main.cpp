@@ -20,6 +20,9 @@
 
 #include "pch.h"
 #include <DragDrop.hpp>
+#include <GLFW_template.hpp>
+
+#define USE_GLFW 1
 
 #ifdef WIN32
 #define _STDCALL_SUPPORTED
@@ -43,12 +46,11 @@
 #endif
 
 #ifdef NDEBUG
-#pragma comment(lib, "freeglut_static.lib")
 #pragma comment(lib, "zmq4.lib")
 #else
-#pragma comment(lib, "freeglut_staticd.lib")
 #pragma comment(lib, "zmq4d.lib")
 #endif // NDEBUG
+
 #endif // WIN32
 
 #include <functional>
@@ -114,12 +116,24 @@ int main(int argc, char **argv)
 		Fluxions::debugging = true;
 	}
 
+#ifdef USE_FREEGLUT
 	GlutTemplateSetParameters("SSPHH", 1280, 720);
 	GlutTemplateInit(argc, argv);
-	InitApp();
-	GlutTemplateWidget(vfApp);
+#endif
+#ifdef USE_GLFW
+	GlfwTemplateSetParameters("SSPHH", 1280, 720);
+	GlfwTemplateInit(argc, argv);
+#endif
 	dragDrop.Init();
+	InitApp();
+#ifdef USE_FREEGLUT
+	GlutTemplateWidget(vfApp);
 	GlutTemplateMainLoop();
+#endif
+#ifdef USE_GLFW
+	GlfwTemplateWidget(vfApp);
+	GlfwTemplateMainLoop();
+#endif
 	KillApp();
 	dragDrop.Kill();
 

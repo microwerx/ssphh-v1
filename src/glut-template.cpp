@@ -4,6 +4,14 @@
 #include <glut-template.hpp>
 #include <GL/freeglut.h>
 
+#ifdef WIN32
+#ifdef NDEBUG
+#pragma comment(lib, "freeglut_static.lib")
+#else
+#pragma comment(lib, "freeglut_staticd.lib")
+#endif // NDEBUG
+#endif // WIN32
+
 //////////////////////////////////////////////////////////////////////
 // G L O B A L   V A R I A B L E S ///////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -114,7 +122,12 @@ void GlutTemplateInit(int argc, char **argv)
 		HFLOGERROR("GLUT Display Mode not supported");
 		exit(-1);
 	}
+#ifdef __unix__
 	glutInitContextVersion(4, 0);
+#endif
+#ifdef WIN32
+	glutInitContextVersion(4, 0);
+#endif
 	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
 	glutInitContextProfile(GLUT_CORE_PROFILE);
 	glutInitWindowSize(gt_screenWidth, gt_screenHeight);
