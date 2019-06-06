@@ -17,7 +17,8 @@
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 #include "pch.h"
-#include <glut-template.hpp>
+//#include <GLUT_template.hpp>
+//#define USE_GLUT 1
 #include <memory>
 
 #include "ssphh.hpp"
@@ -30,8 +31,10 @@ namespace Fluxions
 std::shared_ptr<SSPHH::SSPHH_Application> ssphhPtr;
 extern std::vector<std::string> g_args;
 
+#ifdef USE_GLUT
 extern void PrintBitmapStringJustified(float x, float y, int justification, void *font, const char *format, ...);
 extern void PrintString9x15(float x, float y, int justification, const char *format, ...);
+#endif
 
 extern double gt_Fps;
 extern double g_distance;

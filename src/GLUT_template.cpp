@@ -1,7 +1,7 @@
 #include <string>
 #include <vector>
 #include <fluxions.hpp>
-#include <glut-template.hpp>
+#include <GLUT_template.hpp>
 #include <GL/freeglut.h>
 
 #ifdef WIN32

@@ -170,7 +170,7 @@ namespace SSPHH
 			bool showHUD = false;
 			bool showMainHUD = false;
 			bool showDeferredHUD = false;
-			bool showImGui = true;
+			bool showImGui = false;
 
 			struct TOOLSINFO
 			{

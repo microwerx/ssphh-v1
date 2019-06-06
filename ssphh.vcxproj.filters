@@ -27,9 +27,6 @@
     <ClInclude Include="include\jellyfish.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\glut-template.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Damselfish.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -46,6 +43,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\GLFW_template.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GLUT_template.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -83,9 +83,6 @@
     <ClCompile Include="src\jellyfish.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\glut-template.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ssphh_imgui_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -105,6 +102,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GLFW_template.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GLUT_template.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

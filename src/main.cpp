@@ -19,8 +19,6 @@
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 
 #include "pch.h"
-#include <DragDrop.hpp>
-#include <GLFW_template.hpp>
 
 #define USE_GLFW 1
 
@@ -67,7 +65,9 @@
 #include <unicornfish.hpp>
 #include "ssphh.hpp"
 
-#include <glut-template.hpp>
+#include <DragDrop.hpp>
+#include <GLFW_template.hpp>
+#include <GLUT_template.hpp>
 
 #ifndef FLUXIONS_NO_SDL
 #include <SDL2/SDL.h>
@@ -122,7 +122,9 @@ int main(int argc, char **argv)
 #endif
 #ifdef USE_GLFW
 	GlfwTemplateSetParameters("SSPHH", 1280, 720);
-	GlfwTemplateInit(argc, argv);
+	if (!GlfwTemplateInit(argc, argv)) {
+		return -1;
+	}
 #endif
 	dragDrop.Init();
 	InitApp();
