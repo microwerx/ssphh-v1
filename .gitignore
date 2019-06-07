@@ -321,6 +321,7 @@ __pycache__/
 !*.vert
 !*.frag
 !*.geom
+!*.glsl
 !*.png
 !*.jpg
 !*.exr
@@ -339,10 +340,12 @@ export*
 CoronaStandalone_log.txt
 
 # Ignore the resources folder
-resources/
+resources/scenes
+resources/models
+resources/fonts
 output/
-!resources/shaders/*
-!resources/renderconfigs/*
+!resources/shaders/**
+!resources/renderconfigs/**
 !resources/models/*
 
 x64/

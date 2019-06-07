@@ -1,0 +1,163 @@
+# Render Configuration File for Fluxions Renderer
+
+@DEFAULTWIDTH 1024
+@DEFAULTHEIGHT 1024
+
+# ==== Paths ====
+
+path ./
+path ../shaders/
+path ../textures/
+
+# ==== Samplers =====
+
+sampler default2dSampler
+sampler GL_TEXTURE_WRAP_S GL_REPEAT
+sampler GL_TEXTURE_WRAP_T GL_REPEAT
+sampler GL_TEXTURE_MIN_FILTER GL_LINEAR_MIPMAP_LINEAR
+sampler GL_TEXTURE_MAG_FILTER GL_LINEAR
+
+sampler defaultShadowSampler
+sampler GL_TEXTURE_WRAP_S GL_REPEAT
+sampler GL_TEXTURE_WRAP_T GL_REPEAT
+sampler GL_TEXTURE_MIN_FILTER GL_LINEAR
+sampler GL_TEXTURE_MAG_FILTER GL_LINEAR
+
+sampler defaultCubeSampler
+sampler GL_TEXTURE_WRAP_S GL_CLAMP_TO_EDGE
+sampler GL_TEXTURE_WRAP_T GL_CLAMP_TO_EDGE
+sampler GL_TEXTURE_WRAP_R GL_CLAMP_TO_EDGE
+sampler GL_TEXTURE_MIN_FILTER GL_LINEAR_MIPMAP_LINEAR
+sampler GL_TEXTURE_MAG_FILTER GL_LINEAR
+
+# ==== Textures ====
+
+texture enviroCubeTexture
+texture GL_TEXTURE_CUBE_MAP
+texture GL_TEXTURE_CUBE_MAP_POSITIVE_X "cube_pos_x.png"
+texture GL_TEXTURE_CUBE_MAP_POSITIVE_Y "cube_pos_y.png"
+texture GL_TEXTURE_CUBE_MAP_POSITIVE_Z "cube_pos_z.png"
+texture GL_TEXTURE_CUBE_MAP_NEGATIVE_X "cube_neg_x.png"
+texture GL_TEXTURE_CUBE_MAP_NEGATIVE_Y "cube_neg_y.png"
+texture GL_TEXTURE_CUBE_MAP_NEGATIVE_Z "cube_neg_z.png"
+texture GL_GENERATE_MIPMAP
+
+texture enviroCubeTexture2
+texture GL_TEXTURE_CUBE_MAP
+texture GL_TEXTURE_CUBE_MAP_POSITIVE_X "free_cube_map_positive_x.png"
+texture GL_TEXTURE_CUBE_MAP_POSITIVE_Y "free_cube_map_positive_y.png"
+texture GL_TEXTURE_CUBE_MAP_POSITIVE_Z "free_cube_map_positive_z.png"
+texture GL_TEXTURE_CUBE_MAP_NEGATIVE_X "free_cube_map_negative_x.png"
+texture GL_TEXTURE_CUBE_MAP_NEGATIVE_Y "free_cube_map_negative_y.png"
+texture GL_TEXTURE_CUBE_MAP_NEGATIVE_Z "free_cube_map_negative_z.png"
+texture GL_GENERATE_MIPMAP
+
+# ==== Render Configurations ====
+
+renderconfig foursplit
+
+program upperleft
+description "GLES 3.0"
+vertshader ssphh_es30.vert
+fragshader ssphh_es30.frag
+vertattrib 0 aPosition
+vertattrib 1 aNormal
+vertattrib 2 aTexcoord
+vertattrib 3 aColor
+vertattrib 4 aAttrib
+
+program upperright
+description "GLES 2.0"
+vertshader ssphh_es20.vert
+fragshader ssphh_es20.glsl
+vertattrib 0 aPosition
+vertattrib 1 aNormal
+vertattrib 2 aTexcoord
+vertattrib 3 aColor
+vertattrib 4 aAttrib
+vertattrib 6 aTangent
+vertattrib 7 aBinormal
+
+program lowerleft
+description "Image difference"
+vertshader image_difference_es20.vert
+fragshader image_difference_es20.frag
+vertattrib 0 aPosition
+vertattrib 1 aTexcoord
+
+program lowerright
+description "Groundtruth"
+vertshader groundtruth_es20.vert
+fragshader groundtruth_es20.frag
+vertattrib 0 aPosition
+vertattrib 1 aTexcoord
+
+program DefaultFastProgram
+vertshader ssphh_es20.vert
+fragshader ssphh_es20.frag
+vertattrib 0 aPosition
+vertattrib 1 aNormal
+vertattrib 2 aTexcoord
+vertattrib 3 aColor
+vertattrib 4 aAttrib
+
+program DefaultSlowProgram
+vertshader ssphh_es30.vert
+fragshader ssphh_es30.frag
+vertattrib 0 aPosition
+vertattrib 1 aNormal
+vertattrib 2 aTexcoord
+vertattrib 3 aColor
+vertattrib 4 aAttrib
+
+program DefaultZProgram
+vertshader default_z_vs.glsl
+fragshader default_z_fs.glsl
+vertattrib 0 vtxPosition
+
+renderbuffer "rb_color0" GL_RGBA @DEFAULTWIDTH @DEFAULTHEIGHT
+fbo "renderToTexture"
+fbo attach GL_RENDERBUFFER GL_COLOR_ATTACHMENT0 rb_color0
+
+renderconfig sphl
+
+program sphl
+vertshader sphl_es30.vert
+fragshader sphl_es30.frag
+vertattrib 0 aPosition
+vertattrib 1 aNormal
+vertattrib 2 aTexCoord
+
+renderconfig skybox
+
+program skybox
+vertshader skybox_es20.vert
+fragshader skybox_es20.frag
+vertattrib 0 aPosition
+vertattrib 1 aNormal
+vertattrib 2 aTexCoord
+
+renderconfig glut
+
+program UnwrappedCubeMap
+vertshader unwrapped_cubemap_es20.vert
+fragshader unwrapped_cubemap_es20.frag
+vertattrib 0 aPosition
+vertattrib 1 aTexCoord
+
+renderconfig cube_shadow
+program cube_shadow
+vertshader cube_shadow_gl330.vert
+geomshader cube_shadow_gl330.geom
+fragshader cube_shadow_gl330.frag
+vertattrib 0 aPosition
+
+# ==== UniformLists ====
+
+uniformlist defaultCamera
+uniformMatrix4f cameraMatrix @CAMERAMATRIX
+uniformMatrix4f shadowMatrix @SHADOWMATRIX
+uniformMatrix4f sunMatrix @SUNMATRIX
+
+# ==== Render Commands ====
+
