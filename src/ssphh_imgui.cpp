@@ -96,6 +96,8 @@ namespace SSPHH
 
 	void SSPHH_Application::RenderImGuiHUD()
 	{
+		HFLOGDEBUGFIRSTRUN();
+
 		imguiWinX = 64.0f;
 		imguiWinW = 384.0f;
 

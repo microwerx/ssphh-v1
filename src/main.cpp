@@ -21,6 +21,7 @@
 #include "pch.h"
 
 #define USE_GLFW 1
+//#define USE_FREEGLUT 1
 
 #ifdef WIN32
 #define _STDCALL_SUPPORTED

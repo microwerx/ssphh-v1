@@ -610,7 +610,7 @@ namespace SSPHH
 
 		if (keymod == 0) {
 			if (Interface.showImGui == false && key == "Escape") {
-				glutLeaveMainLoop();
+				LeaveMainLoop();
 			}
 			else if (Interface.showImGui == true && key == "Escape") {
 				return;
@@ -737,8 +737,10 @@ namespace SSPHH
 				Interface.ssphh.enableShowSPHLs = !Interface.ssphh.enableShowSPHLs;
 			if (key == "F8")
 				Interface.showImGui = !Interface.showImGui;
-			if (key == "F10")
+			if (key == "F10") {
 				Interface.showImGui = !Interface.showImGui;
+				HFLOGDEBUG("%s ImGui", Interface.showImGui ? "showing" : "hiding");
+			}
 
 			if (key == "F11") {
 				SavePbskyTextures();
@@ -1045,12 +1047,15 @@ namespace SSPHH
 
 	void SSPHH_Application::OnPreRender()
 	{
+		HFLOGDEBUGFIRSTRUN();
 		glClearColor(0.0, 0.0, 0.0, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 
 	void SSPHH_Application::OnRender3D()
 	{
+		HFLOGDEBUGFIRSTRUN();
+
 		if (Interface.uf.uf_type == UfType::Broker)
 			return;
 
@@ -1093,6 +1098,8 @@ namespace SSPHH
 
 	void SSPHH_Application::OnRender2D()
 	{
+		HFLOGDEBUGFIRSTRUN();
+
 		bool isCameraViewMatrixVisible = true;
 
 		float xpos = 0.0f;
@@ -1134,6 +1141,8 @@ namespace SSPHH
 
 	void SSPHH_Application::OnRenderDearImGui()
 	{
+		HFLOGDEBUGFIRSTRUN();
+
 		if (Interface.showImGui) {
 			RenderImGuiHUD();
 		}
@@ -1141,6 +1150,7 @@ namespace SSPHH
 
 	void SSPHH_Application::OnPostRender()
 	{
+		HFLOGDEBUGFIRSTRUN();
 	}
 
 	void SSPHH_Application::RenderHUD()

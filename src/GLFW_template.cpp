@@ -163,11 +163,25 @@ namespace glfwt
 		}
 	}
 
+	void window_size_callback(GLFWwindow* window, int width, int height)
+	{
+		aspectRatio = (double)width / (double)height;
+		screenWidth = width;
+		screenHeight = height;
+
+		if (vfWidget) {
+			vfWidget->OnReshape(width, height);
+		}
+		else {
+			glViewport(0, 0, width, height);
+		}
+	}
+
 	// timeStamp is seconds
-	void OnUpdate(double timeStamp)
+	void OnUpdate(double deltaTime)
 	{
 		if (!vfWidget) return;
-		vfWidget->OnUpdate(timeStamp);
+		vfWidget->OnUpdate(deltaTime);
 	}
 
 	void OnRender()
@@ -214,6 +228,7 @@ bool GlfwTemplateInit(int argc, char **argv)
 	glfwSetKeyCallback(glfwt::window, glfwt::key_callback);
 	glfwSetMouseButtonCallback(glfwt::window, glfwt::mouse_button_callback);
 	glfwSetCursorPosCallback(glfwt::window, glfwt::cursor_position_callback);
+	glfwSetWindowSizeCallback(glfwt::window, glfwt::window_size_callback);
 
 	glfwt::exitMainloop = false;
 
@@ -230,29 +245,31 @@ void GlfwTemplateMainLoop()
 	// Initialize Viperfish widgets
 	if (glfwt::vfWidget) {
 		glfwt::vfWidget->Init(glfwt::args);
+		glfwt::vfWidget->OnReshape(glfwt::screenWidth, glfwt::screenHeight);
 	}
 
 	// Loop until the user closes the window
+	double t0 = glfwGetTime();
 	while (!glfwWindowShouldClose(glfwt::window) && !glfwt::exitMainloop) {
-		double timeStamp = glfwGetTime();
+		double t1 = glfwGetTime();
+		double dt = t1 - t0;
+		t0 = t1;
 
 		// Update widgets
-		glfwt::OnUpdate(timeStamp);
+		glfwt::OnUpdate(dt);
 
 		// Render widgets (3D, 2D, and then DearImGUI)
 		glfwt::OnRender();
-
-		if (!glfwt::vfWidget) {
-			// Rendering
-			glClearColor(1.0, 0.0, 0.0, 1.0);
-			glClear(GL_COLOR_BUFFER_BIT);
-		}
 
 		// Double buffering
 		glfwSwapBuffers(glfwt::window);
 
 		// Poll/process events
 		glfwPollEvents();
+
+		if (glfwt::vfWidget) {
+			glfwt::exitMainloop = glfwt::vfWidget->leaveMainLoop();
+		}
 	}
 
 	// Kill viperfish widgets
