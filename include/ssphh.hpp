@@ -87,6 +87,10 @@ namespace SSPHH
 		SimpleRenderConfiguration rectShadowRenderConfig;
 		SimpleRenderConfiguration rectEnvMapRenderConfig;
 		SimpleRenderConfiguration uberShaderRenderConfig;
+		SimpleRenderConfiguration foursplitULRenderConfig;
+		SimpleRenderConfiguration foursplitURRenderConfig;
+		SimpleRenderConfiguration foursplitLLRenderConfig;
+		SimpleRenderConfiguration foursplitLRRenderConfig;
 
 		SamplerObject defaultCubeTextureSampler;
 		SamplerObject default2DTextureSampler;

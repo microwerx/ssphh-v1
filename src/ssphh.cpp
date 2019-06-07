@@ -170,6 +170,17 @@ namespace SSPHH
 		gles30CubeMap.GetRenderConfig().shaderProgram = renderer2.FindProgram("pb_monolithic", "DefaultSlowProgram");
 		gles30CubeMap.GetRenderConfig().zShaderProgram = renderer2.FindProgram("pb_monolithic", "DefaultZProgram");
 
+		// New four split render config
+
+		foursplitULRenderConfig.shaderProgram = renderer2.FindProgram("foursplit", "upperleft");
+		foursplitURRenderConfig.shaderProgram = renderer2.FindProgram("foursplit", "upperright");
+		foursplitLLRenderConfig.shaderProgram = renderer2.FindProgram("foutsplit", "lowerleft");
+		foursplitLRRenderConfig.shaderProgram = renderer2.FindProgram("foursplit", "lowerright");
+		if (!foursplitLLRenderConfig.check()) HFLOGERROR("Four split renderconfig failure! --> Lower left");
+		if (!foursplitLRRenderConfig.check()) HFLOGERROR("Four split renderconfig failure! --> Lower right");
+		if (!foursplitULRenderConfig.check()) HFLOGERROR("Four split renderconfig failure! --> Upper left");
+		if (!foursplitURRenderConfig.check()) HFLOGERROR("Four split renderconfig failure! --> Lower right");
+
 		glutSetDefaultErrorMessage();
 	}
 

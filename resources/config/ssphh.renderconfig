@@ -54,6 +54,39 @@ texture GL_GENERATE_MIPMAP
 
 # ==== Render Configurations ====
 
+renderconfig pb_monolithic
+
+program DefaultSlowProgram
+vertshader default_slow_es30.vert
+fragshader default_slow_es30.frag
+vertattrib 0 vtxPosition
+vertattrib 1 vtxNormal
+vertattrib 2 vtxTexCoord
+vertattrib 3 vtxColor
+vertattrib 4 vtxAttrib
+
+program DefaultFastProgram
+vertshader default_fast_vs.glsl
+fragshader default_fast_fs.glsl
+vertattrib 0 vtxPosition
+vertattrib 1 vtxNormal
+vertattrib 2 vtxTexCoord
+vertattrib 3 vtxColor
+vertattrib 4 vtxAttrib
+vertattrib 6 vtxTangent
+vertattrib 7 vtxBinormal
+
+program DefaultZProgram
+vertshader default_z_vs.glsl
+fragshader default_z_fs.glsl
+vertattrib 0 vtxPosition
+
+renderbuffer "rb_color0" GL_RGBA @DEFAULTWIDTH @DEFAULTHEIGHT
+fbo "renderToTexture"
+fbo attach GL_RENDERBUFFER GL_COLOR_ATTACHMENT0 rb_color0
+
+# ==== The New SSPHH Four Split Renderconfig =====
+
 renderconfig foursplit
 
 program upperleft
