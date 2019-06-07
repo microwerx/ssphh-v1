@@ -525,7 +525,7 @@
       <data key="d5"/>
       <data key="d6">
         <y:UMLClassNode>
-          <y:Geometry height="168.0" width="200.0" x="-314.19921875" y="-1071.4"/>
+          <y:Geometry height="228.0" width="200.0" x="-303.9984375" y="-1071.4"/>
           <y:Fill color="#FF3F7F" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="URW Geometric Cond Medium" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="17.000011444091797" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="84.66506958007812" x="57.66746520996094" xml:space="preserve" y="3.0">class Scenegraph<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -534,12 +534,16 @@
 + Lights: PointLight
 + Sphls: SPHL
 + GeometryGroups: GeometryGroup
-+ changed: bool</y:AttributeLabel>
++ Materials: std::map&lt;std::string, MaterialPtr&gt;
++ Maps: std::map&lt;std::string, MapPtr&gt;
++ changed: bool
+- loadedPaths: std::vector&lt;std::string&gt;</y:AttributeLabel>
             <y:MethodLabel xml:space="preserve">+ Load(path: std::string)
 + Save(path: std::string)
 - LoadMTL(path: std::string)
 - LoadOBJ(path: std::string)
-- LoadOBJMTL(path: std::string)</y:MethodLabel>
+- LoadOBJMTL(path: std::string)
++ Reset()</y:MethodLabel>
           </y:UML>
         </y:UMLClassNode>
       </data>
@@ -568,14 +572,45 @@
       <data key="d5"/>
       <data key="d6">
         <y:UMLClassNode>
-          <y:Geometry height="168.0" width="200.0" x="-182.1484375" y="-1303.775"/>
+          <y:Geometry height="168.0" width="200.0" x="-73.99843750000002" y="-1303.775"/>
           <y:Fill color="#FF3F7F" transparent="false"/>
           <y:BorderStyle color="#000000" type="line" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="URW Geometric Cond Medium" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="17.000011444091797" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="110.87309265136719" x="44.563453674316406" xml:space="preserve" y="3.0">class SceneGraphNode<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
           <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="" use3DEffect="true">
-            <y:AttributeLabel xml:space="preserve">+ transform: Matrix4f
-+ position: Vector3f
-+ bbox: BoundingBox3f</y:AttributeLabel>
+            <y:AttributeLabel xml:space="preserve">+ transform_: Matrix4f
++ position_: Vector3f
++ bbox_: BoundingBox3f
++ material_: std::string
++ mtllib_: std::string</y:AttributeLabel>
+            <y:MethodLabel xml:space="preserve">+ getTransform(): Matrix4f &amp;
++ getPosition(): Vector3f &amp;
++ getBBox(): BoundingBox3f &amp;
++ getMaterial(): std::string
++ getMtlLib(): std::string</y:MethodLabel>
+          </y:UML>
+        </y:UMLClassNode>
+      </data>
+    </node>
+    <node id="n47">
+      <data key="d4" xml:space="preserve"/>
+      <data key="d5"/>
+      <data key="d6">
+        <y:UMLClassNode>
+          <y:Geometry height="168.0" width="200.0" x="-303.9984375" y="-1303.775"/>
+          <y:Fill color="#FF3F7F" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="URW Geometric Cond Medium" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="17.000011444091797" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="68.03804016113281" x="65.9809799194336" xml:space="preserve" y="3.0">class Material<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+          <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="" use3DEffect="true">
+            <y:AttributeLabel xml:space="preserve">+ name: string
++ mtllib: string
++ Kd: Color3f
++ Ks: Color3f
++ Ke: Color3f
++ norm: Map
++ map_Kd: MapPtr
++ map_Ks: MapPtr
++ map_Ke: MapPtr
++ ...</y:AttributeLabel>
             <y:MethodLabel xml:space="preserve"/>
           </y:UML>
         </y:UMLClassNode>
