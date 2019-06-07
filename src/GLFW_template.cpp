@@ -63,6 +63,36 @@ namespace glfwt
 
 namespace glfwt
 {
+	int glfwKeyToVf(int key)
+	{
+		if (key >= GLFW_KEY_F1 && key <= GLFW_KEY_F12) return VF_KEY_F1 + (key - GLFW_KEY_F1);
+		else if (key == GLFW_KEY_LEFT) return VF_KEY_LEFT;
+		else if (key == GLFW_KEY_RIGHT) return VF_KEY_RIGHT;
+		else if (key == GLFW_KEY_UP) return VF_KEY_UP;
+		else if (key == GLFW_KEY_DOWN) return VF_KEY_DOWN;
+		else if (key == GLFW_KEY_ESCAPE) return 27;
+		else if (key == GLFW_KEY_TAB) return '\t';
+		else if (key == GLFW_KEY_ENTER) return '\n';
+		else if (key == GLFW_KEY_BACKSPACE) return '\b';
+		else if (key == GLFW_KEY_LEFT_ALT) return VF_KEY_ALT_L;
+		else if (key == GLFW_KEY_RIGHT_ALT) return VF_KEY_ALT_R;
+		else if (key == GLFW_KEY_LEFT_SHIFT) return VF_KEY_SHIFT_L;
+		else if (key == GLFW_KEY_RIGHT_SHIFT) return VF_KEY_SHIFT_R;
+		else if (key == GLFW_KEY_LEFT_CONTROL) return VF_KEY_CTRL_L;
+		else if (key == GLFW_KEY_RIGHT_CONTROL) return VF_KEY_CTRL_R;
+		else if (key == GLFW_KEY_MENU) return VF_KEY_MENU;
+		else if (key == GLFW_KEY_LEFT_SUPER) return VF_KEY_META_L;
+		else if (key == GLFW_KEY_RIGHT_SUPER) return VF_KEY_META_R;
+		else if (key >= GLFW_KEY_KP_0 && key <= GLFW_KEY_KP_EQUAL) return VF_KEY_KP_0 + (key - GLFW_KEY_KP_0);
+		else if (key == GLFW_KEY_PAGE_UP) return VF_KEY_PAGE_UP;
+		else if (key == GLFW_KEY_PAGE_DOWN) return VF_KEY_PAGE_DOWN;
+		else if (key == GLFW_KEY_HOME) return VF_KEY_HOME;
+		else if (key == GLFW_KEY_END) return VF_KEY_END;
+		else if (key == GLFW_KEY_INSERT) return VF_KEY_INSERT;
+		else if (key == GLFW_KEY_DELETE) return VF_KEY_DELETE;
+		return key;
+	}
+
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
 		keyMap[key] = action;
@@ -73,18 +103,20 @@ namespace glfwt
 			mods & GLFW_MOD_SUPER,
 			mods & GLFW_MOD_CAPS_LOCK,
 			mods & GLFW_MOD_NUM_LOCK);
-		std::string keyName = Viperfish::KeyToHTML5Name(key);
+		key = glfwKeyToVf(key);
+		int keymod = Viperfish::GetKeyboardModifiers();
+		std::string keyName = key < 0x100 ? Viperfish::KeyToHTML5Name(key) : Viperfish::SpecialKeyToHTML5Name(key);
 		
-		HFLOGINFO("%03d %s %s",
-			key,
-			keyName.c_str(),
-			action ? "pressed" : "released");
+		//HFLOGDEBUG("%03d %s %s",
+		//	key,
+		//	keyName.c_str(),
+		//	action ? "pressed" : "released");
 
 		if (vfWidget) {
 			if (action == GLFW_PRESS)
-				vfWidget->OnKeyDown(keyName, mods);
+				vfWidget->OnKeyDown(keyName, keymod);
 			else if (action == GLFW_RELEASE) {
-				vfWidget->OnKeyUp(keyName, mods);
+				vfWidget->OnKeyUp(keyName, keymod);
 			}
 			else if (action == GLFW_REPEAT) {
 				// ... not doing repeats right now
@@ -141,9 +173,11 @@ namespace glfwt
 	void OnRender()
 	{
 		if (!vfWidget) return;
+		vfWidget->OnPreRender();
 		vfWidget->OnRender3D();
 		vfWidget->OnRender2D();
 		vfWidget->OnRenderDearImGui();
+		vfWidget->OnPostRender();
 	}
 }
 
