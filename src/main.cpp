@@ -33,6 +33,9 @@
 #endif
 
 #pragma comment(lib, "fluxions.lib")
+#pragma comment(lib, "fluxions-deps.lib")
+#pragma comment(lib, "fluxions-gte.lib")
+
 #pragma comment(lib, "glew32.lib")
 #ifndef FLUXIONS_NO_OPENEXR
 #pragma comment(lib, "Half-2_3.lib")
@@ -44,7 +47,7 @@
 //#pragma comment(lib, "Imath-2_3")
 #endif
 
-#ifdef NDEBUG
+#ifndef _DEBUG
 #pragma comment(lib, "zmq4.lib")
 #else
 #pragma comment(lib, "zmq4d.lib")

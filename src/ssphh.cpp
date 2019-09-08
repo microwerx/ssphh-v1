@@ -1937,7 +1937,7 @@ namespace SSPHH
 
 		std::map<GLenum, RenderTarget *> rts;
 
-		double t0 = hflog.getSecondsElapsed();
+		double sunShadowT0 = hflog.getSecondsElapsed();
 		rectShadowRenderConfig.renderSkyBox = false;
 		rectShadowRenderConfig.viewportRect.w = Interface.renderconfig.sunShadowMapSize;
 		rectShadowRenderConfig.viewportRect.h = Interface.renderconfig.sunShadowMapSize;
@@ -2000,7 +2000,7 @@ namespace SSPHH
 		//	glutBindTextureAndSampler(rt.unit, rt.target, 0, 0);
 		//	rt.unit = 0;
 		//}
-		ssg.environment.sunShadowMapTime = (float)(1000.0f * (hflog.getSecondsElapsed() - t0));
+		ssg.environment.sunShadowMapTime = (float)(1000.0f * (hflog.getSecondsElapsed() - sunShadowT0));
 
 		if (Interface.captureShadows) {
 			SaveTextureMap(GL_TEXTURE_2D, ssg.environment.sunColorMapId, "sun_color.ppm");

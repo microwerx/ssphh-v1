@@ -3,7 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #ifdef WIN32
-#ifdef NDEBUG
+#ifndef _DEBUG
 #pragma comment(lib, "glfw3.lib")
 #else
 #pragma comment(lib, "glfw3d.lib")
