@@ -1,4 +1,4 @@
-﻿// SSPHH/Fluxions/Unicornfish/Viperfish/Hatchetfish/Sunfish/KASL/GLUT Extensions
+﻿// SSPHH/Fluxions/Unicornfish/Viperfish/Hatchetfish/Sunfish/Damselfish/GLUT Extensions
 // Copyright (C) 2017 Jonathan Metzgar
 // All rights reserved.
 //
@@ -455,12 +455,12 @@ namespace SSPHH
 	//
 	//		if (key == '4')
 	//		{
-	//			python.addCommand(KASL::PythonInterpreter::Command::PyRunFile, "resources/scripts/guitest.py");
+	//			python.addCommand(Df::PythonInterpreter::Command::PyRunFile, "resources/scripts/guitest.py");
 	//		}
 	//
 	//		if (key == '5')
 	//		{
-	//			python.addCommand(KASL::PythonInterpreter::Command::PyRunString, "print('hello')");
+	//			python.addCommand(Df::PythonInterpreter::Command::PyRunString, "print('hello')");
 	//		}
 	//
 	//		if (key == '6')
@@ -632,12 +632,12 @@ namespace SSPHH
 
 			if (key == "4") {
 				Interface.tools.shaderDebugChoice = Fluxions::clamp(Interface.tools.shaderDebugChoice - 1, 0, 20);
-				// python.addCommand(KASL::PythonInterpreter::Command::PyRunFile, "resources/scripts/guitest.py");
+				// python.addCommand(Df::PythonInterpreter::Command::PyRunFile, "resources/scripts/guitest.py");
 			}
 
 			if (key == "5") {
 				Interface.tools.shaderDebugChoice = Fluxions::clamp(Interface.tools.shaderDebugChoice + 1, 0, 20);
-				// python.addCommand(KASL::PythonInterpreter::Command::PyRunString, "print('hello')");
+				// python.addCommand(Df::PythonInterpreter::Command::PyRunString, "print('hello')");
 			}
 
 			if (key == "6") {

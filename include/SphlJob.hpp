@@ -17,7 +17,7 @@ public:
 	void resizeCoefs(int maxDegree) noexcept;
 
 	std::string json;
-	KASL::JSONPtr jsonObject;
+	Df::JSONPtr jsonObject;
 
 	int numChannels;
 	int maxDegree;

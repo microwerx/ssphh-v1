@@ -1,4 +1,4 @@
-// SSPHH/Fluxions/Unicornfish/Viperfish/Hatchetfish/Sunfish/KASL/GLUT Extensions
+// SSPHH/Fluxions/Unicornfish/Viperfish/Hatchetfish/Sunfish/Damselfish/GLUT Extensions
 // Copyright (C) 2017 Jonathan Metzgar
 // All rights reserved.
 //
@@ -500,7 +500,7 @@ namespace SSPHH
 
 	public:
 		HUDInfo my_hud_info;
-		//KASL::PythonInterpreter python;
+		//Df::PythonInterpreter python;
 
 		std::vector<std::string> args; // to pull in the argc, argv from main()
 

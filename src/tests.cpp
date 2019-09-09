@@ -1,4 +1,4 @@
-// SSPHH/Fluxions/Unicornfish/Viperfish/Hatchetfish/Sunfish/KASL/GLUT Extensions
+// SSPHH/Fluxions/Unicornfish/Viperfish/Hatchetfish/Sunfish/Damselfish/GLUT Extensions
 // Copyright (C) 2017 Jonathan Metzgar
 // All rights reserved.
 //
@@ -49,14 +49,14 @@ void test_json()
 {
 	std::string test_json = "{\"projects\":[{\"id\":\"1\", \"name\" : \"Outside scene\", \"description\" : \"A scene with a floor, teapot, bunny, and dragon.\"}, { \"id\":\"2\",\"name\" : \"test1\",\"description\" : \"this is a description for test1\" }, { \"id\":\"3\",\"name\" : \"test2\",\"description\" : \"this is a description for test2\" }, { \"id\":\"4\",\"name\" : \"a project\",\"description\" : \"a description about a project\" }, { \"id\":\"32\",\"name\" : \"test\",\"description\" : \"test description\" }, { \"id\":\"114\",\"name\" : \"test8141\",\"description\" : \"this is a description for test1\" }, { \"id\":\"119\",\"name\" : \"project 1\",\"description\" : \"project 1 description\" }, { \"id\":\"120\",\"name\" : \"project 2\",\"description\" : \"project 2 description\" }, { \"id\":\"121\",\"name\" : \"project 3\",\"description\" : \"project 3 description\" }, { \"id\":\"122\",\"name\" : \"project 4\",\"description\" : \"project 4 description\" }, { \"id\":\"123\",\"name\" : \"project 5\",\"description\" : \"project 5 description\" }]}";
 
-	KASL::JSONPtr json = KASL::JSON::New();
+	Df::JSONPtr json = Df::JSON::New();
 	if (json) {
 		bool result = json->Deserialize(test_json);
 		std::cout << __FUNCTION__ << " Deserialize() result was successful\n";
 		std::string str = json->Serialize();
 		std::cout << __FUNCTION__ << "\n";
 		std::cout << str << "\n";
-		KASL::JSONPtr json2 = KASL::JSON::New();
+		Df::JSONPtr json2 = Df::JSON::New();
 		json2->Deserialize(str);
 		result = false;
 		if (json == json2) {

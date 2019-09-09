@@ -2,24 +2,24 @@
 #include <SphlJob.hpp>
 
 
-KASL::JSONPtr NewVector3(const Fluxions::Vector3f & v)
+Df::JSONPtr NewVector3(const Fluxions::Vector3f & v)
 {
-	KASL::JSONPtr p = KASL::JSON::NewObject();
+	Df::JSONPtr p = Df::JSON::NewObject();
 	p->set({
-		{ "x", KASL::JSON::NewNumber(v.x) },
-		{ "y", KASL::JSON::NewNumber(v.y) },
-		{ "z", KASL::JSON::NewNumber(v.z) }
+		{ "x", Df::JSON::NewNumber(v.x) },
+		{ "y", Df::JSON::NewNumber(v.y) },
+		{ "z", Df::JSON::NewNumber(v.z) }
 		});
 	return p;
 }
 
-KASL::JSONPtr NewMatrix(std::vector<std::vector<float>> & M)
+Df::JSONPtr NewMatrix(std::vector<std::vector<float>> & M)
 {
-	KASL::JSONPtr m = KASL::JSON::NewArray();
+	Df::JSONPtr m = Df::JSON::NewArray();
 	for (auto & row : M) {
-		KASL::JSONPtr rowElements = KASL::JSON::NewArray();
+		Df::JSONPtr rowElements = Df::JSON::NewArray();
 		for (auto & col : row) {
-			rowElements->PushBack(KASL::JSON::NewNumber(col));
+			rowElements->PushBack(Df::JSON::NewNumber(col));
 		}
 		m->PushBack(rowElements);
 	}
@@ -28,7 +28,7 @@ KASL::JSONPtr NewMatrix(std::vector<std::vector<float>> & M)
 
 SphlJob::SphlJob()
 {
-	jsonObject = KASL::JSON::MakeObject();
+	jsonObject = Df::JSON::MakeObject();
 	resizeCoefs(0);
 }
 
@@ -41,19 +41,19 @@ SphlJob::~SphlJob()
 
 std::string SphlJob::toJSON() noexcept
 {
-	auto j_meta = KASL::JSON::NewObject();
+	auto j_meta = Df::JSON::NewObject();
 	j_meta->set({
 		{ "position",  NewVector3(meta_position) },
-		{ "scene",     KASL::JSON::NewString(meta_scene) },
-		{ "time",      KASL::JSON::NewString(hflog.makeDTG()) },
-		{ "sphlIndex", KASL::JSON::NewNumber(meta_sphlIndex) },
-		{ "coronaJob",   KASL::JSON::NewString(meta_coronaJob) }
+		{ "scene",     Df::JSON::NewString(meta_scene) },
+		{ "time",      Df::JSON::NewString(hflog.makeDTG()) },
+		{ "sphlIndex", Df::JSON::NewNumber(meta_sphlIndex) },
+		{ "coronaJob",   Df::JSON::NewString(meta_coronaJob) }
 		});
 
-	jsonObject = KASL::JSON::NewObject();
+	jsonObject = Df::JSON::NewObject();
 	jsonObject->set({
-		{ "numChannels", KASL::JSON::NewNumber(numChannels) },
-		{ "maxDegree",   KASL::JSON::NewNumber(maxDegree) },
+		{ "numChannels", Df::JSON::NewNumber(numChannels) },
+		{ "maxDegree",   Df::JSON::NewNumber(maxDegree) },
 		{ "coefs",       NewMatrix(coefs) },
 		{ "meta",        j_meta }
 		});
@@ -74,10 +74,10 @@ bool SphlJob::parseJSON(const std::string &str) noexcept
 
 	bool foundError = false;
 	jsonObject->Deserialize(str);
-	if (!jsonObject->HasKeyOfType("numChannels", KASL::JSON::Type::Number)) return false;
-	if (!jsonObject->HasKeyOfType("maxDegree", KASL::JSON::Type::Number)) return false;
-	if (!jsonObject->HasKeyOfType("coefs", KASL::JSON::Type::Array)) return false;
-	if (!jsonObject->HasKeyOfType("meta", KASL::JSON::Type::Object)) return false;
+	if (!jsonObject->HasKeyOfType("numChannels", Df::JSON::Type::Number)) return false;
+	if (!jsonObject->HasKeyOfType("maxDegree", Df::JSON::Type::Number)) return false;
+	if (!jsonObject->HasKeyOfType("coefs", Df::JSON::Type::Array)) return false;
+	if (!jsonObject->HasKeyOfType("meta", Df::JSON::Type::Object)) return false;
 
 	numChannels = jsonObject->getMember("numChannels")->AsInt();
 	maxDegree = jsonObject->getMember("maxDegree")->AsInt();
@@ -85,7 +85,7 @@ bool SphlJob::parseJSON(const std::string &str) noexcept
 	size_t numCoefs = sphl.size();
 
 	// Copy 'coefs'
-	std::vector<KASL::JSONPtr> j_coefs = jsonObject->getMember("coefs")->AsArray();
+	std::vector<Df::JSONPtr> j_coefs = jsonObject->getMember("coefs")->AsArray();
 	if (j_coefs.size() != sphl.size()) {
 		HFLOGERROR("JSON has incorrect number of SPH degrees %i %i",
 			(int)j_coefs.size(), (int)sphl.size());

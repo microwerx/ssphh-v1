@@ -1,4 +1,4 @@
-// SSPHH/Fluxions/Unicornfish/Viperfish/Hatchetfish/Sunfish/KASL/GLUT Extensions
+// SSPHH/Fluxions/Unicornfish/Viperfish/Hatchetfish/Sunfish/Damselfish/GLUT Extensions
 // PhD Scalable Spherical Harmonics Hierarchies
 // Copyright (C) 2017 Jonathan Metzgar
 // All rights reserved.
@@ -95,7 +95,7 @@ namespace Fluxions
 	extern int test_fluxions_simple_property(int argc, char **argv);
 }
 
-namespace KASL
+namespace Df
 {
 	extern int test_PythonInterpreter(int argc, char **argv);
 }
