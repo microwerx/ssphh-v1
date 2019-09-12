@@ -48,6 +48,12 @@
     <ClInclude Include="include\GLUT_template.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\fluxions_sphl.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fluxions_ssphh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -105,6 +111,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\GLUT_template.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fluxions_ssphh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

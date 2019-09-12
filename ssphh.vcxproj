@@ -138,6 +138,8 @@
   <ItemGroup>
     <ClInclude Include="include\Damselfish.hpp" />
     <ClInclude Include="include\DragDrop.hpp" />
+    <ClInclude Include="include\fluxions_sphl.hpp" />
+    <ClInclude Include="include\fluxions_ssphh.hpp" />
     <ClInclude Include="include\GLFW_template.hpp" />
     <ClInclude Include="include\GLUT_template.hpp" />
     <ClInclude Include="include\jellyfish.hpp" />
@@ -156,6 +158,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="src\fluxions_ssphh.cpp" />
     <ClCompile Include="src\GLFW_template.cpp" />
     <ClCompile Include="src\GLUT_template.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.h</PrecompiledHeaderFile>
