@@ -1634,10 +1634,10 @@ namespace SSPHH
 
 		int i = 0;
 		for (auto &sphl : ssg.ssphhLights) {
-			if (sphl.lightProbe_corona.empty()) {
-				sphl.UploadLightProbe(sphl.lightProbe_corona, sphl.coronaLightProbeTexture);
-				sphl.UploadLightProbe(sphl.lightProbe_sph, sphl.sphLightProbeTexture);
-				sphl.UploadLightProbe(sphl.lightProbe_hier, sphl.hierLightProbeTexture);
+			if (sphl.ptrcLightProbeImage.empty()) {
+				sphl.UploadLightProbe(sphl.ptrcLightProbeImage, sphl.ptrcLightProbeTexture);
+				sphl.UploadLightProbe(sphl.msphLightProbeImage, sphl.msphLightProbeTexture);
+				sphl.UploadLightProbe(sphl.hierLightProbeImage, sphl.hierLightProbeTexture);
 			}
 
 			if (Interface.ssphh.enableShadowColorMap) {
@@ -1646,8 +1646,8 @@ namespace SSPHH
 			else {
 				sphls[i].lightProbeTexIds[0] = sphl.hierLightProbeTexture.GetTexture();
 			}
-			sphls[i].lightProbeTexIds[1] = sphl.coronaLightProbeTexture.GetTexture();
-			sphls[i].lightProbeTexIds[2] = sphl.sphLightProbeTexture.GetTexture();
+			sphls[i].lightProbeTexIds[1] = sphl.ptrcLightProbeTexture.GetTexture();
+			sphls[i].lightProbeTexIds[2] = sphl.msphLightProbeTexture.GetTexture();
 			i++;
 		}
 	}
@@ -2146,13 +2146,13 @@ namespace SSPHH
 			for (auto &sphl : ssg.ssphhLights) {
 				double S = 0.25;
 				double R = 1.0;
-				FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.coronaLightProbeTexture.GetTexture());
+				FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.ptrcLightProbeTexture.GetTexture());
 				FxDrawGL2CubeMap(
 					sphl.position.x + R * 0.707 + S * 1,
 					sphl.position.y - R * 0.707,
 					sphl.position.z,
 					S, vloc, tloc);
-				FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.sphLightProbeTexture.GetTexture());
+				FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.msphLightProbeTexture.GetTexture());
 				FxDrawGL2CubeMap(
 					sphl.position.x + R * 0.707 + S * 3,
 					sphl.position.y - R * 0.707,
@@ -2186,7 +2186,7 @@ namespace SSPHH
 				//		sphl.position.z,
 				//		S, vloc, tloc);
 
-				//	texture = ssg.ssphhLights[hier.index].coronaLightProbeTexture.GetTexture();
+				//	texture = ssg.ssphhLights[hier.index].ptrcLightProbeTexture.GetTexture();
 				//	glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 				//	FxDrawGL2CubeMap(
 				//		sphl.position.x + R * 0.707 + S * (i * 2 + 1),
@@ -2194,7 +2194,7 @@ namespace SSPHH
 				//		sphl.position.z,
 				//		S, vloc, tloc);
 
-				//	texture = ssg.ssphhLights[hier.index].sphLightProbeTexture.GetTexture();
+				//	texture = ssg.ssphhLights[hier.index].msphLightProbeTexture.GetTexture();
 				//	glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 				//	FxDrawGL2CubeMap(
 				//		sphl.position.x + R * 0.707 + S * (i * 2 + 1),
@@ -2712,8 +2712,8 @@ namespace SSPHH
 			return true;
 		}
 		else if (job.IsGEN()) {
-			sphl.ReadCoronaLightProbe(job.GetOutputPath(useEXR));
-			sphl.SaveCoronaLightProbe(job.GetName() + "_sph.ppm");
+			sphl.ReadPtrcLightProbe(job.GetOutputPath(useEXR));
+			sphl.SavePtrcLightProbe(job.GetName() + "_sph.ppm");
 			if (ssg.ssphh.saveJSONs)
 				sphl.SaveJsonSph(job.GetName() + "_sph.json");
 

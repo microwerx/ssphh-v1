@@ -1403,8 +1403,8 @@ namespace SSPHH
 			ostr << ssg.name << "_sphl_" << std::setw(2) << std::setfill('0') << i;
 			sphl.SaveOBJ("output", ostr.str());
 			std::string path = "output/" + ostr.str();
-			sphl.SaveCoronaLightProbe(path + ".ppm");
-			sphl.SaveCoronaLightProbe(path + ".exr");
+			sphl.SavePtrcLightProbe(path + ".ppm");
+			sphl.SavePtrcLightProbe(path + ".exr");
 			i++;
 		}
 	}
