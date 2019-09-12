@@ -16,7 +16,7 @@ void GlfwTemplateSetParameters(const std::string &windowTitle, int width, int he
 bool GlfwTemplateInit(int argc, char **argv);
 
 // Set the Viperfish widget that is the main widget. Call after GlfwTemplateInit(...)
-void GlfwTemplateWidget(Viperfish::Widget::SharedPtr widget);
+void GlfwTemplateWidget(Vf::Widget::SharedPtr widget);
 
 // Give control over to GLFW to handle events. Call after GlfwTemplateWidget(...)
 void GlfwTemplateMainLoop();

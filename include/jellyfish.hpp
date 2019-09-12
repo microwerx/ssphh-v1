@@ -4,7 +4,7 @@
 #include <viperfish_widget.hpp>
 
 // Jellyfish is a turntable widget
-class Jellyfish : public Viperfish::Widget
+class Jellyfish : public Vf::Widget
 {
   public:
 	Jellyfish();

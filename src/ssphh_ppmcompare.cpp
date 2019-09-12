@@ -82,10 +82,10 @@ namespace SSPHH
 
 	void PPMCompare::Compare(Image3f &image1, Image3f &image2)
 	{
-		double t0 = hflog.getSecondsElapsed();
+		double t0 = Hf::Log.getSecondsElapsed();
 
 		if (image1.width() <= 0 || image1.height() <= 0 || image1.width() > 8192 || image1.height() > 8192 || image1.width() != image2.width() || image1.height() != image2.height()) {
-			hflog.errorfn(__FUNCTION__, "image sizes do not match or exceed the dimensions of 8192x8192");
+			Hf::Log.errorfn(__FUNCTION__, "image sizes do not match or exceed the dimensions of 8192x8192");
 			return;
 		}
 
@@ -192,12 +192,12 @@ namespace SSPHH
 		bciMaxValue = (int)(255.99 * bcMaxValue);
 		bciMaxValueBW = (int)(255.99 * bcMaxValueBW);
 
-		compareTime = hflog.getSecondsElapsed() - t0;
+		compareTime = Hf::Log.getSecondsElapsed() - t0;
 	}
 
 	void PPMCompare::SaveResults(const std::string &statsName, const std::string &pathtracerName, bool genDiffs, bool ignoreCache)
 	{
-		std::string dtg = hflog.makeDTG();
+		std::string dtg = Hf::Log.makeDTG();
 
 		std::ofstream fout(statsName + "_blocks.csv", ignoreCache ? std::ios::app : std::ios::out);
 		if (ignoreCache)
@@ -296,7 +296,7 @@ namespace SSPHH
 				continue;
 
 			std::string cmdline = std::string("magick ") + f.second + " " + png;
-			hflog.infofn(__FUNCTION__, "running ", cmdline.c_str());
+			Hf::Log.infofn(__FUNCTION__, "running ", cmdline.c_str());
 			system(cmdline.c_str());
 #ifdef WIN32
 			DeleteFileA(f.second.c_str());

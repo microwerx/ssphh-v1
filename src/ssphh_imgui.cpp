@@ -165,7 +165,7 @@ namespace SSPHH
 				if (ImGui::MenuItem("Checked", NULL, true)) {
 				}
 				if (ImGui::MenuItem("Quit", "Alt+F4")) {
-					glutLeaveMainLoop();
+					LeaveMainLoop();
 				}
 				ImGui::EndMenu();
 			}
@@ -215,7 +215,7 @@ namespace SSPHH
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Quit")) {
-			glutLeaveMainLoop();
+			LeaveMainLoop();
 		}
 
 		float time_ms = (float)(1000.0 / gt_Fps);
@@ -1416,12 +1416,12 @@ namespace SSPHH
 
 	void SSPHH_Application::imguiToolsSaveStats()
 	{
-		hflog.saveStats(ssg.name + "_");
+		Hf::Log.saveStats(ssg.name + "_");
 	}
 
 	void SSPHH_Application::imguiToolsResetStats()
 	{
-		hflog.resetStat("frametime");
+		Hf::Log.resetStat("frametime");
 	}
 
 	void SSPHH_Application::imguiCoronaControls()
@@ -1474,7 +1474,7 @@ namespace SSPHH
 		// for every pair of lights i, j where i != j,
 		//     generate a SCN that represents the
 
-		double viz_t0 = hflog.getSecondsElapsed();
+		double viz_t0 = Hf::Log.getSecondsElapsed();
 
 		int count = 0;
 		int numLights = (int)ssg.ssphhLights.size();
@@ -1528,23 +1528,23 @@ namespace SSPHH
 		if (count)
 			ssg.ssphh.VIZ();
 
-		Interface.ssphh.lastVIZTime = hflog.getSecondsElapsed() - viz_t0;
+		Interface.ssphh.lastVIZTime = Hf::Log.getSecondsElapsed() - viz_t0;
 	}
 
 	void SSPHH_Application::imguiCoronaGenerateSphlINIT()
 	{
-		double timeElapsed = hflog.getSecondsElapsed();
+		double timeElapsed = Hf::Log.getSecondsElapsed();
 		ssg.ssphh.INIT(ssg);
-		Interface.ssphh.lastINITTime = hflog.getSecondsElapsed() - timeElapsed;
+		Interface.ssphh.lastINITTime = Hf::Log.getSecondsElapsed() - timeElapsed;
 		DirtySPHLs();
 	}
 
 	void SSPHH_Application::imguiCoronaGenerateSphlHIER()
 	{
-		double timeElapsed = hflog.getSecondsElapsed();
+		double timeElapsed = Hf::Log.getSecondsElapsed();
 		ssg.ssphh.VIZmix = Interface.ssphh.HierarchiesMix;
 		ssg.ssphh.HIER(Interface.ssphh.HierarchiesIncludeSelf, Interface.ssphh.HierarchiesIncludeNeighbors, Interface.ssphh.MaxDegrees);
-		Interface.ssphh.lastHIERTime = hflog.getSecondsElapsed() - timeElapsed;
+		Interface.ssphh.lastHIERTime = Hf::Log.getSecondsElapsed() - timeElapsed;
 		DirtySPHLs();
 	}
 
@@ -1560,7 +1560,7 @@ namespace SSPHH
 
 		int count = 0;
 		int numLights = (int)ssg.ssphhLights.size();
-		double gen_t0 = hflog.getSecondsElapsed();
+		double gen_t0 = Hf::Log.getSecondsElapsed();
 		Interface.ssphh.gen_times.resize(numLights, 0.0);
 		for (int sendLight = 0; sendLight < numLights; sendLight++) {
 			if (defaultRenderConfig.shaderDebugSphl >= 0 && sendLight != defaultRenderConfig.shaderDebugSphl)
@@ -1605,7 +1605,7 @@ namespace SSPHH
 			DirtySPHLs();
 		}
 
-		Interface.ssphh.lastGENTime = hflog.getSecondsElapsed() - gen_t0;
+		Interface.ssphh.lastGENTime = Hf::Log.getSecondsElapsed() - gen_t0;
 	}
 
 	void SSPHH_Application::imguiCoronaGenerateSky()
@@ -1632,15 +1632,15 @@ namespace SSPHH
 				lightProbe.ReverseSRGB().ReverseToneMap(ssg.environment.toneMapExposure);
 			}
 			lightProbe.convertRectToCubeMap();
-			glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, ssg.environment.pbskyColorMapId);
+			FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, ssg.environment.pbskyColorMapId);
 			for (int i = 0; i < 6; i++) {
 				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA32F, (GLsizei)lightProbe.width(), (GLsizei)lightProbe.height(), 0, GL_RGBA, GL_FLOAT, lightProbe.getImageData(i));
 			}
 			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-			glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+			FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		}
 		else {
-			hflog.errorfn(__FUNCTION__, "Could not generate %s", fpi.path.c_str());
+			Hf::Log.errorfn(__FUNCTION__, "Could not generate %s", fpi.path.c_str());
 		}
 	}
 
@@ -1656,7 +1656,7 @@ namespace SSPHH
 	{
 		imguiCoronaCheckCache();
 		if (Interface.ssphh.enableREF) {
-			double time0 = hflog.getSecondsElapsed();
+			double time0 = Hf::Log.getSecondsElapsed();
 			std::string name = CoronaJob::MakeREFName(
 				Interface.sceneName,
 				false,
@@ -1679,11 +1679,11 @@ namespace SSPHH
 			else
 				job1.Start(coronaScene, ssg);
 			Interface.ssphh.lastREFPath = job1.GetOutputPath();
-			Interface.ssphh.lastREFTime = hflog.getSecondsElapsed() - time0;
+			Interface.ssphh.lastREFTime = Hf::Log.getSecondsElapsed() - time0;
 		}
 
 		if (Interface.ssphh.enableREFCubeMap) {
-			double time0 = hflog.getSecondsElapsed();
+			double time0 = Hf::Log.getSecondsElapsed();
 			std::string name = CoronaJob::MakeREFName(
 				Interface.sceneName,
 				true,
@@ -1706,7 +1706,7 @@ namespace SSPHH
 			else
 				job2.Start(coronaScene, ssg);
 			Interface.ssphh.lastREFCubeMapPath = job2.GetOutputPath();
-			Interface.ssphh.lastREFCubeMapTime = hflog.getSecondsElapsed() - time0;
+			Interface.ssphh.lastREFCubeMapTime = Hf::Log.getSecondsElapsed() - time0;
 		}
 	}
 
@@ -1852,7 +1852,7 @@ namespace SSPHH
 				Interface.ssphh.enableKs = true;
 
 				std::string ptname = GetPathTracerName(Interface.sceneName, true, mrd, pl);
-				hflog.infofn(__FUNCTION__, "Starting %s", ptname.c_str());
+				Hf::Log.infofn(__FUNCTION__, "Starting %s", ptname.c_str());
 
 				coronaScene.WriteMaterials(ssg, true);
 				imguiCoronaGenerateREF();
@@ -1881,7 +1881,7 @@ namespace SSPHH
 					Interface.ssphh.enableKs = ks;
 
 					std::string ptname = GetPathTracerName(Interface.sceneName, ks, mrd, pl);
-					hflog.infofn(__FUNCTION__, "Starting %s", ptname.c_str());
+					Hf::Log.infofn(__FUNCTION__, "Starting %s", ptname.c_str());
 
 					//coronaScene.WriteMaterials(ssg, true);
 					//imguiCoronaGenerateREF();
@@ -1921,7 +1921,7 @@ namespace SSPHH
 						count++;
 						float progress = (float)((double)count / (double)totalProducts);
 						std::string pname = GetPathTracerSphlRenderName(Interface.sceneName, ks, mrd, pl, d);
-						hflog.infofn(__FUNCTION__, "%4d/%4d (%3.2f%% done) products -- finished %s", count, totalProducts, progress,
+						Hf::Log.infofn(__FUNCTION__, "%4d/%4d (%3.2f%% done) products -- finished %s", count, totalProducts, progress,
 							pname.c_str());
 					}
 				}
@@ -1930,7 +1930,7 @@ namespace SSPHH
 
 		std::ofstream fout(Interface.sceneName + "_stats.csv",
 			Interface.ssphh.genProductsIgnoreCache ? std::ios::out : std::ios::app);
-		auto dtg = hflog.makeDTG();
+		auto dtg = Hf::Log.makeDTG();
 		fout << dtg << std::endl;
 		fout << "name,dtg,ks,mrd,pl,md,time,ptE,sphlE,d1E,d2E" << std::endl;
 		for (auto &product : times) {
@@ -2004,12 +2004,12 @@ namespace SSPHH
 		//string file2ppm = file2 + ".ppm"; string file2png = (file1 + mdbuffer) + "_sphlrender.png";
 		//if (!CopyFile(Interface.ssphh.lastREFPath.c_str(), file1ppm.c_str(), FALSE))
 		//{
-		//	hflog.error("%s(): Unable to copy file %s to %s", __FUNCTION__, Interface.ssphh.lastREFPath.c_str(), file1ppm.c_str());
+		//	Hf::Log.error("%s(): Unable to copy file %s to %s", __FUNCTION__, Interface.ssphh.lastREFPath.c_str(), file1ppm.c_str());
 		//	return;
 		//}
 		//if (!CopyFile(Interface.ssphh.lastSphlRenderPath.c_str(), file2ppm.c_str(), FALSE))
 		//{
-		//	hflog.error("%s(): Unable to copy file %s to %s", __FUNCTION__, Interface.ssphh.lastSphlRenderPath.c_str(), file2ppm.c_str());
+		//	Hf::Log.error("%s(): Unable to copy file %s to %s", __FUNCTION__, Interface.ssphh.lastSphlRenderPath.c_str(), file2ppm.c_str());
 		//	return;
 		//}
 		//char tmpbuf[256];
@@ -2020,10 +2020,10 @@ namespace SSPHH
 		//string cmdline2 = "magick  "; cmdline2 += file1ppm + "  " + file1png;
 		//string cmdline3 = "magick  "; cmdline3 += file2ppm + "  " + file2png;
 
-		//hflog.info("running: %s", cmdline1.c_str());
-		//if (auto result = system(cmdline1.c_str()) != 0) hflog.error("%s(): command unsuccessful (%d) %s", __FUNCTION__, result, cmdline1.c_str());
-		//if (auto result = system(cmdline2.c_str()) != 0) hflog.error("%s(): command unsuccessful (%d) %s", __FUNCTION__, result, cmdline2.c_str());
-		//if (auto result = system(cmdline3.c_str()) != 0) hflog.error("%s(): command unsuccessful (%d) %s", __FUNCTION__, result, cmdline3.c_str());
+		//Hf::Log.info("running: %s", cmdline1.c_str());
+		//if (auto result = system(cmdline1.c_str()) != 0) Hf::Log.error("%s(): command unsuccessful (%d) %s", __FUNCTION__, result, cmdline1.c_str());
+		//if (auto result = system(cmdline2.c_str()) != 0) Hf::Log.error("%s(): command unsuccessful (%d) %s", __FUNCTION__, result, cmdline2.c_str());
+		//if (auto result = system(cmdline3.c_str()) != 0) Hf::Log.error("%s(): command unsuccessful (%d) %s", __FUNCTION__, result, cmdline3.c_str());
 
 		//DeleteFile(file1ppm.c_str());
 		//DeleteFile(file2ppm.c_str());
@@ -2206,7 +2206,7 @@ namespace SSPHH
 			for (size_t i = 0; i < ssg.ssphhLights.size(); i++) {
 				auto &sphl = ssg.ssphhLights[i];
 				sphl.SetHierarchyDescription();
-				hflog.info("%s(): hierarchy %02d %s", __FUNCTION__, sphl.index, sphl.hier_description.c_str());
+				Hf::Log.info("%s(): hierarchy %02d %s", __FUNCTION__, sphl.index, sphl.hier_description.c_str());
 			}
 		}
 

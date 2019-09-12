@@ -18,7 +18,7 @@
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 #include <iostream>
 #include <string>
-#include <kasl_json.hpp>
+#include <damselfish_json.hpp>
 #include <hatchetfish.hpp>
 #include <unicornfish_curl.hpp>
 #include <fluxions_gte.hpp>
@@ -80,31 +80,31 @@ int test_curl()
 {
 	using namespace Uf;
 	Curl curl;
-	double t0 = hflog.getSecondsElapsed();
+	double t0 = Hf::Log.getSecondsElapsed();
 	std::string result = curl.Get("http://phd.metzgar-research.com/test_get_project.php");
-	double dt = hflog.getSecondsElapsed() - t0;
-	hflog.info("%s(): curl.GET worked! took %3.6f", __FUNCTION__, dt);
+	double dt = Hf::Log.getSecondsElapsed() - t0;
+	Hf::Log.info("%s(): curl.GET worked! took %3.6f", __FUNCTION__, dt);
 
 	Curl::StringTimePairFuture p;
 	Curl::StringTimePair results;
 
-	t0 = hflog.getSecondsElapsed();
+	t0 = Hf::Log.getSecondsElapsed();
 	p = curl.AsyncGet("http://phd.metzgar-research.com/test_get_project.php");
-	dt = hflog.getSecondsElapsed() - t0;
-	hflog.info("%s(): curl.AsyncGET finished! took %3.6f", __FUNCTION__, dt);
+	dt = Hf::Log.getSecondsElapsed() - t0;
+	Hf::Log.info("%s(): curl.AsyncGET finished! took %3.6f", __FUNCTION__, dt);
 
 	results = p.get();
-	hflog.info("%s(): curl.AsyncGET return result: %s", __FUNCTION__, results.first.c_str());
-	hflog.info("%s(): curl.AsyncGET worked! took %3.6f", __FUNCTION__, results.second);
+	Hf::Log.info("%s(): curl.AsyncGET return result: %s", __FUNCTION__, results.first.c_str());
+	Hf::Log.info("%s(): curl.AsyncGET worked! took %3.6f", __FUNCTION__, results.second);
 
-	t0 = hflog.getSecondsElapsed();
+	t0 = Hf::Log.getSecondsElapsed();
 	p = curl.AsyncGet("http://192.168.1.164/");
-	dt = hflog.getSecondsElapsed() - t0;
-	hflog.info("%s(): curl.AsyncGET finished! took %3.6f", __FUNCTION__, dt);
+	dt = Hf::Log.getSecondsElapsed() - t0;
+	Hf::Log.info("%s(): curl.AsyncGET finished! took %3.6f", __FUNCTION__, dt);
 
 	results = p.get();
-	hflog.info("%s(): curl.AsyncGET return result: %s", __FUNCTION__, results.first.c_str());
-	hflog.info("%s(): curl.AsyncGET worked! took %3.6f", __FUNCTION__, results.second);
+	Hf::Log.info("%s(): curl.AsyncGET return result: %s", __FUNCTION__, results.first.c_str());
+	Hf::Log.info("%s(): curl.AsyncGET worked! took %3.6f", __FUNCTION__, results.second);
 	return 0;
 }
 

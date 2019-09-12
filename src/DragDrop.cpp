@@ -419,7 +419,7 @@ public:
 
 	virtual HRESULT STDMETHODCALLTYPE DragLeave(void) override
 	{
-		//hflog.infofn(__FUNCTION__, "DragLeave");
+		//Hf::Log.infofn(__FUNCTION__, "DragLeave");
 		HFLOGINFO("DragLeave");
 		return NOERROR;
 	}
@@ -574,7 +574,7 @@ void DragDrop::Init()
 {
 	started = true;
 #ifdef WIN32
-	hflog.infofn(__FUNCTION__, "Starting Drag and Drop");
+	Hf::Log.infofn(__FUNCTION__, "Starting Drag and Drop");
 	HRESULT oleInitialized = OleInitialize(nullptr);
 	HWND hwnd = GetActiveWindow();
 	if (!hwnd) return;

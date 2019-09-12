@@ -22,6 +22,7 @@
 #include <memory>
 
 #include "ssphh.hpp"
+#include <hatchetfish_stopwatch.hpp>
 
 namespace Fluxions
 {
@@ -57,7 +58,7 @@ extern void PrintString9x15(float x, float y, int justification, const char *for
 namespace SSPHH
 {
 	using namespace Fluxions;
-	using namespace Viperfish;
+	using namespace Vf;
 
 	SSPHH_Application::SSPHH_Application()
 		: Widget("ssphhapplication"), PBSkyCubeMap(GL_TEXTURE_CUBE_MAP)
@@ -99,7 +100,7 @@ namespace SSPHH
 
 	void SSPHH_Application::InitRenderConfigs()
 	{
-		glutSetErrorMessage(__FILE__, __LINE__, "inside InitRenderConfigs()");
+		FxSetErrorMessage(__FILE__, __LINE__, "inside InitRenderConfigs()");
 
 		rectShadowRenderConfig.clearColorBuffer = true;
 		rectShadowRenderConfig.clearDepthBuffer = true;
@@ -117,7 +118,7 @@ namespace SSPHH
 		rectShadowRenderConfig.fbo.AddTexture2D(GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GL_RGBA8, true);
 		rectShadowRenderConfig.fbo.AddTexture2D(GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, GL_DEPTH_COMPONENT32F, false);
 		if (!rectShadowRenderConfig.fbo.Make()) {
-			hflog.error("%s(): Could not make rect shadow map FBO.", __FUNCTION__);
+			Hf::Log.error("%s(): Could not make rect shadow map FBO.", __FUNCTION__);
 		}
 
 		cubeShadowRenderConfig.clearColorBuffer = true;
@@ -142,19 +143,19 @@ namespace SSPHH
 		defaultRenderConfig.isCubeMap = true;
 		gles30CubeMap.SetRenderConfig(defaultRenderConfig);
 
-		glutSetDefaultErrorMessage();
+		FxSetDefaultErrorMessage();
 	}
 
 	void SSPHH_Application::LoadRenderConfigs()
 	{
-		glutSetErrorMessage(__FILE__, __LINE__, "inside LoadRenderConfigs()");
+		FxSetErrorMessage(__FILE__, __LINE__, "inside LoadRenderConfigs()");
 
-		hflog.info("%s(): resetting and loading...", __FUNCTION__);
+		Hf::Log.info("%s(): resetting and loading...", __FUNCTION__);
 		renderer2.Reset();
 
 		const char *renderconfig_filename = "resources/config/pb_monolithic_2017.renderconfig";
 		if (!renderer2.LoadConfig(renderconfig_filename)) {
-			hflog.error("%s(): %s file not found.", __FUNCTION__, renderconfig_filename);
+			Hf::Log.error("%s(): %s file not found.", __FUNCTION__, renderconfig_filename);
 		}
 
 		renderer2.LoadShaders();
@@ -181,13 +182,13 @@ namespace SSPHH
 		if (!foursplitULRenderConfig.check()) HFLOGERROR("Four split renderconfig failure! --> Upper left");
 		if (!foursplitURRenderConfig.check()) HFLOGERROR("Four split renderconfig failure! --> Lower right");
 
-		glutSetDefaultErrorMessage();
+		FxSetDefaultErrorMessage();
 	}
 
 	void SSPHH_Application::LoadScene()
 	{
 		if (Interface.uf.uf_type == UfType::Broker) {
-			hflog.info("configured to be a broker, so not loading scene");
+			Hf::Log.info("configured to be a broker, so not loading scene");
 			return;
 		}
 
@@ -223,21 +224,21 @@ namespace SSPHH
 
 	void SSPHH_Application::ReloadRenderConfigs()
 	{
-		Viperfish::StopWatch stopwatch;
+		Hf::StopWatch stopwatch;
 		InitRenderConfigs();
 		LoadRenderConfigs();
 		stopwatch.Stop();
-		hflog.info("%s(): reload took %4.2f milliseconds", __FUNCTION__, stopwatch.GetMillisecondsElapsed());
+		Hf::Log.info("%s(): reload took %4.2f milliseconds", __FUNCTION__, stopwatch.GetMillisecondsElapsed());
 		Interface.lastRenderConfigLoadTime = stopwatch.GetMillisecondsElapsed();
 	}
 
 	void SSPHH_Application::ReloadScenegraph()
 	{
 		ssg.Reset();
-		Viperfish::StopWatch stopwatch;
+		Hf::StopWatch stopwatch;
 		LoadScene();
 		stopwatch.Stop();
-		hflog.info("%s(): SSG reload took %4.2f milliseconds", __FUNCTION__, stopwatch.GetMillisecondsElapsed());
+		Hf::Log.info("%s(): SSG reload took %4.2f milliseconds", __FUNCTION__, stopwatch.GetMillisecondsElapsed());
 		Interface.lastScenegraphLoadTime = stopwatch.GetMillisecondsElapsed();
 	}
 
@@ -255,34 +256,34 @@ namespace SSPHH
 				FilePathInfo fpi(cmdargs[j + 1]);
 				if (fpi.Exists()) {
 					sceneFilename = cmdargs[j + 1];
-					hflog.info("%s(): loading scene file %s", __FUNCTION__, sceneFilename.c_str());
+					Hf::Log.info("%s(): loading scene file %s", __FUNCTION__, sceneFilename.c_str());
 				}
 				else {
-					hflog.error("%s(): scene file %s does not exist.", __FUNCTION__, sceneFilename.c_str());
+					Hf::Log.error("%s(): scene file %s does not exist.", __FUNCTION__, sceneFilename.c_str());
 				}
 				j++;
 			}
 
 			if (cmdargs[j] == "-broker") {
 				Interface.uf.uf_type = UfType::Broker;
-				hflog.info("Unicornfish: starting in broker mode");
+				Hf::Log.info("Unicornfish: starting in broker mode");
 			}
 			if (cmdargs[j] == "-worker") {
 				Interface.uf.uf_type = UfType::Worker;
-				hflog.info("Unicornfish: starting in client mode");
+				Hf::Log.info("Unicornfish: starting in client mode");
 			}
 			if (cmdargs[j] == "-client") {
 				Interface.uf.uf_type = UfType::Client;
-				hflog.info("Unicornfish: starting in worker mode");
+				Hf::Log.info("Unicornfish: starting in worker mode");
 			}
 			if ((cmdargs[j] == "-endpoint") && nextArgExists) {
 				Interface.uf.endpoint = cmdargs[j + 1];
 				j++;
-				hflog.info("Unicornfish: using endpoint %s", Interface.uf.endpoint.c_str());
+				Hf::Log.info("Unicornfish: using endpoint %s", Interface.uf.endpoint.c_str());
 			}
 			if ((cmdargs[j] == "-service") && nextArgExists) {
 				Interface.uf.service = cmdargs[j + 1];
-				hflog.info("Unicornfish: using service %s", Interface.uf.service.c_str());
+				Hf::Log.info("Unicornfish: using service %s", Interface.uf.service.c_str());
 				j++;
 			}
 		}
@@ -335,7 +336,7 @@ namespace SSPHH
 
 		InitUnicornfish();
 
-		Viperfish::StopWatch stopwatch;
+		Hf::StopWatch stopwatch;
 
 		// StartPython();
 
@@ -344,7 +345,7 @@ namespace SSPHH
 
 		InitImGui();
 
-		glutSetErrorMessage(__FILE__, __LINE__, "inside OnInit()");
+		FxSetErrorMessage(__FILE__, __LINE__, "inside OnInit()");
 
 		Interface.preCameraMatrix.LoadIdentity();
 
@@ -357,10 +358,10 @@ namespace SSPHH
 		my_hud_info.glVersionString = glversion ? glversion : "Unknown Version";
 
 		if (!enviroCubeTexture3.LoadTextureCoronaCubeMap("export_cubemap.png", true)) {
-			hflog.error("%s(): enviroCubeTexture3...Could not load export_cubemap.png", __FUNCTION__);
+			Hf::Log.error("%s(): enviroCubeTexture3...Could not load export_cubemap.png", __FUNCTION__);
 		}
 		else {
-			hflog.info("Loaded enviroCubeTexture3...loaded export_cubemap.png");
+			Hf::Log.info("Loaded enviroCubeTexture3...loaded export_cubemap.png");
 		}
 
 		PBSkyCubeMap.Create();
@@ -390,16 +391,16 @@ namespace SSPHH
 		//defaultShadow2DTextureSampler.SetCompareFunction(GL_LESS);
 		//defaultShadow2DTextureSampler.SetCompareMode(GL_COMPARE_REF_TO_TEXTURE);
 
-		glutSetErrorMessage(__FILE__, __LINE__, "before loading scene");
+		FxSetErrorMessage(__FILE__, __LINE__, "before loading scene");
 
 		LoadScene();
 
-		glutSetDefaultErrorMessage();
+		FxSetDefaultErrorMessage();
 
 		ResetScene();
 
 		stopwatch.Stop();
-		hflog.info("%s(): took %3.2f seconds", __FUNCTION__, stopwatch.GetSecondsElapsed());
+		Hf::Log.info("%s(): took %3.2f seconds", __FUNCTION__, stopwatch.GetSecondsElapsed());
 	}
 
 	void SSPHH_Application::OnKill()
@@ -432,19 +433,19 @@ namespace SSPHH
 	//
 	//		if (key == '1')
 	//		{
-	//			Viperfish::StopWatch stopwatch;
+	//			Hf::StopWatch stopwatch;
 	//			InitRenderConfigs();
 	//			LoadRenderConfigs();
 	//			stopwatch.Stop();
-	//			hflog.info("%s(): reload took %4.2f milliseconds", __FUNCTION__, stopwatch.GetMillisecondsElapsed());
+	//			Hf::Log.info("%s(): reload took %4.2f milliseconds", __FUNCTION__, stopwatch.GetMillisecondsElapsed());
 	//		}
 	//
 	//		if (key == '2')
 	//		{
-	//			Viperfish::StopWatch stopwatch;
+	//			Hf::StopWatch stopwatch;
 	//			ssg.Load(sceneFilename);
 	//			stopwatch.Stop();
-	//			hflog.info("%s(): SSG reload took %4.2f milliseconds", __FUNCTION__, stopwatch.GetMillisecondsElapsed());
+	//			Hf::Log.info("%s(): SSG reload took %4.2f milliseconds", __FUNCTION__, stopwatch.GetMillisecondsElapsed());
 	//		}
 	//
 	//		if (tolower(key) == '3') {
@@ -806,7 +807,7 @@ namespace SSPHH
 	{
 		Widget::OnUpdate(deltaTime);
 
-		Viperfish::StopWatch stopwatch;
+		Hf::StopWatch stopwatch;
 		DoInterfaceUpdate(deltaTime);
 
 		if (Interface.enableSunCycle) {
@@ -1075,7 +1076,7 @@ namespace SSPHH
 		// r.UpdateBuffers(sg);
 		// r.Render();
 
-		double renderT0 = hflog.getSecondsElapsed();
+		double renderT0 = Hf::Log.getSecondsElapsed();
 		if (renderMode == 0) {
 			RenderFixedFunctionGL();
 		}
@@ -1085,13 +1086,13 @@ namespace SSPHH
 		else if (renderMode == 2) {
 			RenderGLES30();
 		}
-		my_hud_info.totalRenderTime = hflog.getSecondsElapsed() - renderT0;
+		my_hud_info.totalRenderTime = Hf::Log.getSecondsElapsed() - renderT0;
 
 		static double t0 = 0.0;
-		double t1 = hflog.getMillisecondsElapsed();
+		double t1 = Hf::Log.getMillisecondsElapsed();
 		double dt = t1 - t0;
 		if (dt < 1000.0)
-			hflog.takeStat("frametime", dt);
+			Hf::Log.takeStat("frametime", dt);
 		t0 = t1;
 		SaveScreenshot();
 	}
@@ -1168,68 +1169,68 @@ namespace SSPHH
 		};
 
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "Renderer: %s", my_hud_info.glRendererString.c_str());
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Renderer: %s", my_hud_info.glRendererString.c_str());
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "Vendor:   %s", my_hud_info.glVendorString.c_str());
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Vendor:   %s", my_hud_info.glVendorString.c_str());
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "Version:  %s", my_hud_info.glVersionString.c_str());
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Version:  %s", my_hud_info.glVersionString.c_str());
 
 		ypos += 15.0f;
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "OnUpdate() time:    % 4.2f", my_hud_info.onUpdateTime);
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "OnUpdate() time:    % 4.2f", my_hud_info.onUpdateTime);
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "Total Render time:  % 4.2f", my_hud_info.totalRenderTime);
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Total Render time:  % 4.2f", my_hud_info.totalRenderTime);
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "G-Buffer pass time: % 4.2f", my_hud_info.gbufferPassTime);
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "G-Buffer pass time: % 4.2f", my_hud_info.gbufferPassTime);
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "Deferred pass time: % 4.2f", my_hud_info.deferredPassTime);
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Deferred pass time: % 4.2f", my_hud_info.deferredPassTime);
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "Pbsky render time:  % 4.2f", my_hud_info.pbskyTime);
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Pbsky render time:  % 4.2f", my_hud_info.pbskyTime);
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "Pbsky RGB min/max:  MIN: % 4.2e -- MAX: % 4.2e",
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Pbsky RGB min/max:  MIN: % 4.2e -- MAX: % 4.2e",
 			ssg.environment.pbsky.getMinRgbValue(), ssg.environment.pbsky.getMaxRgbValue());
 		ypos += 15.0f;
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "Render mode: %d %s", renderMode, renderModes[renderMode]);
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Render mode: %d %s", renderMode, renderModes[renderMode]);
 		ypos += 15.0f;
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "% -2.3f, % -2.3f, % -2.3f, % -2.3f", cameraMatrix.m11, cameraMatrix.m12, cameraMatrix.m13, cameraMatrix.m14);
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "% -2.3f, % -2.3f, % -2.3f, % -2.3f", cameraMatrix.m11, cameraMatrix.m12, cameraMatrix.m13, cameraMatrix.m14);
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "% -2.3f, % -2.3f, % -2.3f, % -2.3f", cameraMatrix.m21, cameraMatrix.m22, cameraMatrix.m23, cameraMatrix.m24);
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "% -2.3f, % -2.3f, % -2.3f, % -2.3f", cameraMatrix.m21, cameraMatrix.m22, cameraMatrix.m23, cameraMatrix.m24);
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "% -2.3f, % -2.3f, % -2.3f, % -2.3f", cameraMatrix.m31, cameraMatrix.m32, cameraMatrix.m33, cameraMatrix.m34);
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "% -2.3f, % -2.3f, % -2.3f, % -2.3f", cameraMatrix.m31, cameraMatrix.m32, cameraMatrix.m33, cameraMatrix.m34);
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "% -2.3f, % -2.3f, % -2.3f, % -2.3f", cameraMatrix.m41, cameraMatrix.m42, cameraMatrix.m43, cameraMatrix.m44);
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "% -2.3f, % -2.3f, % -2.3f, % -2.3f", cameraMatrix.m41, cameraMatrix.m42, cameraMatrix.m43, cameraMatrix.m44);
 
 		Vector4f eye = cameraMatrix * Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "CAMERA: X: % -3.2f, Y: % -3.2f, Z: % -3.2f", eye.x, eye.y, eye.z);
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "CAMERA: X: % -3.2f, Y: % -3.2f, Z: % -3.2f", eye.x, eye.y, eye.z);
 		Vector3f sun = ssg.environment.pbsky.GetSunVector();
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "SUN ANGLES:   AZ: % -3.1f, ALT: % -3.1f",
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "SUN ANGLES:   AZ: % -3.1f, ALT: % -3.1f",
 			ssg.environment.pbsky.GetSunAzimuth(),
 			ssg.environment.pbsky.GetSunAltitude());
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "SUN POSITION: X: % -2.2f  Y: % -2.2f  Z: % -2.2f", sun.x, sun.y, sun.z);
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "SUN POSITION: X: % -2.2f  Y: % -2.2f  Z: % -2.2f", sun.x, sun.y, sun.z);
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "MAP POSITION: LAT: % -3.2f   LONG: % -3.2f", ssg.environment.pbsky.GetLatitude(), ssg.environment.pbsky.GetLongitude());
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "MAP POSITION: LAT: % -3.2f   LONG: % -3.2f", ssg.environment.pbsky.GetLatitude(), ssg.environment.pbsky.GetLongitude());
 
 		Color4f sunDiskRadiance = ssg.environment.pbsky.GetSunDiskRadiance();
 		Color4f groundRadiance = ssg.environment.pbsky.GetGroundRadiance();
 		// Sun Disk Radiance
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "SUN DISK RADIANCE: R: % -3.1f  G: % -3.1f  B: % -3.2f  AVG: % -3.2f",
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "SUN DISK RADIANCE: R: % -3.1f  G: % -3.1f  B: % -3.2f  AVG: % -3.2f",
 			sunDiskRadiance.r, sunDiskRadiance.g, sunDiskRadiance.b,
 			ssg.environment.pbsky.GetAverageRadiance());
 
 		// Ground Radiance
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "GROUND RADIANCE:   R: % -3.1f  G: % -3.1f  B: % -3.2f",
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "GROUND RADIANCE:   R: % -3.1f  G: % -3.1f  B: % -3.2f",
 			groundRadiance.r, groundRadiance.g, groundRadiance.b);
 
 		float seconds = (float)(ssg.environment.pbsky.getSec() + ssg.environment.pbsky.getSecFract());
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, GLUT_BITMAP_9_BY_15, "DATE: %02d/%02d/%02d %02d:%02d:%02d%.3f  LST: %2.3f",
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 0, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "DATE: %02d/%02d/%02d %02d:%02d:%02d%.3f  LST: %2.3f",
 			ssg.environment.pbsky.getMonth(),
 			ssg.environment.pbsky.getDay(),
 			ssg.environment.pbsky.getYear(),
@@ -1257,13 +1258,13 @@ namespace SSPHH
 		y += 15.0f;
 
 		if (counter == 0)
-			PrintString9x15(0, y, GLUT_JUSTIFICATION::RIGHT, "NONE");
+			PrintString9x15(0, y, FX_GLUT_JUSTIFICATION::RIGHT, "NONE");
 		if (counter == 1)
-			PrintString9x15(0, y, GLUT_JUSTIFICATION::RIGHT, "RECT SHADOW");
+			PrintString9x15(0, y, FX_GLUT_JUSTIFICATION::RIGHT, "RECT SHADOW");
 		if (counter == 2)
-			PrintString9x15(0, y, GLUT_JUSTIFICATION::RIGHT, "SPHERE 1 CUBE MAP");
+			PrintString9x15(0, y, FX_GLUT_JUSTIFICATION::RIGHT, "SPHERE 1 CUBE MAP");
 		if (counter == 3)
-			PrintString9x15(0, y, GLUT_JUSTIFICATION::RIGHT, "ENVIRO CUBE MAP");
+			PrintString9x15(0, y, FX_GLUT_JUSTIFICATION::RIGHT, "ENVIRO CUBE MAP");
 		y += 15.0f;
 
 		PrintString9x15(0, y, 1, "ESC...QUIT");
@@ -1297,7 +1298,7 @@ namespace SSPHH
 		y += 15.0f;
 		PrintString9x15(0, y, 0, "screen split position: %i, %i", renderer2.GetDeferredSplitPoint().x, renderer2.GetDeferredSplitPoint().y);
 
-		const std::vector<std::string> &history = hflog.getHistory();
+		const std::vector<std::string> &history = Hf::Log.getHistory();
 		for (int i = 0; i < history.size(); i++) {
 			std::string m = history[i];
 			std::istringstream istr(m);
@@ -1321,77 +1322,77 @@ namespace SSPHH
 	{
 		GLfloat xpos = 0.0f;
 		GLfloat ypos = 60.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "-- Actions ----------------");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "-- Actions ----------------");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Toggle Help            [F1]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Toggle Help            [F1]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Toggle Main HUD        [F2]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Toggle Main HUD        [F2]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Toggle HUD             [F3]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Toggle HUD             [F3]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Toggle Deferred HUD    [F4]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Toggle Deferred HUD    [F4]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Recompute Sky          [F5]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Recompute Sky          [F5]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Output Corona SCN      [F6]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Output Corona SCN      [F6]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Output Corona Cube SCN [F7]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Output Corona Cube SCN [F7]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Save PBSKY PPMs       [F11]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Save PBSKY PPMs       [F11]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Render Mode           [F12]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Render Mode           [F12]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Reload Scene            [1]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Reload Scene            [1]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Reset Scene             [2]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Reset Scene             [2]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Increase Counter        [3]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Increase Counter        [3]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Python Test             [4]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Python Test             [4]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Python GUI              [5]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Python GUI              [5]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Sky Box                 [6]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Sky Box                 [6]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "+ 1 Hour              [-/_]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "+ 1 Hour              [-/_]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "- 1 Hour              [=/+]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "- 1 Hour              [=/+]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Rotate objects      [SPACE]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Rotate objects      [SPACE]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "-- Movement ----------");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "-- Movement ----------");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Turn Up                [UP]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Turn Up                [UP]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Turn Down            [DOWN]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Turn Down            [DOWN]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Turn Left            [LEFT]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Turn Left            [LEFT]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Turn Right          [RIGHT]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Turn Right          [RIGHT]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Move Forward            [W]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Move Forward            [W]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Move Backward           [S]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Move Backward           [S]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Move Left               [A]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Move Left               [A]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Move Right              [D]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Move Right              [D]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Roll Left               [Q]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Roll Left               [Q]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Roll Right              [E]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Roll Right              [E]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Move Down               [Z]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Move Down               [Z]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Move Up                 [C]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Move Up                 [C]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "Reset camera            [R]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "Reset camera            [R]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "-- PBSKY -------------");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "-- PBSKY -------------");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "In/de-crease lat [CTRL-l/L]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "In/de-crease lat [CTRL-l/L]");
 		ypos += 15.0f;
-		glutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, GLUT_BITMAP_9_BY_15, "In/de-crease long [ALT-l/L]");
+		FxGlutPrintBitmapStringJustified(xpos, ypos, screenWidth, 1, (void *)FX_GLUT_FONT::BITMAP_9_BY_15, "In/de-crease long [ALT-l/L]");
 		ypos += 15.0f;
 	}
 
@@ -1436,7 +1437,7 @@ namespace SSPHH
 		screenOrthoMatrix.LoadIdentity();
 		screenOrthoMatrix.Ortho2D(0.0f, screenWidth, screenHeight, 0.0f);
 
-		hflog.setMaxHistory(height / 30);
+		Hf::Log.setMaxHistory(height / 30);
 	}
 
 	void SSPHH_Application::RenderFixedFunctionGL()
@@ -1468,8 +1469,8 @@ namespace SSPHH
 
 		// Render Sun and Environment
 
-		// glutEnvironmentCube(50.0f, enviroCubeTexture1.GetTextureId());
-		glutEnvironmentCube(50.0f, PBSkyCubeMap.GetTextureId());
+		// FxDrawGL1EnvironmentCube(50.0f, enviroCubeTexture1.GetTextureId());
+		FxDrawGL1EnvironmentCube(50.0f, PBSkyCubeMap.GetTextureId());
 
 		// Render Scene
 
@@ -1478,7 +1479,7 @@ namespace SSPHH
 		glEnable(GL_LIGHTING);
 
 		if (ssg.geometryObjects.size() == 0)
-			glutSolidTeapot(1.0);
+			FxDrawGL1SolidTeapot(1.0);
 
 		glDisable(GL_LIGHTING);
 
@@ -1487,24 +1488,24 @@ namespace SSPHH
 		glMultMatrixf(ssg.camera.viewMatrix.AsInverse().const_ptr());
 		glPushMatrix();
 		glTranslatef(0.0f, 0.0f, -1.0f);
-		glutWireCone(2 * sin(ssg.camera.fov * FX_DEGREES_TO_RADIANS * 0.5), 1.0, 32, 2);
+		FxDrawGL1WireCone(2 * sin(ssg.camera.fov * FX_DEGREES_TO_RADIANS * 0.5), 1.0, 32, 2);
 		glPopMatrix();
 		glPushMatrix();
 		glTranslatef(0.0f, 0.0f, 0.5f);
-		glutWireCube(1.0);
+		FxDrawGL1WireCube(1.0);
 		glPopMatrix();
-		glutSixAxis(1.0);
-		glutWireFrustumf(ssg.camera.projectionMatrix.const_ptr());
+		FxDrawGL1SixAxis(1.0);
+		FxDrawGL1WireFrustumf(ssg.camera.projectionMatrix.const_ptr());
 		glPopMatrix();
 
 		// Scene center
-		glutSixAxis(2.0);
+		FxDrawGL1SixAxis(2.0);
 
 		// Spheres
 		for (auto s = ssg.spheres.begin(); s != ssg.spheres.end(); s++) {
 			glPushMatrix();
 			glMultMatrixf(s->second.transform.const_ptr());
-			glutSolidSphere(0.5, 16, 16);
+			FxDrawGL1SolidSphere(0.5f, 16, 16);
 			glPopMatrix();
 		}
 
@@ -1517,7 +1518,7 @@ namespace SSPHH
 
 			glPushMatrix();
 			glTranslatef(center.x, center.y, center.z);
-			glutWireCube(ssg.geometryObjects[g->second.objectId].BoundingBox.MaxSize());
+			FxDrawGL1WireCube(ssg.geometryObjects[g->second.objectId].BoundingBox.MaxSize());
 			glPopMatrix();
 
 			glEnable(GL_LIGHTING);
@@ -1532,7 +1533,7 @@ namespace SSPHH
 		glPushMatrix();
 		sunVector *= 20.0f;
 		glTranslatef(sunVector.x, sunVector.y, sunVector.z);
-		glutSolidSphere(0.5, 16, 16);
+		FxDrawGL1SolidSphere(0.5f, 16, 16);
 		glPopMatrix();
 
 		// Point Lights
@@ -1541,9 +1542,9 @@ namespace SSPHH
 			glPushMatrix();
 			glTranslatef(pl->position.x, pl->position.y, pl->position.z);
 			glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
-			glutSolidSphere(0.5f, 16, 16);
+			FxDrawGL1SolidSphere(0.5f, 16, 16);
 			glColor4f(1.0f, 1.0f, 0.0f, 0.1f);
-			glutSolidSphere(pl->falloffRadius, 16, 16);
+			FxDrawGL1SolidSphere(pl->falloffRadius, 16, 16);
 			glPopMatrix();
 		}
 		glDisable(GL_BLEND);
@@ -1556,10 +1557,10 @@ namespace SSPHH
 	void SSPHH_Application::RenderGLES20()
 	{
 		RenderFixedFunctionGL();
-		glutSetErrorMessage(__FILE__, __LINE__, "%s: Part 1", __FUNCTION__);
+		FxSetErrorMessage(__FILE__, __LINE__, "%s: Part 1", __FUNCTION__);
 		glUseProgram(0);
 		glDisable(GL_DEPTH_TEST);
-		glutSetDefaultErrorMessage();
+		FxSetDefaultErrorMessage();
 	}
 
 	void SSPHH_Application::DirtySPHLs()
@@ -1653,7 +1654,7 @@ namespace SSPHH
 
 	void SSPHH_Application::RenderGLES30()
 	{
-		glutSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
+		FxSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
 
 		SetupRenderGLES30();
 		RenderGLES30Shadows();
@@ -1669,12 +1670,12 @@ namespace SSPHH
 		if (counter == 3)
 			RenderTest3EnviroCubeMap();
 
-		glutSetDefaultErrorMessage();
+		FxSetDefaultErrorMessage();
 	}
 
 	void SSPHH_Application::RenderGLES30Scene()
 	{
-		glutSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
+		FxSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
 
 		defaultRenderConfig.clearDepthBuffer = true;
 		defaultRenderConfig.clearColorBuffer = false;
@@ -1697,11 +1698,11 @@ namespace SSPHH
 		ssg.camera.actualViewMatrix = defaultRenderConfig.cameraMatrix;
 
 		if (Interface.drawSkyBox) {
-			glutSetErrorMessage(__FILE__, __LINE__, "skybox");
+			FxSetErrorMessage(__FILE__, __LINE__, "skybox");
 			glEnable(GL_DEPTH_TEST);
 			RenderSkyBox();
 			glDisable(GL_DEPTH_TEST);
-			glutSetErrorMessage("ssphh.cpp", __LINE__, __FUNCTION__);
+			FxSetErrorMessage("ssphh.cpp", __LINE__, __FUNCTION__);
 		}
 
 		glUseProgram(0);
@@ -1726,7 +1727,7 @@ namespace SSPHH
 			srcfpixels = (float *)srcdata;
 		}
 		else {
-			hflog.warning("%s(): Unsupported source format", __FUNCTION__);
+			Hf::Log.warning("%s(): Unsupported source format", __FUNCTION__);
 		}
 
 		if (dsttype == GL_UNSIGNED_BYTE) {
@@ -1736,7 +1737,7 @@ namespace SSPHH
 			dstfpixels = (float *)dstdata;
 		}
 		else {
-			hflog.warning("%s(): Unsupported destination format", __FUNCTION__);
+			Hf::Log.warning("%s(): Unsupported destination format", __FUNCTION__);
 		}
 
 		size_t size = w * h * layers;
@@ -1774,7 +1775,7 @@ namespace SSPHH
 	bool SaveTextureMap(GLenum target, GLuint id, const std::string &path)
 	{
 		glActiveTexture(GL_TEXTURE0);
-		glutDebugBindTexture(target, id);
+		FxDebugBindTexture(target, id);
 		int w = 0;
 		int h = 0;
 		int internalformat = 0;
@@ -1854,8 +1855,8 @@ namespace SSPHH
 			type = GL_UNSIGNED_BYTE;
 		}
 		else {
-			hflog.warning("%s(): unknown internal format %04x / %d / %s", __FUNCTION__, internalformat, internalformat, glNameTranslator.GetString(internalformat));
-			hflog.warning("%s(): unknown type %d/%s/%s/%s", __FUNCTION__, depthSize, glNameTranslator.GetString(depthType), glNameTranslator.GetString(type), glNameTranslator.GetString(components));
+			Hf::Log.warning("%s(): unknown internal format %04x / %d / %s", __FUNCTION__, internalformat, internalformat, glNameTranslator.GetString(internalformat));
+			Hf::Log.warning("%s(): unknown type %d/%s/%s/%s", __FUNCTION__, depthSize, glNameTranslator.GetString(depthType), glNameTranslator.GetString(type), glNameTranslator.GetString(components));
 			return false;
 		}
 
@@ -1909,7 +1910,7 @@ namespace SSPHH
 		}
 
 		if (error != 0) {
-			hflog.warning("%s(): glError() -> %s [%s/%s/%s] (R: %d/%s, G: %d/%s, B: %d/%s, A: %d/%s, Z: %d/%s)", __FUNCTION__,
+			Hf::Log.warning("%s(): glError() -> %s [%s/%s/%s] (R: %d/%s, G: %d/%s, B: %d/%s, A: %d/%s, Z: %d/%s)", __FUNCTION__,
 				glNameTranslator.GetString(error),
 				glNameTranslator.GetString(internalformat), glNameTranslator.GetString(type), glNameTranslator.GetString(components),
 				redSize, glNameTranslator.GetString(redType),
@@ -1927,17 +1928,17 @@ namespace SSPHH
 			}
 		}
 
-		glutDebugBindTexture(target, 0);
+		FxDebugBindTexture(target, 0);
 		return true;
 	}
 
 	void SSPHH_Application::RenderGLES30Shadows()
 	{
-		glutSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
+		FxSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
 
 		std::map<GLenum, RenderTarget *> rts;
 
-		double sunShadowT0 = hflog.getSecondsElapsed();
+		double sunShadowT0 = Hf::Log.getSecondsElapsed();
 		rectShadowRenderConfig.renderSkyBox = false;
 		rectShadowRenderConfig.viewportRect.w = Interface.renderconfig.sunShadowMapSize;
 		rectShadowRenderConfig.viewportRect.h = Interface.renderconfig.sunShadowMapSize;
@@ -1990,17 +1991,17 @@ namespace SSPHH
 		//		rt.sampler = 0;
 		//	}
 
-		//	glutBindTextureAndSampler(rt.unit, rt.target, rt.object, rt.sampler);
+		//	FxBindTextureAndSampler(rt.unit, rt.target, rt.object, rt.sampler);
 
 		//	int w, h;
 		//	int mipLevel = 0;
 		//	glGetTexLevelParameteriv(rt.target, mipLevel, GL_TEXTURE_WIDTH, &w);
 		//	glGetTexLevelParameteriv(rt.target, mipLevel, GL_TEXTURE_HEIGHT, &h);
 
-		//	glutBindTextureAndSampler(rt.unit, rt.target, 0, 0);
+		//	FxBindTextureAndSampler(rt.unit, rt.target, 0, 0);
 		//	rt.unit = 0;
 		//}
-		ssg.environment.sunShadowMapTime = (float)(1000.0f * (hflog.getSecondsElapsed() - sunShadowT0));
+		ssg.environment.sunShadowMapTime = (float)(1000.0f * (Hf::Log.getSecondsElapsed() - sunShadowT0));
 
 		if (Interface.captureShadows) {
 			SaveTextureMap(GL_TEXTURE_2D, ssg.environment.sunColorMapId, "sun_color.ppm");
@@ -2021,7 +2022,7 @@ namespace SSPHH
 			cubeShadowRenderConfig.cameraPosition = Vector4f(spl.position, 1.0f);
 
 			RenderCubeShadowMap(ssg, scs, cubeShadowRenderConfig);
-			glutSetErrorMessage("ssphh.cpp", __LINE__, __FUNCTION__);
+			FxSetErrorMessage("ssphh.cpp", __LINE__, __FUNCTION__);
 		}
 
 		for (int i = 0; i < ssg.ssphhLights.size(); i++) {
@@ -2045,7 +2046,7 @@ namespace SSPHH
 			cubeShadowRenderConfig.cameraPosition = sphl.position;
 
 			RenderCubeShadowMap(ssg, sphl.depthSphlMap, cubeShadowRenderConfig);
-			glutSetErrorMessage("ssphh.cpp", __LINE__, __FUNCTION__);
+			FxSetErrorMessage("ssphh.cpp", __LINE__, __FUNCTION__);
 
 			if (Interface.captureShadows) {
 				std::ostringstream ostr;
@@ -2072,7 +2073,7 @@ namespace SSPHH
 		rc.blendFuncDstFactor = GL_ONE;
 
 		if (!rc.shaderProgram) {
-			//hflog.info("%s(): sphl shader not found", __FUNCTION__);
+			//Hf::Log.info("%s(): sphl shader not found", __FUNCTION__);
 			return;
 		}
 
@@ -2124,10 +2125,10 @@ namespace SSPHH
 						//	glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, ssg.environment.pbskyColorMapId);
 						//else if (i == 2)
 
-						glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.lightProbeTexIds[i]);
+						FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.lightProbeTexIds[i]);
 
 						//sph_renderer.RenderMesh(sphl.lightProbeModel, lpWorldMatrix[i]);
-						glutCubeMap(
+						FxDrawGL2CubeMap(
 							sphl.position.x + R * cos(angles[i]),
 							sphl.position.y + R * sin(angles[i]),
 							sphl.position.z,
@@ -2136,7 +2137,7 @@ namespace SSPHH
 				}
 			}
 
-			glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+			FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 			glActiveTexture(GL_TEXTURE0);
 		}
 
@@ -2145,20 +2146,20 @@ namespace SSPHH
 			for (auto &sphl : ssg.ssphhLights) {
 				double S = 0.25;
 				double R = 1.0;
-				glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.coronaLightProbeTexture.GetTexture());
-				glutCubeMap(
+				FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.coronaLightProbeTexture.GetTexture());
+				FxDrawGL2CubeMap(
 					sphl.position.x + R * 0.707 + S * 1,
 					sphl.position.y - R * 0.707,
 					sphl.position.z,
 					S, vloc, tloc);
-				glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.sphLightProbeTexture.GetTexture());
-				glutCubeMap(
+				FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.sphLightProbeTexture.GetTexture());
+				FxDrawGL2CubeMap(
 					sphl.position.x + R * 0.707 + S * 3,
 					sphl.position.y - R * 0.707,
 					sphl.position.z,
 					S, vloc, tloc);
-				glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.hierLightProbeTexture.GetTexture());
-				glutCubeMap(
+				FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.hierLightProbeTexture.GetTexture());
+				FxDrawGL2CubeMap(
 					sphl.position.x + R * 0.707 + S * 5,
 					sphl.position.y - R * 0.707,
 					sphl.position.z,
@@ -2171,7 +2172,7 @@ namespace SSPHH
 
 				//	texture = hier.debugLightProbe.texture.GetTexture();
 				//	glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, texture);
-				//	glutCubeMap(
+				//	FxDrawGL2CubeMap(
 				//		sphl.position.x + R * 0.707 + S * (i * 2 + 1),
 				//		sphl.position.y - R * 0.707 - S * 2,
 				//		sphl.position.z,
@@ -2179,7 +2180,7 @@ namespace SSPHH
 
 				//	texture = hier.debugSphLightProbe.texture.GetTexture();
 				//	glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, texture);
-				//	glutCubeMap(
+				//	FxDrawGL2CubeMap(
 				//		sphl.position.x + R * 0.707 + S * (i * 2 + 1),
 				//		sphl.position.y - R * 0.707 - S * 4,
 				//		sphl.position.z,
@@ -2187,7 +2188,7 @@ namespace SSPHH
 
 				//	texture = ssg.ssphhLights[hier.index].coronaLightProbeTexture.GetTexture();
 				//	glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, texture);
-				//	glutCubeMap(
+				//	FxDrawGL2CubeMap(
 				//		sphl.position.x + R * 0.707 + S * (i * 2 + 1),
 				//		sphl.position.y - R * 0.707 - S * 6,
 				//		sphl.position.z,
@@ -2195,7 +2196,7 @@ namespace SSPHH
 
 				//	texture = ssg.ssphhLights[hier.index].sphLightProbeTexture.GetTexture();
 				//	glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, texture);
-				//	glutCubeMap(
+				//	FxDrawGL2CubeMap(
 				//		sphl.position.x + R * 0.707 + S * (i * 2 + 1),
 				//		sphl.position.y - R * 0.707 - S * 8,
 				//		sphl.position.z,
@@ -2203,7 +2204,7 @@ namespace SSPHH
 				//	i++;
 				//}
 
-				glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+				FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 			}
 		}
 		sph_renderer.RestoreGLState();
@@ -2297,7 +2298,7 @@ namespace SSPHH
 
 		//	glPushMatrix();
 		//	glTranslatef(sphl.position.X, sphl.position.y, sphl.position.z);
-		//	glutSolidSphere(1.0, 16, 16);
+		//	FxDrawGL1SolidSphere(1.0, 16, 16);
 		//	glPopMatrix();
 		//}
 		//glPopMatrix();
@@ -2308,7 +2309,7 @@ namespace SSPHH
 
 	void SSPHH_Application::RenderTest1SunShadows()
 	{
-		glutSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
+		FxSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
 
 		int w = rectShadowRenderConfig.viewportRect.w;
 		int h = rectShadowRenderConfig.viewportRect.h;
@@ -2328,7 +2329,7 @@ namespace SSPHH
 
 	void SSPHH_Application::RenderTest2SphereCubeMap()
 	{
-		glutSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
+		FxSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
 
 		Matrix4f cameraMatrix = Interface.inversePreCameraMatrix * ssg.camera.viewMatrix;
 		Vector3f cameraPosition(cameraMatrix.m14, cameraMatrix.m24, cameraMatrix.m34);
@@ -2352,7 +2353,7 @@ namespace SSPHH
 
 	void SSPHH_Application::RenderTest3EnviroCubeMap()
 	{
-		glutSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
+		FxSetErrorMessage(__FILE__, __LINE__, "%s", __FUNCTION__);
 
 		SimpleProgramPtr program = renderer2.FindProgram("glut", "UnwrappedCubeMap");
 		if (program != nullptr) {
@@ -2365,9 +2366,9 @@ namespace SSPHH
 			program->ApplyUniform("ProjectionMatrix", orthoProjectionMatrix);
 			program->ApplyUniform("CameraMatrix", identityMatrix);
 			program->ApplyUniform("WorldMatrix", identityMatrix);
-			glutBindTextureAndSampler(0, GL_TEXTURE_CUBE_MAP, enviroCubeTexture3.GetTextureId(), ssg.environment.enviroColorMapSamplerId);
-			glutUnwrappedCubeMap(0, 0, 256, vloc, tloc);
-			glutBindTextureAndSampler(0, GL_TEXTURE_CUBE_MAP, 0, 0);
+			FxBindTextureAndSampler(0, GL_TEXTURE_CUBE_MAP, enviroCubeTexture3.GetTextureId(), ssg.environment.enviroColorMapSamplerId);
+			FxDrawGL2UnwrappedCubeMap(0, 0, 256, vloc, tloc);
+			FxBindTextureAndSampler(0, GL_TEXTURE_CUBE_MAP, 0, 0);
 			glUseProgram(0);
 		}
 	}
@@ -2375,9 +2376,9 @@ namespace SSPHH
 	void SSPHH_Application::SavePbskyTextures()
 	{
 		// Save PB Sky PPMs
-		hflog.info("%s(): saving pbsky ppm texture maps", __FUNCTION__);
+		Hf::Log.info("%s(): saving pbsky ppm texture maps", __FUNCTION__);
 
-		Viperfish::StopWatch stopwatch;
+		Hf::StopWatch stopwatch;
 		ssg.environment.pbsky.generatedCylMap.savePPMRaw("pbsky_cylmap.ppm");
 		ssg.environment.pbsky.generatedCubeMap.savePPMRaw("pbsky_cubemap_0.ppm", 0);
 		ssg.environment.pbsky.generatedCubeMap.savePPMRaw("pbsky_cubemap_1.ppm", 1);
@@ -2386,7 +2387,7 @@ namespace SSPHH
 		ssg.environment.pbsky.generatedCubeMap.savePPMRaw("pbsky_cubemap_4.ppm", 4);
 		ssg.environment.pbsky.generatedCubeMap.savePPMRaw("pbsky_cubemap_5.ppm", 5);
 		stopwatch.Stop();
-		hflog.info("%s(): saving pbsky ppm texture maps took %4.2f seconds", __FUNCTION__, stopwatch.GetSecondsElapsed());
+		Hf::Log.info("%s(): saving pbsky ppm texture maps took %4.2f seconds", __FUNCTION__, stopwatch.GetSecondsElapsed());
 	}
 
 	void SSPHH_Application::RenderSkyBox()
@@ -2499,7 +2500,7 @@ namespace SSPHH
 		if (uToneMapGamma >= 0)
 			glUniform1f(uToneMapGamma, ssg.environment.toneMapGamma);
 		if (uCubeTexture >= 0) {
-			glutBindTextureAndSampler(ssg.environment.pbskyColorMapUnit, GL_TEXTURE_CUBE_MAP, ssg.environment.pbskyColorMapId, ssg.environment.pbskyColorMapSamplerId);
+			FxBindTextureAndSampler(ssg.environment.pbskyColorMapUnit, GL_TEXTURE_CUBE_MAP, ssg.environment.pbskyColorMapId, ssg.environment.pbskyColorMapSamplerId);
 			glUniform1i(uCubeTexture, ssg.environment.pbskyColorMapUnit);
 		}
 		if (uProjectionMatrix >= 0) {
@@ -2682,7 +2683,7 @@ namespace SSPHH
 		bool useEXR = true;
 		FilePathInfo fpi(job.GetOutputPath(useEXR));
 		if (fpi.DoesNotExist()) {
-			hflog.errorfn(__FUNCTION__, "Could not find rendered light probe %s", job.GetOutputPath(useEXR).c_str());
+			Hf::Log.errorfn(__FUNCTION__, "Could not find rendered light probe %s", job.GetOutputPath(useEXR).c_str());
 			return false;
 		}
 

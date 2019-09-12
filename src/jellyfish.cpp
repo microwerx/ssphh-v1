@@ -21,7 +21,7 @@
 
 
 Jellyfish::Jellyfish()
-	: Viperfish::Widget("jellyfish")
+	: Vf::Widget("jellyfish")
 {
 
 }
@@ -39,7 +39,7 @@ Jellyfish::~Jellyfish()
 
 void Jellyfish::OnInit(const std::vector<std::string> &args)
 {
-	Viperfish::Widget::OnInit(args);
+	Vf::Widget::OnInit(args);
 }
 
 void Jellyfish::OnKill()

@@ -2,7 +2,7 @@
 #define SPHL_JOB_HPP
 
 #include <fluxions_gte_spherical_harmonic.hpp>
-#include <kasl_json.hpp>
+#include <damselfish_json.hpp>
 #include <fluxions_corona_job.hpp>
 
 class SphlJob

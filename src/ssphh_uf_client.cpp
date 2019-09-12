@@ -56,7 +56,7 @@ namespace Uf
 						sphlJob.resizeCoefs(5);
 						sphlJob.meta_position.reset(0.0f, 0.0f, 0.0f);
 						sphlJob.meta_scene = coronaJob.GetName();
-						sphlJob.meta_time = hflog.makeDTG();
+						sphlJob.meta_time = Hf::Log.makeDTG();
 						sphlJob.meta_coronaJob = coronaJob.ToString();
 
 						// The stack is (from bottom)

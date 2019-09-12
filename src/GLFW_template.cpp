@@ -2,7 +2,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #ifndef _DEBUG
 #pragma comment(lib, "glfw3.lib")
 #else
@@ -17,7 +17,6 @@
 namespace glfwt
 {
 	std::string windowTitle = "Scalable Spherical Harmonics Hierarchies (SSPHH)";
-	int displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH;
 	int screenWidth = 1280;
 	int screenHeight = 720;
 	double Fps = 0;
@@ -51,7 +50,7 @@ namespace glfwt
 	std::map<int, int> keyMap;
 	int specialKeyMap[256] = { 0 };
 	std::vector<std::string> args;
-	Viperfish::Widget::SharedPtr vfWidget = nullptr;
+	Vf::Widget::SharedPtr vfWidget = nullptr;
 	bool exitMainloop = false;
 
 	GLFWwindow* window = nullptr;
@@ -96,7 +95,7 @@ namespace glfwt
 	void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
 		keyMap[key] = action;
-		Viperfish::SetKeyboardModifiers(
+		Vf::SetKeyboardModifiers(
 			mods & GLFW_MOD_SHIFT,
 			mods & GLFW_MOD_CONTROL,
 			mods & GLFW_MOD_ALT,
@@ -104,8 +103,8 @@ namespace glfwt
 			mods & GLFW_MOD_CAPS_LOCK,
 			mods & GLFW_MOD_NUM_LOCK);
 		key = glfwKeyToVf(key);
-		int keymod = Viperfish::GetKeyboardModifiers();
-		std::string keyName = key < 0x100 ? Viperfish::KeyToHTML5Name(key) : Viperfish::SpecialKeyToHTML5Name(key);
+		int keymod = Vf::GetKeyboardModifiers();
+		std::string keyName = key < 0x100 ? Vf::KeyToHTML5Name(key) : Vf::SpecialKeyToHTML5Name(key);
 		
 		//HFLOGDEBUG("%03d %s %s",
 		//	key,
@@ -200,15 +199,12 @@ namespace glfwt
 //////////////////////////////////////////////////////////////////////
 
 
-void GlfwTemplateSetParameters(const std::string &windowTitle, int width, int height, int displayMode)
+void GlfwTemplateSetParameters(const std::string &windowTitle, int width, int height)
 {
 	glfwt::windowTitle = windowTitle;
 	glfwt::screenWidth = width;
 	glfwt::screenHeight = height;
 	glfwt::aspectRatio = (float)width / (float)height;
-	if (displayMode >= 0) {
-		glfwt::displayMode = displayMode;
-	}
 }
 
 bool GlfwTemplateInit(int argc, char **argv)
@@ -235,7 +231,7 @@ bool GlfwTemplateInit(int argc, char **argv)
 	return true;
 }
 
-void GlfwTemplateWidget(Viperfish::Widget::SharedPtr widget)
+void GlfwTemplateWidget(Vf::Widget::SharedPtr widget)
 {
 	glfwt::vfWidget = widget;
 }

@@ -80,8 +80,8 @@
 
 extern void do_tests();
 
-Viperfish::Widget::SharedPtr vfApp;
-Viperfish::Widget::SharedPtr imguiPtr;
+Vf::Widget::SharedPtr vfApp;
+Vf::Widget::SharedPtr imguiPtr;
 
 double g_distance = -10.0;
 double xrot = 0.0;
@@ -158,9 +158,9 @@ void InitApp()
 	Fluxions::EnableGLDebugFunc();
 
 	ssphhPtr = std::make_shared<SSPHH::SSPHH_Application>("ssphh");
-	imguiPtr = std::make_shared<Viperfish::DearImGuiWidget>("imguiwidget");
+	imguiPtr = std::make_shared<Vf::DearImGuiWidget>("imguiwidget");
 	imguiPtr->decorate(ssphhPtr);
-	vfApp = std::make_shared<Viperfish::Widget>("controller");
+	vfApp = std::make_shared<Vf::Widget>("controller");
 	vfApp->decorate(imguiPtr);
 }
 

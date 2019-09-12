@@ -24,17 +24,16 @@
 #include <fluxions_corona_job.hpp>
 #include <fluxions_renderer.hpp>
 #include <hatchetfish.hpp>
-#include <kasl_python.hpp>
+#include <damselfish_python.hpp>
 #include <viperfish_mouse.hpp>
 #include <viperfish_widget.hpp>
 //#include <fluxions_pbsky.hpp>
-//#include <kasl_python.hpp>
 #include <fluxions_sphl.hpp>
 #include <imgui.h>
 #include <ssphh_ppmcompare.hpp>
 #include <ssphh_unicornfish.hpp>
 
-using namespace Viperfish;
+using namespace Vf;
 using namespace Fluxions;
 
 namespace SSPHH

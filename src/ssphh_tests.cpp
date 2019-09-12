@@ -27,7 +27,7 @@ namespace SSPHH
 		}
 		fpi.Set("output");
 		if (!fpi.IsDirectory()) {
-			hflog.errorfn(__FUNCTION__, "Path 'output' is not a directory");
+			Hf::Log.errorfn(__FUNCTION__, "Path 'output' is not a directory");
 			return;
 		}
 		test = 0;
@@ -36,14 +36,14 @@ namespace SSPHH
 			std::ostringstream ostr;
 			ostr << ssg.name << "_sphl" << count;
 			if (!sphl.SaveOBJ("output", ostr.str())) {
-				hflog.warningfn(__FUNCTION__, "sphl.SaveOBJ() failed to save %s", ostr.str().c_str());
+				Hf::Log.warningfn(__FUNCTION__, "sphl.SaveOBJ() failed to save %s", ostr.str().c_str());
 				break;
 			}
 			count++;
 		}
 
 		if (count != ssg.ssphhLights.size()) {
-			hflog.errorfn(__FUNCTION__, "Did not save all the SPHLs as OBJ/MTL files");
+			Hf::Log.errorfn(__FUNCTION__, "Did not save all the SPHLs as OBJ/MTL files");
 			test = -1;
 		}
 		else {

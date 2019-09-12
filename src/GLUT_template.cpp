@@ -55,7 +55,7 @@ double gt_zFar = 100.0;
 int gt_keyMap[256] = { 0 };
 int gt_specialKeyMap[256] = { 0 };
 std::vector<std::string> gt_args;
-Viperfish::Widget::SharedPtr gt_Widget = nullptr;
+Vf::Widget::SharedPtr gt_Widget = nullptr;
 
 //////////////////////////////////////////////////////////////////////
 // P R O T O T Y P E S ///////////////////////////////////////////////
@@ -159,7 +159,7 @@ void GlutTemplateInit(int argc, char **argv)
 	glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
 }
 
-void GlutTemplateWidget(Viperfish::Widget::SharedPtr widget)
+void GlutTemplateWidget(Vf::Widget::SharedPtr widget)
 {
 	gt_Widget = widget;
 }
@@ -184,7 +184,7 @@ void GlutTemplateMainLoop()
 void display()
 {
 	if (gt_Widget) {
-		using Viperfish::Widget;
+		using Vf::Widget;
 		Widget::SharedPtr w = gt_Widget;
 		w->OnPreRender();
 		w->OnRender3D();
@@ -225,7 +225,7 @@ void reshape(int width, int height)
 
 	if (gt_Widget)
 	{
-		using Viperfish::Widget;
+		using Vf::Widget;
 		Widget::SharedPtr w = gt_Widget;
 		w->OnReshape(width, height);
 	}
@@ -238,11 +238,11 @@ void reshape(int width, int height)
 void keyboard(unsigned char key, int x, int y)
 {
 	gt_keyMap[key] = 1;
-	std::string keyName = Viperfish::KeyToHTML5Name(key);
+	std::string keyName = Vf::KeyToHTML5Name(key);
 
 	if (gt_Widget)
 	{
-		using Viperfish::Widget;
+		using Vf::Widget;
 		Widget::SharedPtr w = gt_Widget;
 		w->OnKeyDown(keyName, glutGetModifiers());
 	}
@@ -257,10 +257,10 @@ void keyboardup(unsigned char key, int x, int y)
 {
 	gt_keyMap[key] = 0;
 
-	std::string keyName = Viperfish::KeyToHTML5Name(key);
+	std::string keyName = Vf::KeyToHTML5Name(key);
 	if (gt_Widget)
 	{
-		using Viperfish::Widget;
+		using Vf::Widget;
 		Widget::SharedPtr w = gt_Widget;
 		w->OnKeyUp(keyName, glutGetModifiers());
 	}
@@ -270,10 +270,10 @@ void special(int key, int x, int y)
 {
 	gt_specialKeyMap[key] = 1;
 
-	std::string keyName = Viperfish::SpecialKeyToHTML5Name(key);
+	std::string keyName = Vf::SpecialKeyToHTML5Name(key);
 	if (gt_Widget)
 	{
-		using Viperfish::Widget;
+		using Vf::Widget;
 		Widget::SharedPtr w = gt_Widget;
 		w->OnKeyDown(keyName, glutGetModifiers());
 	}
@@ -283,10 +283,10 @@ void specialup(int key, int x, int y)
 {
 	gt_specialKeyMap[key] = 0;
 
-	std::string keyName = Viperfish::SpecialKeyToHTML5Name(key);
+	std::string keyName = Vf::SpecialKeyToHTML5Name(key);
 	if (gt_Widget)
 	{
-		using Viperfish::Widget;
+		using Vf::Widget;
 		Widget::SharedPtr w = gt_Widget;
 		w->OnKeyUp(keyName, glutGetModifiers());
 	}
@@ -310,7 +310,7 @@ void mouse(int button, int state, int x, int y)
 
 	if (gt_Widget)
 	{
-		using Viperfish::Widget;
+		using Vf::Widget;
 		Widget::SharedPtr w = gt_Widget;
 		w->OnMouseMove(gt_mouseX, gt_mouseY);
 	}
@@ -318,7 +318,7 @@ void mouse(int button, int state, int x, int y)
 	{
 		if (gt_Widget)
 		{
-			using Viperfish::Widget;
+			using Vf::Widget;
 			Widget::SharedPtr w = gt_Widget;
 			w->OnMouseButtonDown(button);
 		}
@@ -326,7 +326,7 @@ void mouse(int button, int state, int x, int y)
 	else if (state == GLUT_UP) {
 		if (gt_Widget)
 		{
-			using Viperfish::Widget;
+			using Vf::Widget;
 			Widget::SharedPtr w = gt_Widget;
 			w->OnMouseButtonUp(button);
 		}
@@ -342,7 +342,7 @@ void motion(int x, int y)
 
 	if (gt_Widget)
 	{
-		using Viperfish::Widget;
+		using Vf::Widget;
 		Widget::SharedPtr w = gt_Widget;
 		w->OnMouseMove(gt_mouseX, gt_mouseY);
 	}
@@ -357,7 +357,7 @@ void passive(int x, int y)
 
 	if (gt_Widget)
 	{
-		using Viperfish::Widget;
+		using Vf::Widget;
 		Widget::SharedPtr w = gt_Widget;
 		w->OnMouseMove(x, y);
 	}
@@ -369,7 +369,7 @@ void entry(int state)
 	{
 		if (gt_Widget)
 		{
-			using Viperfish::Widget;
+			using Vf::Widget;
 			Widget::SharedPtr w = gt_Widget;
 			w->OnMouseEnter();
 		}
@@ -378,7 +378,7 @@ void entry(int state)
 	{
 		if (gt_Widget)
 		{
-			using Viperfish::Widget;
+			using Vf::Widget;
 			Widget::SharedPtr w = gt_Widget;
 			w->OnMouseLeave();
 		}
@@ -391,7 +391,7 @@ void visibility(int state)
 	{
 		if (gt_Widget)
 		{
-			using Viperfish::Widget;
+			using Vf::Widget;
 			Widget::SharedPtr w = gt_Widget;
 			w->OnWindowVisible();
 		}
@@ -400,7 +400,7 @@ void visibility(int state)
 	{
 		if (gt_Widget)
 		{
-			using Viperfish::Widget;
+			using Vf::Widget;
 			Widget::SharedPtr w = gt_Widget;
 			w->OnWindowHidden();
 		}
@@ -433,7 +433,7 @@ void idle()
 	{
 		if (gt_Widget)
 		{
-			using Viperfish::Widget;
+			using Vf::Widget;
 			Widget::SharedPtr w = gt_Widget;
 			w->OnUpdate(updatedt);
 		}
@@ -548,7 +548,7 @@ void PrintBitmapStringJustified(float x, float y, int justification, void *font,
 		glRasterPos2f((GLfloat)(gt_screenWidth - pixelWidthOfString) / 2.0f, (GLfloat)y);
 	}
 
-	glutBitmapString(font, buffer);
+	FxGlutBitmapString(font, buffer);
 }
 
 void PrintStrokeStringJustified(float x, float y, int justification, void *font, const char *format, ...)
@@ -582,7 +582,7 @@ void PrintStrokeStringJustified(float x, float y, int justification, void *font,
 		glRasterPos2f((float)(gt_screenWidth - pixelWidthOfString) / 2.0f, (float)y);
 	}
 
-	glutStrokeString(font, buffer);
+	FxGlutStrokeString(font, buffer);
 }
 
 // Default GLUT Display Actions //
@@ -620,7 +620,7 @@ void Set3DViewport()
 void RenderOpenGL11TestGui()
 {
 	glColor3f(1.0f, 1.0f, 1.0f);
-	glutPrintString9x15(0.0, 0.0, gt_screenWidth, 0, "%s", gt_windowTitle.c_str());
+	FxGlutPrintString9x15(0.0, 0.0, gt_screenWidth, 0, "%s", gt_windowTitle.c_str());
 }
 
 void RenderCheckerboard()
