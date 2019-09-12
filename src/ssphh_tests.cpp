@@ -1,5 +1,5 @@
-#include "pch.h"
-#ifdef WIN32
+#include "pch.hpp"
+#ifdef _WIN32
 #include <direct.h>		// for _mkdir
 #endif
 #include <ssphh.hpp>
@@ -19,7 +19,7 @@ namespace SSPHH
 		int &test = Interface.tests.saveSphlOBJ;
 		FilePathInfo fpi("output");
 		if (fpi.DoesNotExist()) {
-#ifdef WIN32
+#ifdef _WIN32
 			_mkdir("output");
 #else
 			mkdir("output", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);

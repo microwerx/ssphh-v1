@@ -17,7 +17,7 @@
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 
-#include "pch.h"
+#include "pch.hpp"
 #include <ssphh.hpp>
 #include <fluxions_corona_scene_file.hpp>
 #include <fluxions_corona_job.hpp>
@@ -899,7 +899,7 @@ namespace SSPHH
 				std::ostringstream id;
 				id << "MS" << std::setfill('0') << std::setw(2) << i << " '" << sspl.name << "'";
 				const void *ptr = &sspl;
-#ifdef WIN32
+#ifdef _WIN32
 				//va_list args = nullptr;
 #elif __unix__
 				// va_list args = va_list();
@@ -1717,7 +1717,7 @@ namespace SSPHH
 
 			//vector<string> files_to_delete = {};
 			// Delete sun-to-sphl light probe
-#ifdef WIN32
+#ifdef _WIN32
 			DeleteFile((base_filename + ".scn").c_str());
 			DeleteFile((base_filename + ".exr").c_str());
 			DeleteFile((base_filename + ".ppm").c_str());

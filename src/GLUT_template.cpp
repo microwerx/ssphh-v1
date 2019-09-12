@@ -4,20 +4,20 @@
 #include <GLUT_template.hpp>
 #include <GL/freeglut.h>
 
-#ifdef WIN32
-#ifdef NDEBUG
-#pragma comment(lib, "freeglut_static.lib")
-#else
+#ifdef _WIN32
+#ifdef _DEBUG
 #pragma comment(lib, "freeglut_staticd.lib")
-#endif // NDEBUG
-#endif // WIN32
+#else
+#pragma comment(lib, "freeglut_static.lib")
+#endif // _DEBUG
+#endif // _WIN32
 
 //////////////////////////////////////////////////////////////////////
 // G L O B A L   V A R I A B L E S ///////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
 std::string gt_windowTitle = "Scalable Spherical Harmonics Hierarchies (SSPHH)";
-#ifdef WIN32
+#ifdef _WIN32
 int gt_displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH; // | GLUT_SRGB; // | GLUT_BORDERLESS;
 #else
 int gt_displayMode = GLUT_DOUBLE | GLUT_STENCIL | GLUT_RGBA | GLUT_DEPTH;
@@ -112,7 +112,7 @@ void GlutTemplateInit(int argc, char **argv)
 		gt_args.push_back(argv[i]);
 	}
 
-#ifdef WIN32
+#ifdef _WIN32
 	SetProcessDPIAware();
 #endif
 
@@ -125,7 +125,7 @@ void GlutTemplateInit(int argc, char **argv)
 #ifdef __unix__
 	glutInitContextVersion(4, 0);
 #endif
-#ifdef WIN32
+#ifdef _WIN32
 	glutInitContextVersion(4, 0);
 #endif
 	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);

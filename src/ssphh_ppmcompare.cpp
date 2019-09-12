@@ -16,7 +16,7 @@
 // along with this program.If not, see <https://www.gnu.org/licenses/>.
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
-#include "pch.h"
+#include "pch.hpp"
 #ifdef __unix__
 #include <unistd.h>
 #endif
@@ -298,7 +298,7 @@ namespace SSPHH
 			std::string cmdline = std::string("magick ") + f.second + " " + png;
 			Hf::Log.infofn(__FUNCTION__, "running ", cmdline.c_str());
 			system(cmdline.c_str());
-#ifdef WIN32
+#ifdef _WIN32
 			DeleteFileA(f.second.c_str());
 #elif __unix__
 			unlink(f.second.c_str());

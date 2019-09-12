@@ -21,7 +21,7 @@
 // ssphh.pch will be the pre-compiled header
 // stdafx.obj will contain the pre-compiled type information
 
-#include "pch.h"
+#include "pch.hpp"
 
 // TODO: reference any additional headers you need in STDAFX.H
 // and not in this file
@@ -42,7 +42,7 @@
 
 #ifndef FLUXIONS_NO_SDL
 
-#ifdef WIN32
+#ifdef _WIN32
 #define NOMINMAX
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>

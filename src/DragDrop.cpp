@@ -7,7 +7,7 @@
 
 DragDrop dragDrop;
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <Windows.h>
 #include <WinUser.h>
 #include <shellapi.h> // for DragAcceptFiles()
@@ -573,7 +573,7 @@ DragDrop::~DragDrop()
 void DragDrop::Init()
 {
 	started = true;
-#ifdef WIN32
+#ifdef _WIN32
 	Hf::Log.infofn(__FUNCTION__, "Starting Drag and Drop");
 	HRESULT oleInitialized = OleInitialize(nullptr);
 	HWND hwnd = GetActiveWindow();
@@ -588,7 +588,7 @@ void DragDrop::Init()
 void DragDrop::Kill()
 {
 	started = false;
-#ifdef WIN32
+#ifdef _WIN32
 	if (pDropTarget) {
 		if (pDropTarget->Release() == 0) {
 			pDropTarget = nullptr;

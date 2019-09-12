@@ -18,12 +18,12 @@
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 
-#include "pch.h"
+#include "pch.hpp"
 
 #define USE_GLFW 1
 //#define USE_FREEGLUT 1
 
-#ifdef WIN32
+#ifdef _WIN32
 #define _STDCALL_SUPPORTED
 
 #ifndef FLUXIONS_NO_SDL
@@ -47,13 +47,13 @@
 //#pragma comment(lib, "Imath-2_3")
 #endif
 
-#ifndef _DEBUG
-#pragma comment(lib, "zmq4.lib")
-#else
+#ifdef _DEBUG
 #pragma comment(lib, "zmq4d.lib")
-#endif // NDEBUG
+#else
+#pragma comment(lib, "zmq4.lib")
+#endif // _DEBUG
 
-#endif // WIN32
+#endif // _WIN32
 
 #include <functional>
 #include <stdio.h>
