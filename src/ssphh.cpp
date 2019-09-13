@@ -1524,7 +1524,7 @@ namespace SSPHH
 			glEnable(GL_LIGHTING);
 			OBJStaticModel &osm = ssg.geometryObjects[g->second.objectId];
 			glEnable(GL_TEXTURE_2D);
-			osm.RenderGL11();
+			osm.RenderGL1();
 			glDisable(GL_TEXTURE_2D);
 			glDisable(GL_LIGHTING);
 			glPopMatrix();
