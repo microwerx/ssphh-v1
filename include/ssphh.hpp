@@ -32,6 +32,8 @@
 #include <imgui.h>
 #include <ssphh_ppmcompare.hpp>
 #include <ssphh_unicornfish.hpp>
+#include <fluxions_ssg_ssphh.hpp>
+#include <unicornfish_corona_database.hpp>
 
 using namespace Vf;
 using namespace Fluxions;
@@ -106,6 +108,7 @@ namespace SSPHH
 		Fluxions::SimpleRenderer_GLuint renderer;
 		Uf::CoronaDatabase sceneDB;
 		Fluxions::SimpleSceneGraph ssg;
+		Fluxions::SSG_SSPHH *ssgUserData = nullptr;
 		Uf::CoronaSceneFile coronaScene;
 		std::vector<Uf::CoronaJob> coronaJobs;
 		Fluxions::SimpleGLES30Renderer gles30;

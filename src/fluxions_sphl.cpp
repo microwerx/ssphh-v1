@@ -20,7 +20,7 @@
 #include <fstream>
 #include <fluxions_gte.hpp>
 #include <fluxions_gte_spherical_harmonic.hpp>
-#include <fluxions_gte_math.hpp>
+#include <fluxions_gte_scalar_math.hpp>
 #include <fluxions_sphl.hpp>
 
 template class std::vector<Fluxions::TVector3<int>>;

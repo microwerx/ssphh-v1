@@ -21,9 +21,5 @@
 
 namespace Fluxions
 {
-	namespace SSPHH
-	{
-
-	} // namespace SSPHH
 
 } // namespace Fluxions

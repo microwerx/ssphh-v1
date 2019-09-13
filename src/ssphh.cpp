@@ -74,6 +74,9 @@ namespace SSPHH
 
 	SSPHH_Application::~SSPHH_Application()
 	{
+		if (ssgUserData) {
+			delete ssgUserData;
+		}
 	}
 
 	void SSPHH_Application::ResetScene()
@@ -393,6 +396,12 @@ namespace SSPHH
 
 		FxSetErrorMessage(__FILE__, __LINE__, "before loading scene");
 
+		if (ssgUserData) {
+			delete ssgUserData;
+			ssgUserData = nullptr;
+		}
+		ssgUserData = new SSG_SSPHH(&ssg);
+
 		LoadScene();
 
 		FxSetDefaultErrorMessage();
@@ -416,6 +425,12 @@ namespace SSPHH
 
 		renderer.Reset();
 		KillUnicornfish();
+
+		if (ssgUserData) {
+			ssg.userdata = nullptr;
+			delete ssgUserData;
+			ssgUserData = nullptr;
+		}
 		//python.kill();
 		//python.join();
 	}
@@ -1566,7 +1581,7 @@ namespace SSPHH
 	void SSPHH_Application::DirtySPHLs()
 	{
 		int i = 0;
-		for (auto &sphl : ssg.ssphhLights) {
+		for (auto &sphl : ssgUserData->ssphhLights) {
 			sphls[i++];
 			sphl.dirty = true;
 		}
@@ -1583,7 +1598,7 @@ namespace SSPHH
 			coefs_init = true;
 		}
 
-		if (ssg.ssphhLights.size() != sphls.size()) {
+		if (ssgUserData->ssphhLights.size() != sphls.size()) {
 			sphls.clear();
 			DirtySPHLs();
 		}
@@ -1594,7 +1609,7 @@ namespace SSPHH
 		}
 
 		int i = 0;
-		for (auto &sphl : ssg.ssphhLights) {
+		for (auto &sphl : ssgUserData->ssphhLights) {
 			if (sphl.randomize) {
 				//sphls[i].randomize();
 				//for (int lm = 0; lm < sphl.GetMaxCoefficients(); lm++)
@@ -1633,7 +1648,7 @@ namespace SSPHH
 		UpdateSPHLs();
 
 		int i = 0;
-		for (auto &sphl : ssg.ssphhLights) {
+		for (auto &sphl : ssgUserData->ssphhLights) {
 			if (sphl.ptrcLightProbeImage.empty()) {
 				sphl.UploadLightProbe(sphl.ptrcLightProbeImage, sphl.ptrcLightProbeTexture);
 				sphl.UploadLightProbe(sphl.msphLightProbeImage, sphl.msphLightProbeTexture);
@@ -2025,8 +2040,8 @@ namespace SSPHH
 			FxSetErrorMessage("ssphh.cpp", __LINE__, __FUNCTION__);
 		}
 
-		for (int i = 0; i < ssg.ssphhLights.size(); i++) {
-			auto &sphl = ssg.ssphhLights[i];
+		for (int i = 0; i < ssgUserData->ssphhLights.size(); i++) {
+			auto &sphl = ssgUserData->ssphhLights[i];
 			auto &scs = sphl.depthSphlMap;
 
 			scs.zfar = cubeShadowRenderConfig.zfar;
@@ -2143,7 +2158,7 @@ namespace SSPHH
 
 		if (0) //(!Interface.ssphh.enableBasicShowSPHLs)
 		{
-			for (auto &sphl : ssg.ssphhLights) {
+			for (auto &sphl : ssgUserData->ssphhLights) {
 				double S = 0.25;
 				double R = 1.0;
 				FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, sphl.ptrcLightProbeTexture.GetTexture());
@@ -2186,7 +2201,7 @@ namespace SSPHH
 				//		sphl.position.z,
 				//		S, vloc, tloc);
 
-				//	texture = ssg.ssphhLights[hier.index].ptrcLightProbeTexture.GetTexture();
+				//	texture = ssgUserData->ssphhLights[hier.index].ptrcLightProbeTexture.GetTexture();
 				//	glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 				//	FxDrawGL2CubeMap(
 				//		sphl.position.x + R * 0.707 + S * (i * 2 + 1),
@@ -2194,7 +2209,7 @@ namespace SSPHH
 				//		sphl.position.z,
 				//		S, vloc, tloc);
 
-				//	texture = ssg.ssphhLights[hier.index].msphLightProbeTexture.GetTexture();
+				//	texture = ssgUserData->ssphhLights[hier.index].msphLightProbeTexture.GetTexture();
 				//	glutDebugBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 				//	FxDrawGL2CubeMap(
 				//		sphl.position.x + R * 0.707 + S * (i * 2 + 1),
@@ -2224,15 +2239,15 @@ namespace SSPHH
 			glLoadIdentity();
 
 			std::vector<SimpleVertex> vertices;
-			for (int i = 0; i < ssg.ssphhLights.size(); i++) {
-				auto &sphl = ssg.ssphhLights[i];
+			for (int i = 0; i < ssgUserData->ssphhLights.size(); i++) {
+				auto &sphl = ssgUserData->ssphhLights[i];
 				if (!sphl.enabled)
 					continue;
 
 				Color3f color1;
 				Color3f color2;
 
-				for (int j = 0; j < ssg.ssphhLights.size(); j++) {
+				for (int j = 0; j < ssgUserData->ssphhLights.size(); j++) {
 					if (i == j || j < 0)
 						continue;
 
@@ -2246,9 +2261,9 @@ namespace SSPHH
 
 					SimpleVertex v1, v2;
 					v1.color = HLSToRGBf(h, l, s).ToColor4();
-					v1.position = ssg.ssphhLights[i].position.xyz();
+					v1.position = ssgUserData->ssphhLights[i].position.xyz();
 					v2.color = v1.color;
-					v2.position = ssg.ssphhLights[j].position.xyz();
+					v2.position = ssgUserData->ssphhLights[j].position.xyz();
 
 					v1.position += Vector3f(0.0f, -0.5f, 0.0f);
 					v2.position += Vector3f(0.0f, 0.5f, 0.0f);
@@ -2651,7 +2666,7 @@ namespace SSPHH
 			if (numScattered > 0) {
 				return 0;
 			}
-			std::map<std::string, CoronaJob> jobs;
+			std::map<std::string, Uf::CoronaJob> jobs;
 			ssphhUf.GetFinishedJobs(jobs);
 
 			int numVIZ = 0;
@@ -2670,15 +2685,15 @@ namespace SSPHH
 			}
 
 			if (numGEN)
-				ssg.ssphh.GEN();
+				ssgUserData->ssphh.GEN();
 			if (numVIZ)
-				ssg.ssphh.VIZ();
-			ssg.ssphh.HIER();
+				ssgUserData->ssphh.VIZ();
+			ssgUserData->ssphh.HIER();
 		}
 		return numScattered;
 	}
 
-	bool SSPHH_Application::GI_ProcessJob(CoronaJob &job)
+	bool SSPHH_Application::GI_ProcessJob(Uf::CoronaJob &job)
 	{
 		bool useEXR = true;
 		FilePathInfo fpi(job.GetOutputPath(useEXR));
@@ -2697,7 +2712,7 @@ namespace SSPHH
 			recvLight = job.GetVIZRecvLightIndex();
 		}
 
-		SimpleSSPHHLight &sphl = ssg.ssphhLights[sendLight];
+		SimpleSSPHHLight &sphl = ssgUserData->ssphhLights[sendLight];
 		Sph4f sph;
 		if (job.IsVIZ()) {
 			if (useEXR) {
@@ -2714,7 +2729,7 @@ namespace SSPHH
 		else if (job.IsGEN()) {
 			sphl.ReadPtrcLightProbe(job.GetOutputPath(useEXR));
 			sphl.SavePtrcLightProbe(job.GetName() + "_sph.ppm");
-			if (ssg.ssphh.saveJSONs)
+			if (ssgUserData->ssphh.saveJSONs)
 				sphl.SaveJsonSph(job.GetName() + "_sph.json");
 
 			if (useEXR) {
@@ -2733,7 +2748,7 @@ namespace SSPHH
 		return false;
 	}
 
-	bool SSPHH_Application::GI_ProcessGatherJob(CoronaJob &job)
+	bool SSPHH_Application::GI_ProcessGatherJob(Uf::CoronaJob &job)
 	{
 		int sendLight = -1;
 		int recvLight = -1;
@@ -2745,7 +2760,7 @@ namespace SSPHH
 			recvLight = job.GetVIZRecvLightIndex();
 		}
 
-		SimpleSSPHHLight &sphl = ssg.ssphhLights[sendLight];
+		SimpleSSPHHLight &sphl = ssgUserData->ssphhLights[sendLight];
 		Sph4f sph;
 		job.CopySPHToSph4f(sph);
 		if (job.IsVIZ()) {
@@ -2760,7 +2775,7 @@ namespace SSPHH
 		return false;
 	}
 
-	void SSPHH_Application::RunJob(CoronaJob &job)
+	void SSPHH_Application::RunJob(Uf::CoronaJob &job)
 	{
 		job.Start(coronaScene, ssg);
 		GI_ProcessJob(job);

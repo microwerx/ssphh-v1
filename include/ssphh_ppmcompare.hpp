@@ -21,7 +21,7 @@
 
 #include <fluxions.hpp>
 #include <fluxions_gte.hpp>
-#include <fluxions_gte_matrix_extra.hpp>
+#include <fluxions_gte_matrix_math.hpp>
 #include <fluxions_stdcxx.hpp>
 
 namespace SSPHH
