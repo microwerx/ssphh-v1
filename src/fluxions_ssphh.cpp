@@ -16,14 +16,14 @@
 // along with this program.If not, see <https://www.gnu.org/licenses/>.
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
-#include "pch.hpp"
+
 #include <fluxions_ssphh.hpp>
 
 namespace Fluxions
 {
-namespace SSPHH
-{
+	namespace SSPHH
+	{
 
-} // namespace SSPHH
+	} // namespace SSPHH
 
 } // namespace Fluxions

@@ -20,8 +20,8 @@
 #define SSPHH_HPP
 
 #include <fluxions.hpp>
-#include <fluxions_corona_scene_file.hpp>
-#include <fluxions_corona_job.hpp>
+#include <unicornfish_corona_scene_file.hpp>
+#include <unicornfish_corona_job.hpp>
 #include <fluxions_renderer.hpp>
 #include <hatchetfish.hpp>
 #include <damselfish_python.hpp>
