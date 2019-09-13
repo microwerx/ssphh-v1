@@ -80,13 +80,13 @@ namespace Fluxions
 			maxDegree = sphl.maxDegree;
 		}
 		else {
-			maxDegree = min(sphl.maxDegree, maxDegrees);
+			maxDegree = Fluxions::min2(sphl.maxDegree, maxDegrees);
 		}
 
 		makeSimpleSPHLs = simpleSPHLs;
 
 		// clear out the entire coefficient matrix
-		for (size_t j = 0; j <= MaxComponents; j++) {
+		for (size_t j = 0; j < MaxComponents; j++) {
 			for (size_t i = 0; i < MaxCoefficients; i++) {
 				v_coefs[j][i] = 0.0f;
 			}
@@ -94,7 +94,7 @@ namespace Fluxions
 
 		for (size_t j = 0; j < 4; j++) {
 			size_t lmmax = GetMaxSphCoefficients(maxDegree);
-			for (size_t lm = 0; lm <= lmmax; lm++) {
+			for (size_t lm = 0; lm < lmmax; lm++) {
 				v_coefs[j][lm] = sphl.E0 * sphl.msph[j][lm];
 			}
 		}

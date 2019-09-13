@@ -27,8 +27,7 @@ namespace SSPHH
 
 	using namespace Fluxions;
 
-	IntensityStat &IntensityStat::operator+=(const Color3f &color)
-	{
+	IntensityStat& IntensityStat::operator+=(const Color3f& color) {
 		sumColor += color;
 		minColor = Color3d::min(color, minColor);
 		maxColor = Color3d::max(color.maxrgb(), maxColor);
@@ -45,8 +44,7 @@ namespace SSPHH
 		return *this;
 	}
 
-	void IntensityStat::Finalize()
-	{
+	void IntensityStat::Finalize() {
 		double invNumPixels = 1.0 / count;
 		xbarColor = invNumPixels * sumColor;
 		xbarI = invNumPixels * sumI;
@@ -58,30 +56,23 @@ namespace SSPHH
 		uclColor = xbarColor + 2.66 * rbarColor;
 	}
 
-	PPMCompare::PPMCompare()
-	{
-	}
+	PPMCompare::PPMCompare() {}
 
-	PPMCompare::~PPMCompare()
-	{
-	}
+	PPMCompare::~PPMCompare() {}
 
-	void PPMCompare::Init(bool hasSpecular, int maxRayDepth, int passCount, int maxDegree)
-	{
+	void PPMCompare::Init(bool hasSpecular, int maxRayDepth, int passCount, int maxDegree) {
 		ks = hasSpecular;
 		mrd = maxRayDepth;
 		pl = passCount;
 		md = maxDegree;
 	}
 
-	void PPMCompare::SetConversion(ColorSpaceType im1type, ColorSpaceType im2type)
-	{
+	void PPMCompare::SetConversion(ColorSpaceType im1type, ColorSpaceType im2type) {
 		imageColorSpaces[0] = im1type;
 		imageColorSpaces[1] = im2type;
 	}
 
-	void PPMCompare::Compare(Image3f &image1, Image3f &image2)
-	{
+	void PPMCompare::Compare(Image3f& image1, Image3f& image2) {
 		double t0 = Hf::Log.getSecondsElapsed();
 
 		if (image1.width() <= 0 || image1.height() <= 0 || image1.width() > 8192 || image1.height() > 8192 || image1.width() != image2.width() || image1.height() != image2.height()) {
@@ -89,7 +80,7 @@ namespace SSPHH
 			return;
 		}
 
-		std::vector<Image3f *> images = {
+		std::vector<Image3f*> images = {
 			&image1stat.image,
 			&image2stat.image,
 			&diffstat.image,
@@ -98,7 +89,7 @@ namespace SSPHH
 
 		int width = image1.width();
 		int height = image1.height();
-		for (auto &image : images) {
+		for (auto& image : images) {
 			image->resize(width, height);
 		}
 
@@ -195,53 +186,53 @@ namespace SSPHH
 		compareTime = Hf::Log.getSecondsElapsed() - t0;
 	}
 
-	void PPMCompare::SaveResults(const std::string &statsName, const std::string &pathtracerName, bool genDiffs, bool ignoreCache)
-	{
+	void PPMCompare::SaveResults(const std::string& statsName, const std::string& pathtracerName, bool genDiffs, bool ignoreCache) {
 		std::string dtg = Hf::Log.makeDTG();
-
-		std::ofstream fout(statsName + "_blocks.csv", ignoreCache ? std::ios::app : std::ios::out);
-		if (ignoreCache)
-			fout << "name,dtg,ks,mrd,pl,md,j,i,addr,avgI,minI,maxI" << std::endl;
-		const int CountIndex = 0;
-		const int AverageIndex = 1;
-		const int MinIndex = 2;
-		const int MaxIndex = 3;
-		const int AvgIIndex = 4;
-		const int MinIIndex = 5;
-		const int MaxIIndex = 6;
-		for (int j = 0; j < blockstat.image.height(); j++) {
-			for (int i = 0; i < blockstat.image.width(); i++) {
-				size_t addr = blockstat.image.addr(i, j);
-				float averageI = std::get<AvgIIndex>(blockcounts[addr]);
-				float mindiffI = std::get<MinIIndex>(blockcounts[addr]);
-				float maxdiffI = std::get<MaxIIndex>(blockcounts[addr]);
-				fout << statsName << ",";
-				fout << dtg << ",";
-				fout << (ks ? "Ks" : "None") << ", ";
-				fout << mrd << ",";
-				fout << pl << ",";
-				fout << md << ",";
-				fout << j << ",";
-				fout << i << ",";
-				fout << addr << ",";
-				fout << std::setprecision(6) << std::fixed << std::setw(10) << averageI << ",";
-				fout << std::setprecision(6) << std::fixed << std::setw(10) << mindiffI << ",";
-				fout << std::setprecision(6) << std::fixed << std::setw(10) << maxdiffI << std::endl;
+		{
+			std::ofstream fout(statsName + "_blocks.csv", ignoreCache ? std::ios::app : std::ios::out);
+			if (ignoreCache)
+				fout << "name,dtg,ks,mrd,pl,md,j,i,addr,avgI,minI,maxI" << std::endl;
+			const int CountIndex = 0;
+			const int AverageIndex = 1;
+			const int MinIndex = 2;
+			const int MaxIndex = 3;
+			const int AvgIIndex = 4;
+			const int MinIIndex = 5;
+			const int MaxIIndex = 6;
+			for (int j = 0; j < blockstat.image.height(); j++) {
+				for (int i = 0; i < blockstat.image.width(); i++) {
+					size_t addr = blockstat.image.addr(i, j);
+					float averageI = std::get<AvgIIndex>(blockcounts[addr]);
+					float mindiffI = std::get<MinIIndex>(blockcounts[addr]);
+					float maxdiffI = std::get<MaxIIndex>(blockcounts[addr]);
+					fout << statsName << ",";
+					fout << dtg << ",";
+					fout << (ks ? "Ks" : "None") << ", ";
+					fout << mrd << ",";
+					fout << pl << ",";
+					fout << md << ",";
+					fout << j << ",";
+					fout << i << ",";
+					fout << addr << ",";
+					fout << std::setprecision(6) << std::fixed << std::setw(10) << averageI << ",";
+					fout << std::setprecision(6) << std::fixed << std::setw(10) << mindiffI << ",";
+					fout << std::setprecision(6) << std::fixed << std::setw(10) << maxdiffI << std::endl;
+				}
 			}
+			fout.close();
 		}
-		fout.close();
 
 		if (mrd >= 0 && pl >= 0 && md >= 0) {
 			std::ofstream fout(statsName + "_stats.csv", ignoreCache ? std::ios::out : std::ios::app);
 			if (ignoreCache)
 				fout << "name,type,dtg,ks,mrd,pl,md,sumI,xbarI,minI,maxI,rbarI,lclI,uclI" << std::endl;
 
-			std::vector<std::pair<const char *, IntensityStat *>> pstats = {
+			std::vector<std::pair<const char*, IntensityStat*>> pstats = {
 				{"IMAGE1", &image1stat},
 				{"IMAGE2", &image2stat},
 				{"DIFFIM", &absdiffstat} };
 
-			for (auto &pstat : pstats) {
+			for (auto& pstat : pstats) {
 				fout << statsName << ",";
 				fout << pstat.first << ",";
 				fout << dtg << ",";
@@ -287,7 +278,7 @@ namespace SSPHH
 		blockbwimage.savePPMi(files["diff04"], 255.0f, 0, bciMaxValueBW);
 
 		// convert to PNG
-		for (auto &f : files) {
+		for (auto& f : files) {
 			std::string png = f.second;
 			png.replace(png.end() - 3, png.end(), "png");
 

@@ -53,7 +53,7 @@ namespace glfwt
 	Vf::Widget::SharedPtr vfWidget = nullptr;
 	bool exitMainloop = false;
 
-	GLFWwindow* window = nullptr;
+	GLFWwindow* pGlfwWindow = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -217,14 +217,14 @@ bool GlfwTemplateInit(int argc, char **argv)
 
 	// monitor is set to NULL
 	// share is set to NULL
-	glfwt::window = glfwCreateWindow(glfwt::screenWidth, glfwt::screenHeight, glfwt::windowTitle.c_str(), NULL, NULL);
+	glfwt::pGlfwWindow = glfwCreateWindow(glfwt::screenWidth, glfwt::screenHeight, glfwt::windowTitle.c_str(), NULL, NULL);
 
-	glfwMakeContextCurrent(glfwt::window);
+	glfwMakeContextCurrent(glfwt::pGlfwWindow);
 
-	glfwSetKeyCallback(glfwt::window, glfwt::key_callback);
-	glfwSetMouseButtonCallback(glfwt::window, glfwt::mouse_button_callback);
-	glfwSetCursorPosCallback(glfwt::window, glfwt::cursor_position_callback);
-	glfwSetWindowSizeCallback(glfwt::window, glfwt::window_size_callback);
+	glfwSetKeyCallback(glfwt::pGlfwWindow, glfwt::key_callback);
+	glfwSetMouseButtonCallback(glfwt::pGlfwWindow, glfwt::mouse_button_callback);
+	glfwSetCursorPosCallback(glfwt::pGlfwWindow, glfwt::cursor_position_callback);
+	glfwSetWindowSizeCallback(glfwt::pGlfwWindow, glfwt::window_size_callback);
 
 	glfwt::exitMainloop = false;
 
@@ -246,7 +246,7 @@ void GlfwTemplateMainLoop()
 
 	// Loop until the user closes the window
 	double t0 = glfwGetTime();
-	while (!glfwWindowShouldClose(glfwt::window) && !glfwt::exitMainloop) {
+	while (!glfwWindowShouldClose(glfwt::pGlfwWindow) && !glfwt::exitMainloop) {
 		double t1 = glfwGetTime();
 		double dt = t1 - t0;
 		t0 = t1;
@@ -258,7 +258,7 @@ void GlfwTemplateMainLoop()
 		glfwt::OnRender();
 
 		// Double buffering
-		glfwSwapBuffers(glfwt::window);
+		glfwSwapBuffers(glfwt::pGlfwWindow);
 
 		// Poll/process events
 		glfwPollEvents();

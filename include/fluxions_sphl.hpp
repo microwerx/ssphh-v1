@@ -24,10 +24,10 @@
 #include <fluxions_gte.hpp>
 #include <fluxions_simple_geometry_mesh.hpp>
 #include <fluxions_gte_image.hpp>
+#include <fluxions_ssphh.hpp>
 
 namespace Fluxions
 {
-
 	struct FxModel
 	{
 		std::vector<Vector3f> vertices;

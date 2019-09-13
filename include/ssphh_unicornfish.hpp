@@ -24,8 +24,8 @@
 #include <unicornfish_broker.hpp>
 #include <unicornfish_client.hpp>
 #include <unicornfish_worker.hpp>
-#include <fluxions_corona_job.hpp>
-#include <fluxions_corona_scene_file.hpp>
+#include <unicornfish_corona_job.hpp>
+#include <unicornfish_corona_scene_file.hpp>
 
 enum class UfType
 {
@@ -155,15 +155,15 @@ public:
 	void SetUIMessage(Unicornfish::NodeType type, const std::string &message);
 	const std::string &GetUIMessage(Unicornfish::NodeType type);
 
-	void ScatterJob(Fluxions::CoronaJob &job);
-	// Move the queue of scattered jobs out. CoronaJob::IsFinished() returns false
-	int PushScatteredJobs(std::map<std::string, Fluxions::CoronaJob> &jobs);
-	// Move the queue of gathered jobs back. CoronaJob::IsFinished() returns true
-	void PullFinishedJobs(std::map<std::string, Fluxions::CoronaJob> &jobs);
+	void ScatterJob(Uf::CoronaJob &job);
+	// Move the queue of scattered jobs out. Uf::CoronaJob::IsFinished() returns false
+	int PushScatteredJobs(std::map<std::string, Uf::CoronaJob> &jobs);
+	// Move the queue of gathered jobs back. Uf::CoronaJob::IsFinished() returns true
+	void PullFinishedJobs(std::map<std::string, Uf::CoronaJob> &jobs);
 	int GetNumScatteredJobs() const;
 	int GetNumFinishedJobs() const;
 
-	void GetFinishedJobs(std::map<std::string, Fluxions::CoronaJob> &finished_jobs);
+	void GetFinishedJobs(std::map<std::string, Uf::CoronaJob> &finished_jobs);
 
 private:
 	std::mutex uf_mutex;
@@ -177,8 +177,8 @@ private:
 	std::thread client_thread;
 
 	int numScattered = 0;
-	std::map<std::string, Fluxions::CoronaJob> incoming_jobs;
-	std::map<std::string, Fluxions::CoronaJob> finished_jobs;
+	std::map<std::string, Uf::CoronaJob> incoming_jobs;
+	std::map<std::string, Uf::CoronaJob> finished_jobs;
 
 	std::string broker_message;
 	std::string worker_message;

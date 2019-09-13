@@ -104,10 +104,10 @@ namespace SSPHH
 		TMatrix4<GLfloat> screenOrthoMatrix;
 
 		Fluxions::SimpleRenderer_GLuint renderer;
-		Fluxions::CoronaDatabase sceneDB;
+		Uf::CoronaDatabase sceneDB;
 		Fluxions::SimpleSceneGraph ssg;
-		Fluxions::CoronaSceneFile coronaScene;
-		std::vector<Fluxions::CoronaJob> coronaJobs;
+		Uf::CoronaSceneFile coronaScene;
+		std::vector<Uf::CoronaJob> coronaJobs;
 		Fluxions::SimpleGLES30Renderer gles30;
 
 		Fluxions::Renderer renderer2;
@@ -494,8 +494,8 @@ namespace SSPHH
 
 		void GI_ScatterJobs();
 		int GI_GatherJobs();
-		bool GI_ProcessJob(CoronaJob &job);
-		bool GI_ProcessGatherJob(CoronaJob &job);
+		bool GI_ProcessJob(Uf::CoronaJob &job);
+		bool GI_ProcessGatherJob(Uf::CoronaJob &job);
 
 	public:
 		HUDInfo my_hud_info;
@@ -560,7 +560,7 @@ namespace SSPHH
 
 		virtual void OnReshape(int width, int height) override;
 
-		void RunJob(CoronaJob &job);
+		void RunJob(Uf::CoronaJob &job);
 
 	private:
 		void OptimizeClippingPlanes();
