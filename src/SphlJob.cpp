@@ -16,10 +16,11 @@ Df::JSONPtr NewVector3(const Fluxions::Vector3f & v)
 Df::JSONPtr NewMatrix(std::vector<std::vector<float>> & M)
 {
 	Df::JSONPtr m = Df::JSON::NewArray();
-	for (auto & row : M) {
+	for (std::vector<float> & row : M) {
 		Df::JSONPtr rowElements = Df::JSON::NewArray();
-		for (auto & col : row) {
-			rowElements->PushBack(Df::JSON::NewNumber(col));
+		for (const float & col : row) {
+			Df::JSONPtr el = Df::JSON::NewNumber(col);
+			rowElements->PushBack(el);
 		}
 		m->PushBack(rowElements);
 	}

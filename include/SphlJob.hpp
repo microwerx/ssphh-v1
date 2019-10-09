@@ -3,7 +3,6 @@
 
 #include <fluxions_gte_spherical_harmonic.hpp>
 #include <damselfish_json.hpp>
-#include <fluxions_corona_job.hpp>
 
 class SphlJob
 {

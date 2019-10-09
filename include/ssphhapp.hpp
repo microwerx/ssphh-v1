@@ -20,8 +20,6 @@
 #define SSPHH_HPP
 
 #include <fluxions.hpp>
-#include <unicornfish_corona_scene_file.hpp>
-#include <unicornfish_corona_job.hpp>
 #include <fluxions_renderer.hpp>
 #include <hatchetfish.hpp>
 #include <damselfish_python.hpp>
@@ -32,8 +30,13 @@
 #include <imgui.h>
 #include <ssphh_ppmcompare.hpp>
 #include <ssphh_unicornfish.hpp>
-#include <fluxions_ssg_ssphh.hpp>
-#include <unicornfish_corona_database.hpp>
+#include <fluxions_ssg_ssphh_renderer_plugin.hpp>
+#include <fluxions_simple_ssphh.hpp>
+
+//#define SSPHH_RENDER_CLASSIC_OPENGL 1
+#ifdef SSPHH_RENDER_CLASSIC_OPENGL
+#include <GLUT_template.hpp>
+#endif
 
 using namespace Vf;
 using namespace Fluxions;
@@ -106,9 +109,10 @@ namespace SSPHH
 		TMatrix4<GLfloat> screenOrthoMatrix;
 
 		Fluxions::SimpleRenderer_GLuint renderer;
-		Uf::CoronaDatabase sceneDB;
+		//Uf::CoronaDatabase sceneDB;
 		Fluxions::SimpleSceneGraph ssg;
-		Fluxions::SSG_SSPHH *ssgUserData = nullptr;
+		Fluxions::SimpleSSPHH ssphh;
+		Fluxions::SSG_SSPHHRendererPlugin *ssgUserData = nullptr;
 		Uf::CoronaSceneFile coronaScene;
 		std::vector<Uf::CoronaJob> coronaJobs;
 		Fluxions::SimpleGLES30Renderer gles30;
@@ -331,9 +335,9 @@ namespace SSPHH
 
 				bool uf_isinit = false; // one time flag to tell service if it has started or not
 				bool uf_stop = false;   // one time flag to tell service to stop
-				UfType uf_type;
-				std::string endpoint;
-				std::string service;
+				UfType uf_type{ UfType::None };
+				std::string endpoint{ "" };
+				std::string service{ "" };
 
 				bool standalone_client = true;
 				bool standalone_broker = true;
@@ -474,8 +478,10 @@ namespace SSPHH
 		static std::string GetStatsName(const std::string &sceneName, bool ks, int mrd, int pl, int md);
 
 		void SetupRenderGLES30();
-		void UpdateSPHLs();
+
 		void DirtySPHLs();
+		void UpdateSPHLs();
+		void UploadSPHLs();
 
 		const int MAX_RENDER_MODES = 3;
 		int renderMode = 2;

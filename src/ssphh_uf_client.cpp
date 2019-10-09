@@ -17,7 +17,7 @@
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 #include "pch.hpp"
-#include <ssphh.hpp>
+#include <ssphhapp.hpp>
 #include <ssphh_unicornfish.hpp>
 #include <SphlJob.hpp>
 
@@ -50,7 +50,7 @@ namespace Uf
 				for (auto & job : scatteredJobs) {
 					int64_t dt = cur_time - sent_times[job.first];
 					if (!job.second.IsJobWorking() && dt >= 25000) {
-						Fluxions::CoronaJob &coronaJob = job.second;
+						Uf::CoronaJob &coronaJob = job.second;
 						SphlJob sphlJob;
 						sphlJob.numChannels = 4;
 						sphlJob.resizeCoefs(5);
@@ -64,7 +64,7 @@ namespace Uf
 						// sphlJob: SphlJob
 						// sceneName: string
 						// service: string [groundtruth, sph, irprobe]
-						Uf::Message request(&job.second, sizeof(CoronaJob));
+						Uf::Message request(&job.second, sizeof(Uf::CoronaJob));
 						request.Push(sphlJob.toJSON());
 						request.Push(job.first);
 						sent_times[job.first] = cur_time;

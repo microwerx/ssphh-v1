@@ -2,7 +2,7 @@
 #ifdef _WIN32
 #include <direct.h>		// for _mkdir
 #endif
-#include <ssphh.hpp>
+#include <ssphhapp.hpp>
 
 namespace SSPHH
 {
@@ -32,7 +32,7 @@ namespace SSPHH
 		}
 		test = 0;
 		size_t count = 0;
-		for (auto &sphl : ssg.ssphhLights) {
+		for (auto &sphl : ssgUserData->ssphhLights) {
 			std::ostringstream ostr;
 			ostr << ssg.name << "_sphl" << count;
 			if (!sphl.SaveOBJ("output", ostr.str())) {
@@ -42,7 +42,7 @@ namespace SSPHH
 			count++;
 		}
 
-		if (count != ssg.ssphhLights.size()) {
+		if (count != ssgUserData->ssphhLights.size()) {
 			Hf::Log.errorfn(__FUNCTION__, "Did not save all the SPHLs as OBJ/MTL files");
 			test = -1;
 		}

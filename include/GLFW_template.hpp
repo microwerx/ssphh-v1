@@ -10,7 +10,7 @@
 namespace glfwt { }
 
 // Call before GlfwTemplateInit to set parameters
-void GlfwTemplateSetParameters(const std::string &windowTitle, int width, int height, int displayMode = -1);
+void GlfwTemplateSetParameters(const std::string &windowTitle, int width, int height);
 
 // Call to initialize GLFW. Call after GlfwTemplateSetParameters(...)
 bool GlfwTemplateInit(int argc, char **argv);

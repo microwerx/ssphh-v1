@@ -17,7 +17,7 @@
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 #include "pch.hpp"
-#include <ssphh.hpp>
+#include <ssphhapp.hpp>
 #include <unicornfish.hpp>
 
 
@@ -78,7 +78,7 @@ int Unicornfish::GetNumFinishedJobs() const
 }
 
 
-void Unicornfish::GetFinishedJobs(std::map<std::string, Fluxions::CoronaJob> & jobs)
+void Unicornfish::GetFinishedJobs(std::map<std::string, Uf::CoronaJob> & jobs)
 {
 	LockWrite();
 	jobs = finished_jobs;
@@ -88,7 +88,7 @@ void Unicornfish::GetFinishedJobs(std::map<std::string, Fluxions::CoronaJob> & j
 }
 
 
-void Unicornfish::ScatterJob(CoronaJob & job)
+void Unicornfish::ScatterJob(Uf::CoronaJob & job)
 {
 	LockWrite();
 	incoming_jobs[job.GetName()] = job;
@@ -96,7 +96,7 @@ void Unicornfish::ScatterJob(CoronaJob & job)
 }
 
 
-int Unicornfish::PushScatteredJobs(std::map<std::string, Fluxions::CoronaJob> & jobs)
+int Unicornfish::PushScatteredJobs(std::map<std::string, Uf::CoronaJob> & jobs)
 {
 	LockWrite();
 	int count = (int)incoming_jobs.size();
@@ -111,7 +111,7 @@ int Unicornfish::PushScatteredJobs(std::map<std::string, Fluxions::CoronaJob> & 
 }
 
 
-void Unicornfish::PullFinishedJobs(std::map<std::string, Fluxions::CoronaJob> & jobs)
+void Unicornfish::PullFinishedJobs(std::map<std::string, Uf::CoronaJob> & jobs)
 {
 	LockWrite();
 	bool finishedJobFound;

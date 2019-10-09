@@ -17,12 +17,14 @@
 //
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 #include "pch.hpp"
-#include <ssphh.hpp>
+#include <ssphhapp.hpp>
 #include <ssphh_unicornfish.hpp>
 #include <SphlJob.hpp>
 
 namespace Uf
 {
+	constexpr size_t CoronaJobSize = sizeof(Uf::CoronaJob);
+
 	void DoOldWorker(const char * endpoint, const char * service, Unicornfish * context)
 	{
 		if (!context)
@@ -35,8 +37,8 @@ namespace Uf
 			if (worker.WaitRequest()) {
 				Uf::Message request = worker.GetRequest();
 				std::string jobName = request.PopString();
-				Fluxions::CoronaJob job;
-				request.PopMem(&job, sizeof(Fluxions::CoronaJob));
+				Uf::CoronaJob job;
+				request.PopMem(&job, CoronaJobSize);
 				auto & frame = request.PopFrame();
 				memcpy(&job, frame.GetData(), frame.SizeInBytes());
 
@@ -54,11 +56,11 @@ namespace Uf
 				job.MarkJobFinished();
 
 				reply = request;
-				reply.Push(&job, sizeof(Fluxions::CoronaJob));
+				reply.Push(&job, CoronaJobSize);
 				reply.Push("finished");
 				reply.Push(jobName);
 				worker.SendReply(reply);
-				memset(&job, 0, sizeof(Fluxions::CoronaJob));
+				memset(&job, 0, CoronaJobSize);
 
 				context->SetUIMessage(Unicornfish::NodeType::Worker, "waiting");
 			}
@@ -83,10 +85,10 @@ namespace Uf
 				std::string jsonSphlJob = request.PopString();
 				SphlJob sphlJob;
 				sphlJob.parseJSON(jsonSphlJob);
-				Fluxions::CoronaJob job;
+				Uf::CoronaJob job;
 				job.FromString(sphlJob.meta_coronaJob);
-				Fluxions::CoronaJob job1;
-				request.PopMem(&job1, sizeof(Fluxions::CoronaJob));
+				Uf::CoronaJob job1;
+				request.PopMem(&job1, CoronaJobSize);
 				auto & frame = request.PopFrame();
 				memcpy(&job, frame.GetData(), frame.SizeInBytes());
 
@@ -114,12 +116,12 @@ namespace Uf
 				// sphlJob: JSON string
 				// coronaJob: CoronaJob
 				reply = request;
-				reply.Push(&job, sizeof(Fluxions::CoronaJob));
+				reply.Push(&job, CoronaJobSize);
 				reply.Push(sphlJob.toJSON());
 				reply.Push("finished");
 				reply.Push(jobName);
 				worker.SendReply(reply);
-				memset(&job, 0, sizeof(Fluxions::CoronaJob));
+				memset(&job, 0, CoronaJobSize);
 
 				context->SetUIMessage(Unicornfish::NodeType::Worker, "waiting");
 			}

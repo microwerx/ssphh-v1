@@ -18,10 +18,11 @@
 // For any other type of licensing, please contact me at jmetzgar@outlook.com
 
 #include "pch.hpp"
-#include <ssphh.hpp>
-#include <fluxions_corona_scene_file.hpp>
-#include <fluxions_corona_job.hpp>
+#include <ssphhapp.hpp>
+#include <unicornfish_corona_scene_file.hpp>
+#include <unicornfish_corona_job.hpp>
 #include <fluxions_ssphh.hpp>
+#include <fluxions_ssphh_utilities.hpp>
 
 using namespace Fluxions;
 
@@ -41,7 +42,7 @@ extern double gt_Fps;
 auto DeleteFile = unlink;
 #endif
 
-CoronaSceneFile coronaScene;
+Uf::CoronaSceneFile coronaScene;
 
 struct COLORS
 {
@@ -87,15 +88,13 @@ static const std::string DebugShaderChoices[21] = {
 
 namespace SSPHH
 {
-	void SSPHH_Application::InitImGui()
-	{
+	void SSPHH_Application::InitImGui() {
 		//ImGuiIO& io = ImGui::GetIO();
 		//io.Fonts->AddFontDefault();
 		//io.Fonts->AddFontFromFileTTF("resources/fonts/dock-medium.otf", 16.0f);
 	}
 
-	void SSPHH_Application::RenderImGuiHUD()
-	{
+	void SSPHH_Application::RenderImGuiHUD() {
 		HFLOGDEBUGFIRSTRUN();
 
 		imguiWinX = 64.0f;
@@ -114,8 +113,7 @@ namespace SSPHH
 		//ImGui::ShowUserGuide();
 	}
 
-	void SSPHH_Application::imguiShowMenuBar()
-	{
+	void SSPHH_Application::imguiShowMenuBar() {
 		if (ImGui::BeginMainMenuBar()) {
 			if (ImGui::BeginMenu("File")) {
 				ImGui::MenuItem("(dummy menu)", NULL, false, false);
@@ -199,8 +197,7 @@ namespace SSPHH
 		}
 	}
 
-	void SSPHH_Application::imguiShowToolWindow()
-	{
+	void SSPHH_Application::imguiShowToolWindow() {
 		///////////////////////////////////////////////////////////
 		// T O O L   W I N D O W //////////////////////////////////
 		///////////////////////////////////////////////////////////
@@ -268,14 +265,14 @@ namespace SSPHH
 			imguiSphlRandomize();
 		}
 		if (ImGui::SmallButton("Corona->SPH")) {
-			if (!ssg.ssphhLights.empty()) {
-				imguiSphlCoronaToSPH(ssg.ssphhLights.size() - 1);
+			if (!ssgUserData->ssphhLights.empty()) {
+				imguiSphlCoronaToSPH(ssgUserData->ssphhLights.size() - 1);
 			}
 		}
 		ImGui::SameLine();
 		if (ImGui::SmallButton("SPH->CubeMap")) {
-			if (!ssg.ssphhLights.empty()) {
-				imguiSphlSPHtoCubeMap(ssg.ssphhLights.size() - 1);
+			if (!ssgUserData->ssphhLights.empty()) {
+				imguiSphlSPHtoCubeMap(ssgUserData->ssphhLights.size() - 1);
 			}
 		}
 		ImGui::PopID();
@@ -445,7 +442,7 @@ namespace SSPHH
 			if (ImGui::Button("GL Extensions") || Interface.tools.gl_extensions.empty()) {
 				Interface.tools.gl_extensions.clear();
 				Interface.tools.gl_extensions_cstr.clear();
-				std::string extensions = (const char *)glGetString(GL_EXTENSIONS);
+				std::string extensions = (const char*)glGetString(GL_EXTENSIONS);
 				std::regex my_regex("\\w+");
 				std::sregex_iterator begin = std::sregex_iterator(extensions.begin(), extensions.end(), my_regex);
 				std::sregex_iterator end = std::sregex_iterator();
@@ -458,11 +455,11 @@ namespace SSPHH
 
 				sort(Interface.tools.gl_extensions.begin(), Interface.tools.gl_extensions.end());
 
-				for (auto &s : Interface.tools.gl_extensions) {
+				for (auto& s : Interface.tools.gl_extensions) {
 					Interface.tools.gl_extensions_cstr.push_back(s.c_str());
 				}
-				Interface.tools.gl_version = (const char *)glGetString(GL_VERSION);
-				Interface.tools.gl_renderer = (const char *)glGetString(GL_RENDERER);
+				Interface.tools.gl_version = (const char*)glGetString(GL_VERSION);
+				Interface.tools.gl_renderer = (const char*)glGetString(GL_RENDERER);
 			}
 			ImGui::Text("GL_RENDERER: %s", Interface.tools.gl_renderer.c_str());
 			ImGui::Text("GL_VERSION:  %s", Interface.tools.gl_version.c_str());
@@ -479,8 +476,7 @@ namespace SSPHH
 		ImGui::End();
 	}
 
-	void SSPHH_Application::imguiShowRenderConfigWindow()
-	{
+	void SSPHH_Application::imguiShowRenderConfigWindow() {
 		if (!Interface.tools.showRenderConfigWindow) {
 			return;
 		}
@@ -529,15 +525,14 @@ namespace SSPHH
 		ImGui::Separator();
 
 		for (size_t i = 0; i < sphls.size(); i++) {
-			const GLuint *texid = sphls[i].lightProbeTexIds;
+			const GLuint* texid = sphls[i].lightProbeTexIds;
 			ImGui::Text("sphls[%d] light probes %d -- %d -- %d", (int)i, (int)texid[0], (int)texid[1], (int)texid[2]);
 		}
 
 		ImGui::End();
 	}
 
-	void SSPHH_Application::imguiShowScenegraphEditor()
-	{
+	void SSPHH_Application::imguiShowScenegraphEditor() {
 		///////////////////////////////////////////////////////////
 		// S C E N E G R A P H   E D I T O R //////////////////////
 		///////////////////////////////////////////////////////////
@@ -550,7 +545,7 @@ namespace SSPHH
 			ImGui::Begin("Scenegraph");
 			static int sceneNumber = 0;
 			static char scenenameBuffer[128];
-			static const char *scenes = "test_indoor_scene\0test_outside_scene\0test_mitsuba_scene\0\0";
+			static const char* scenes = "test_indoor_scene\0test_outside_scene\0test_mitsuba_scene\0\0";
 			//static const char *scenes = "indoor\0outside\0mitsuba\0\0";
 			int lastSceneNumber = sceneNumber;
 			ImGui::Combo("Scene", &sceneNumber, scenes);
@@ -576,7 +571,7 @@ namespace SSPHH
 					break;
 				}
 			}
-			auto safeCopy = [](char *dest, std::string &input, size_t maxChars) {
+			auto safeCopy = [](char* dest, std::string& input, size_t maxChars) {
 				size_t size = std::min(input.size(), maxChars - 1);
 				memcpy(dest, input.data(), size);
 			};
@@ -594,9 +589,9 @@ namespace SSPHH
 			Vector3f sceneMax(trunc(sceneBBox.maxBounds.x + 0.5f), trunc(sceneBBox.maxBounds.y + 0.5f), trunc(sceneBBox.maxBounds.z + 0.5f));
 			Vector3f sceneSize(trunc(sceneBBox.X() + 0.5f), trunc(sceneBBox.Y() + 0.5f), trunc(sceneBBox.Z() + 0.5f));
 			ImGui::Text("scene dimensions (%.1f %.1f %.1f)/(%.1f, %.1f, %.1f) [%.1f, %.1f, %.1f]",
-				sceneMin.x, sceneMin.y, sceneMin.z,
-				sceneMax.x, sceneMax.y, sceneMax.z,
-				sceneSize.x, sceneSize.y, sceneSize.z);
+						sceneMin.x, sceneMin.y, sceneMin.z,
+						sceneMax.x, sceneMax.y, sceneMax.z,
+						sceneSize.x, sceneSize.y, sceneSize.z);
 
 			ImGui::Checkbox("Environment", &Interface.ssg.showEnvironment);
 			if (Interface.ssg.showEnvironment) {
@@ -609,11 +604,11 @@ namespace SSPHH
 					ImGui::Text("enviroDepthMap   Unit/Id/SamplerId: %2d/%2d/%2d", ssg.environment.enviroDepthMapUnit, ssg.environment.enviroDepthMapId, ssg.environment.enviroDepthMapSamplerId);
 					ImGui::Text("pbskyColorMap    Unit/Id/SamplerId: %2d/%2d/%2d", ssg.environment.pbskyColorMapUnit, ssg.environment.pbskyColorMapId, ssg.environment.pbskyColorMapSamplerId);
 					ImGui::Text("shadow map: znear: %.1f, zfar: %0.1f, origin(%.1f, %.1f, %.1f), target(%.1f, %.1f, %.1f), up(%.2f, %.2f, %.2f)",
-						ssg.environment.sunShadowMapNearZ,
-						ssg.environment.sunShadowMapFarZ,
-						ssg.environment.sunShadowMapOrigin.x, ssg.environment.sunShadowMapOrigin.y, ssg.environment.sunShadowMapOrigin.z,
-						ssg.environment.sunShadowMapTarget.x, ssg.environment.sunShadowMapTarget.y, ssg.environment.sunShadowMapTarget.z,
-						ssg.environment.sunShadowMapUp.x, ssg.environment.sunShadowMapUp.y, ssg.environment.sunShadowMapUp.z);
+								ssg.environment.sunShadowMapNearZ,
+								ssg.environment.sunShadowMapFarZ,
+								ssg.environment.sunShadowMapOrigin.x, ssg.environment.sunShadowMapOrigin.y, ssg.environment.sunShadowMapOrigin.z,
+								ssg.environment.sunShadowMapTarget.x, ssg.environment.sunShadowMapTarget.y, ssg.environment.sunShadowMapTarget.z,
+								ssg.environment.sunShadowMapUp.x, ssg.environment.sunShadowMapUp.y, ssg.environment.sunShadowMapUp.z);
 					SEPARATOR_NEWLINE
 				}
 
@@ -730,17 +725,17 @@ namespace SSPHH
 				}
 
 				ImGui::Text("DATE: %02d/%02d/%04d %02d:%02d:%02d%.3f -- LST : %2.3f",
-					ssg.environment.pbsky.getMonth(),
-					ssg.environment.pbsky.getDay(),
-					ssg.environment.pbsky.getYear(),
-					ssg.environment.pbsky.getHour(),
-					ssg.environment.pbsky.getMin(),
-					ssg.environment.pbsky.getSec(),
-					ssg.environment.pbsky.getSecFract(),
-					ssg.environment.pbsky.getLST());
+							ssg.environment.pbsky.getMonth(),
+							ssg.environment.pbsky.getDay(),
+							ssg.environment.pbsky.getYear(),
+							ssg.environment.pbsky.getHour(),
+							ssg.environment.pbsky.getMin(),
+							ssg.environment.pbsky.getSec(),
+							ssg.environment.pbsky.getSecFract(),
+							ssg.environment.pbsky.getLST());
 				ImGui::Text("LAT: % 2.2f LONG: % 3.2f",
-					ssg.environment.pbsky.GetLatitude(),
-					ssg.environment.pbsky.GetLongitude());
+							ssg.environment.pbsky.GetLatitude(),
+							ssg.environment.pbsky.GetLongitude());
 				NEWLINE_SEPARATOR
 			}
 
@@ -752,7 +747,7 @@ namespace SSPHH
 					}
 
 				int i = 0;
-				for (auto &g : ssg.geometry) {
+				for (auto& g : ssg.geometry) {
 					std::ostringstream label;
 					label << g.second.objectName << "(" << i << ")";
 					ImGui::Checkbox(label.str().c_str(), &Interface.ssg.geometryCollapsed[i].second);
@@ -765,9 +760,9 @@ namespace SSPHH
 						Vector3f meshSceneMax = bbox.maxBounds;
 						Vector3f meshSceneSize = bbox.Size();
 						ImGui::Text("dimensions (%.1f %.1f %.1f)/(%.1f, %.1f, %.1f) [%.1f, %.1f, %.1f]",
-							meshSceneMin.x, meshSceneMin.y, meshSceneMin.z,
-							meshSceneMax.x, meshSceneMax.y, meshSceneMax.z,
-							meshSceneSize.x, meshSceneSize.y, meshSceneSize.z);
+									meshSceneMin.x, meshSceneMin.y, meshSceneMin.z,
+									meshSceneMax.x, meshSceneMax.y, meshSceneMax.z,
+									meshSceneSize.x, meshSceneSize.y, meshSceneSize.z);
 						//ImGui::Text("dimensions: %.2f/%.2f/%.2f", g.second.bbox.MaxX(), g.second.bbox.MaxY(), g.second.bbox.MaxZ());
 
 						imguiMatrix4fEditControl(i, g.second.transform);
@@ -780,7 +775,7 @@ namespace SSPHH
 			ImGui::Checkbox("Point Lights", &Interface.ssg.showPointLights);
 			if (Interface.ssg.showPointLights) {
 				int i = 0;
-				for (auto &spl : ssg.pointLights) {
+				for (auto& spl : ssg.pointLights) {
 					std::ostringstream ostr;
 					ImGui::Text("Name(%d): %s", i, spl.name.c_str());
 					ImGui::DragFloat("E0", &spl.E0, 0.1f, 0.0f, 5.0f);
@@ -794,8 +789,7 @@ namespace SSPHH
 		}
 	}
 
-	void SSPHH_Application::imguiMatrix4fEditControl(int id, Matrix4f &m)
-	{
+	void SSPHH_Application::imguiMatrix4fEditControl(int id, Matrix4f& m) {
 		NEWLINE_SEPARATOR
 			ImGui::PushID(id);
 		ImGui::Text("Rotate: ");
@@ -869,8 +863,7 @@ namespace SSPHH
 		ImGui::PopID();
 	}
 
-	void SSPHH_Application::imguiShowSphlEditor()
-	{
+	void SSPHH_Application::imguiShowSphlEditor() {
 		///////////////////////////////////////////////////////////
 		// S P H L   E D I T O R //////////////////////////////////
 		///////////////////////////////////////////////////////////
@@ -888,23 +881,23 @@ namespace SSPHH
 			}
 			ImGui::SetNextWindowContentWidth(w);
 			ImGui::Begin("SSPL Editor");
-			ImGui::Text("%d SSPLs", (int)ssg.ssphhLights.size());
+			ImGui::Text("%d SSPLs", (int)ssgUserData->ssphhLights.size());
 			if (ImGui::Button("Add SSPL")) {
 				imguiSphlAdd();
 			}
 			int i = 0;
 			const float stepSize = 0.1f;
 			int whichToDelete = -1;
-			for (auto &sspl : ssg.ssphhLights) {
+			for (auto& sspl : ssgUserData->ssphhLights) {
 				std::ostringstream id;
 				id << "MS" << std::setfill('0') << std::setw(2) << i << " '" << sspl.name << "'";
-				const void *ptr = &sspl;
+				const void* ptr = &sspl;
 #ifdef _WIN32
 				//va_list args = nullptr;
 #elif __unix__
 				// va_list args = va_list();
 #endif
-				const char *colors[4] = { "R", "G", "B", "Mono" };
+				const char* colors[4] = { "R", "G", "B", "Mono" };
 				const ImVec4 mscolors[4] = {
 					{1.0f, 0.0f, 0.0f, 1.0f},
 					{0.0f, 1.0f, 0.0f, 1.0f},
@@ -1199,14 +1192,13 @@ namespace SSPHH
 				i++;
 			}
 			if (whichToDelete >= 0) {
-				ssg.ssphhLights.erase(ssg.ssphhLights.begin() + whichToDelete);
+				ssgUserData->ssphhLights.erase(ssgUserData->ssphhLights.begin() + whichToDelete);
 			}
 			ImGui::End();
 		}
 	}
 
-	void SSPHH_Application::imguiShowMaterialEditor()
-	{
+	void SSPHH_Application::imguiShowMaterialEditor() {
 		///////////////////////////////////////////////////////////
 		// M A T E R I A L   E D I T O R //////////////////////////
 		///////////////////////////////////////////////////////////
@@ -1225,9 +1217,9 @@ namespace SSPHH
 			if (Interface.mtls.showMaps) {
 				int i = 0;
 				SEPARATOR_NEWLINE
-					for (auto &mtllib : ssg.materials) {
+					for (auto& mtllib : ssg.materials) {
 						ImGui::Text("Mtllib %i: %s", mtllib.first, mtllib.second.name.c_str());
-						for (auto &map : mtllib.second.maps) {
+						for (auto& map : mtllib.second.maps) {
 							ImGui::Text("map: %s", map.second.mapName.c_str());
 						}
 						i++;
@@ -1238,9 +1230,9 @@ namespace SSPHH
 			ImGui::Checkbox("Mtls", &Interface.mtls.showMtls);
 			if (Interface.mtls.showMtls) {
 				int i = 0;
-				for (auto &mtllib : ssg.materials) {
+				for (auto& mtllib : ssg.materials) {
 					std::string mtllib_key = mtllib.second.fpi.fullfname;
-					bool *mtllib_collapsed = nullptr;
+					bool* mtllib_collapsed = nullptr;
 					if (Interface.mtls.mtllibsCollapsed.find(mtllib_key) == Interface.mtls.mtllibsCollapsed.end()) {
 						Interface.mtls.mtllibsCollapsed[mtllib_key] = false;
 					}
@@ -1252,10 +1244,10 @@ namespace SSPHH
 					ImGui::Checkbox(mtllib_key.c_str(), mtllib_collapsed);
 					if (*mtllib_collapsed) {
 						int j = 0;
-						for (auto &mtl : mtllib.second.mtls) {
+						for (auto& mtl : mtllib.second.mtls) {
 							std::string mtl_name = mtllib.second.mtls.GetNameFromHandle(mtl.first);
 							std::string mtllib_mtl_key = mtllib_key + "!!" + mtl_name;
-							bool *mtl_collapsed = nullptr;
+							bool* mtl_collapsed = nullptr;
 							if (Interface.mtls.mtlsCollapsed.find(mtllib_mtl_key) == Interface.mtls.mtlsCollapsed.end()) {
 								Interface.mtls.mtlsCollapsed[mtllib_mtl_key] = false;
 								Interface.mtls.mtls_ptrs[mtllib_mtl_key].Ka = mtl.second.Ka.ptr();
@@ -1312,58 +1304,52 @@ namespace SSPHH
 		}
 	}
 
-	void SSPHH_Application::imguiSphlAdd()
-	{
-		ssg.ssphhLights.resize(ssg.ssphhLights.size() + 1);
-		SimpleSSPHHLight &sphl = ssg.ssphhLights.back();
+	void SSPHH_Application::imguiSphlAdd() {
+		ssgUserData->ssphhLights.resize(ssgUserData->ssphhLights.size() + 1);
+		SimpleSSPHHLight& sphl = ssgUserData->ssphhLights.back();
 		std::ostringstream name;
-		name << "New SSPL " << ssg.ssphhLights.size();
+		name << "New SSPL " << ssgUserData->ssphhLights.size();
 		sphl.name = name.str();
 		sphl.name.reserve(32);
 		sphl.ChangeDegrees(DefaultSphlDegree);
 
-		for (auto &sphl : ssg.ssphhLights) {
+		for (auto& sphl : ssgUserData->ssphhLights) {
 			sphl.dirty = true;
 		}
 
 		imguiCoronaGenerateSphlINIT();
 	}
 
-	void SSPHH_Application::imguiSphlDelete()
-	{
-		if (!ssg.ssphhLights.empty())
-			ssg.ssphhLights.pop_back();
+	void SSPHH_Application::imguiSphlDelete() {
+		if (!ssgUserData->ssphhLights.empty())
+			ssgUserData->ssphhLights.pop_back();
 
 		imguiCoronaGenerateSphlINIT();
 	}
 
-	void SSPHH_Application::imguiSphlRandomize()
-	{
-		if (ssg.ssphhLights.empty())
+	void SSPHH_Application::imguiSphlRandomize() {
+		if (ssgUserData->ssphhLights.empty())
 			return;
-		auto i = ssg.ssphhLights.size() - 1;
-		ssg.ssphhLights[i].Randomize();
+		auto i = ssgUserData->ssphhLights.size() - 1;
+		ssgUserData->ssphhLights[i].Randomize();
 	}
 
-	void SSPHH_Application::imguiSphlDecreaseDegrees()
-	{
-		if (ssg.ssphhLights.empty())
+	void SSPHH_Application::imguiSphlDecreaseDegrees() {
+		if (ssgUserData->ssphhLights.empty())
 			return;
-		auto i = ssg.ssphhLights.size() - 1;
-		ssg.ssphhLights[i].DecDegrees();
+		auto i = ssgUserData->ssphhLights.size() - 1;
+		ssgUserData->ssphhLights[i].DecDegrees();
 	}
 
-	void SSPHH_Application::imguiSphlIncreaseDegrees()
-	{
-		if (ssg.ssphhLights.empty())
+	void SSPHH_Application::imguiSphlIncreaseDegrees() {
+		if (ssgUserData->ssphhLights.empty())
 			return;
-		auto i = ssg.ssphhLights.size() - 1;
-		ssg.ssphhLights[i].IncDegrees();
+		auto i = ssgUserData->ssphhLights.size() - 1;
+		ssgUserData->ssphhLights[i].IncDegrees();
 	}
 
-	void SSPHH_Application::imguiSphlCoronaToSPH(size_t which)
-	{
-		if (ssg.ssphhLights.empty() && ssg.ssphhLights.size() <= which)
+	void SSPHH_Application::imguiSphlCoronaToSPH(size_t which) {
+		if (ssgUserData->ssphhLights.empty() && ssgUserData->ssphhLights.size() <= which)
 			return;
 
 		enviroCubeTexture3.LoadTextureCoronaCubeMap("export_cubemap.png", true);
@@ -1371,21 +1357,19 @@ namespace SSPHH
 		SphlSampler sphlSampler;
 		sphlSampler.resize(64, 32);
 		sphlSampler.saveSampleMap("sample_stratification.ppm", 4);
-		sphlSampler.sampleCubeMap(enviroCubeTexture3.GetImage(), ssg.ssphhLights[which].msph);
+		sphlSampler.sampleCubeMap(enviroCubeTexture3.GetImage(), ssgUserData->ssphhLights[which].msph);
 
-		ssg.ssphhLights[which].dirty = true;
+		ssgUserData->ssphhLights[which].dirty = true;
 	}
 
-	void SSPHH_Application::imguiSphlSPHtoCubeMap(size_t which)
-	{
-		if (ssg.ssphhLights.empty() && ssg.ssphhLights.size() <= which)
+	void SSPHH_Application::imguiSphlSPHtoCubeMap(size_t which) {
+		if (ssgUserData->ssphhLights.empty() && ssgUserData->ssphhLights.size() <= which)
 			return;
 
-		ssg.ssphhLights[which].dirty = true;
+		ssgUserData->ssphhLights[which].dirty = true;
 	}
 
-	void SSPHH_Application::imguiSphlSaveToOBJ()
-	{
+	void SSPHH_Application::imguiSphlSaveToOBJ() {
 		//int i = 0;
 		//for (auto &it : sphls)
 		//{
@@ -1398,7 +1382,7 @@ namespace SSPHH
 		//}
 
 		size_t i = 0;
-		for (auto &sphl : ssg.ssphhLights) {
+		for (auto& sphl : ssgUserData->ssphhLights) {
 			std::ostringstream ostr;
 			ostr << ssg.name << "_sphl_" << std::setw(2) << std::setfill('0') << i;
 			sphl.SaveOBJ("output", ostr.str());
@@ -1409,23 +1393,19 @@ namespace SSPHH
 		}
 	}
 
-	void SSPHH_Application::imguiToolsTakeScreenshot()
-	{
+	void SSPHH_Application::imguiToolsTakeScreenshot() {
 		Interface.saveScreenshot = true;
 	}
 
-	void SSPHH_Application::imguiToolsSaveStats()
-	{
+	void SSPHH_Application::imguiToolsSaveStats() {
 		Hf::Log.saveStats(ssg.name + "_");
 	}
 
-	void SSPHH_Application::imguiToolsResetStats()
-	{
+	void SSPHH_Application::imguiToolsResetStats() {
 		Hf::Log.resetStat("frametime");
 	}
 
-	void SSPHH_Application::imguiCoronaControls()
-	{
+	void SSPHH_Application::imguiCoronaControls() {
 		// TODO: Remove this control if we're not using it for anything anymore
 		return;
 
@@ -1442,8 +1422,7 @@ namespace SSPHH
 		ImGui::PopID();
 	}
 
-	void SSPHH_Application::imguiCoronaGenerateSCN()
-	{
+	void SSPHH_Application::imguiCoronaGenerateSCN() {
 		// Algorithm
 		// generate export_corona_cubemap_sphl_XX.scn      (64x64) where XX is the index of the SPHL
 		// generate export_corona_ground_truth.png (1280x720)
@@ -1455,19 +1434,18 @@ namespace SSPHH
 				break;
 
 			std::ostringstream ostr;
-			ostr << CoronaJob::exportPathPrefix << "export_corona_cubemap_sphl_"
+			ostr << Uf::CoronaJob::exportPathPrefix << "export_corona_cubemap_sphl_"
 				<< std::setw(2) << std::setfill('0') << (int)i << ".scn";
 			coronaScene.WriteCubeMapSCN(ostr.str(), ssg, sphls[i].position.xyz());
 		}
 
-		coronaScene.WriteSCN(CoronaJob::exportPathPrefix +
-			"export_corona_ground_truth.scn", ssg);
-		coronaScene.WriteCubeMapSCN(CoronaJob::exportPathPrefix +
-			"export_corona_ground_truth_cube.scn", ssg);
+		coronaScene.WriteSCN(Uf::CoronaJob::exportPathPrefix +
+							 "export_corona_ground_truth.scn", ssg);
+		coronaScene.WriteCubeMapSCN(Uf::CoronaJob::exportPathPrefix +
+									"export_corona_ground_truth_cube.scn", ssg);
 	}
 
-	void SSPHH_Application::imguiCoronaGenerateSphlVIZ()
-	{
+	void SSPHH_Application::imguiCoronaGenerateSphlVIZ() {
 		imguiCoronaCheckCache();
 
 		// Algorithm
@@ -1477,14 +1455,14 @@ namespace SSPHH
 		double viz_t0 = Hf::Log.getSecondsElapsed();
 
 		int count = 0;
-		int numLights = (int)ssg.ssphhLights.size();
+		int numLights = (int)ssgUserData->ssphhLights.size();
 		Interface.ssphh.viz_times.resize(numLights, 0.0);
 
 		for (int sendLight = 0; sendLight < numLights; sendLight++) {
 			if (defaultRenderConfig.shaderDebugSphl >= 0 && sendLight != defaultRenderConfig.shaderDebugSphl)
 				continue;
 
-			auto &sphl = ssg.ssphhLights[sendLight];
+			auto& sphl = ssgUserData->ssphhLights[sendLight];
 			sphl.vizgenLightProbes.resize(numLights);
 
 			for (int recvLight = 0; recvLight < numLights; recvLight++) {
@@ -1494,16 +1472,16 @@ namespace SSPHH
 				int mrd = Interface.ssphh.VIZ_MaxRayDepth;
 				int pl = Interface.ssphh.VIZ_PassLimit;
 				std::string viz_name;
-				viz_name = CoronaJob::MakeVIZName(Interface.sceneName,
-					recvLight,
-					sendLight,
-					false,
-					false,
-					Interface.ssphh.enableKs,
-					mrd,
-					pl);
+				viz_name = Fluxions::MakeVIZName(Interface.sceneName,
+												 recvLight,
+												 sendLight,
+												 false,
+												 false,
+												 Interface.ssphh.enableKs,
+												 mrd,
+												 pl);
 
-				CoronaJob job(viz_name, CoronaJob::Type::VIZ, sendLight, recvLight);
+				Uf::CoronaJob job(viz_name, Uf::CoronaJob::Type::VIZ, sendLight, recvLight);
 				if (Interface.ssphh.enableHDR)
 					job.EnableHDR();
 				if (Interface.ssphh.enableHQ)
@@ -1526,30 +1504,27 @@ namespace SSPHH
 		}
 
 		if (count)
-			ssg.ssphh.VIZ();
+			ssphh.VIZ();
 
 		Interface.ssphh.lastVIZTime = Hf::Log.getSecondsElapsed() - viz_t0;
 	}
 
-	void SSPHH_Application::imguiCoronaGenerateSphlINIT()
-	{
+	void SSPHH_Application::imguiCoronaGenerateSphlINIT() {
 		double timeElapsed = Hf::Log.getSecondsElapsed();
-		ssg.ssphh.INIT(ssg);
+		ssphh.INIT(ssg);
 		Interface.ssphh.lastINITTime = Hf::Log.getSecondsElapsed() - timeElapsed;
 		DirtySPHLs();
 	}
 
-	void SSPHH_Application::imguiCoronaGenerateSphlHIER()
-	{
+	void SSPHH_Application::imguiCoronaGenerateSphlHIER() {
 		double timeElapsed = Hf::Log.getSecondsElapsed();
-		ssg.ssphh.VIZmix = Interface.ssphh.HierarchiesMix;
-		ssg.ssphh.HIER(Interface.ssphh.HierarchiesIncludeSelf, Interface.ssphh.HierarchiesIncludeNeighbors, Interface.ssphh.MaxDegrees);
+		ssphh.VIZmix = Interface.ssphh.HierarchiesMix;
+		ssphh.HIER(Interface.ssphh.HierarchiesIncludeSelf, Interface.ssphh.HierarchiesIncludeNeighbors, Interface.ssphh.MaxDegrees);
 		Interface.ssphh.lastHIERTime = Hf::Log.getSecondsElapsed() - timeElapsed;
 		DirtySPHLs();
 	}
 
-	void SSPHH_Application::imguiCoronaGenerateSphlGEN()
-	{
+	void SSPHH_Application::imguiCoronaGenerateSphlGEN() {
 		imguiCoronaCheckCache();
 
 		// Algorithm
@@ -1559,19 +1534,19 @@ namespace SSPHH
 		//
 
 		int count = 0;
-		int numLights = (int)ssg.ssphhLights.size();
+		int numLights = (int)ssgUserData->ssphhLights.size();
 		double gen_t0 = Hf::Log.getSecondsElapsed();
 		Interface.ssphh.gen_times.resize(numLights, 0.0);
 		for (int sendLight = 0; sendLight < numLights; sendLight++) {
 			if (defaultRenderConfig.shaderDebugSphl >= 0 && sendLight != defaultRenderConfig.shaderDebugSphl)
 				continue;
-			auto &sphl = ssg.ssphhLights[sendLight];
+			auto& sphl = ssgUserData->ssphhLights[sendLight];
 			sphl.vizgenLightProbes.resize(numLights);
 
 			//sphl.index = sendLight;
 			int mrd = Interface.ssphh.GEN_MaxRayDepth;
 			int pl = Interface.ssphh.GEN_PassLimit;
-			CoronaJob job(CoronaJob::MakeGENName(
+			Uf::CoronaJob job(Fluxions::MakeGENName(
 				Interface.sceneName,
 				sendLight,
 				false,
@@ -1579,7 +1554,7 @@ namespace SSPHH
 				Interface.ssphh.enableKs,
 				mrd,
 				pl),
-				CoronaJob::Type::GEN, sendLight);
+				Uf::CoronaJob::Type::GEN, sendLight);
 			if (Interface.ssphh.enableHDR)
 				job.EnableHDR();
 			if (Interface.ssphh.enableHQ)
@@ -1601,16 +1576,15 @@ namespace SSPHH
 		}
 
 		if (count) {
-			ssg.ssphh.GEN();
+			ssphh.GEN();
 			DirtySPHLs();
 		}
 
 		Interface.ssphh.lastGENTime = Hf::Log.getSecondsElapsed() - gen_t0;
 	}
 
-	void SSPHH_Application::imguiCoronaGenerateSky()
-	{
-		CoronaJob job("ssphh_sky", CoronaJob::Type::Sky);
+	void SSPHH_Application::imguiCoronaGenerateSky() {
+		Uf::CoronaJob job("ssphh_sky", Uf::CoronaJob::Type::Sky);
 
 		if (Interface.ssphh.enableHQ)
 			job.EnableHQ();
@@ -1644,20 +1618,18 @@ namespace SSPHH
 		}
 	}
 
-	void SSPHH_Application::imguiCoronaCheckCache()
-	{
+	void SSPHH_Application::imguiCoronaCheckCache() {
 		if (coronaScene.enableKs != Interface.ssphh.enableKs) {
 			coronaScene.enableKs = Interface.ssphh.enableKs;
 			coronaScene.ClearCache();
 		}
 	}
 
-	void SSPHH_Application::imguiCoronaGenerateREF()
-	{
+	void SSPHH_Application::imguiCoronaGenerateREF() {
 		imguiCoronaCheckCache();
 		if (Interface.ssphh.enableREF) {
 			double time0 = Hf::Log.getSecondsElapsed();
-			std::string name = CoronaJob::MakeREFName(
+			std::string name = Fluxions::MakeREFName(
 				Interface.sceneName,
 				false,
 				Interface.ssphh.enableHDR,
@@ -1665,7 +1637,7 @@ namespace SSPHH
 				Interface.ssphh.enableKs,
 				Interface.ssphh.REF_MaxRayDepth,
 				Interface.ssphh.REF_PassLimit);
-			CoronaJob job1(name, CoronaJob::Type::REF);
+			Uf::CoronaJob job1(name, Uf::CoronaJob::Type::REF);
 			if (Interface.ssphh.enableHQ)
 				job1.EnableHQ();
 			if (Interface.ssphh.enableHDR)
@@ -1684,7 +1656,7 @@ namespace SSPHH
 
 		if (Interface.ssphh.enableREFCubeMap) {
 			double time0 = Hf::Log.getSecondsElapsed();
-			std::string name = CoronaJob::MakeREFName(
+			std::string name = Fluxions::MakeREFName(
 				Interface.sceneName,
 				true,
 				Interface.ssphh.enableHDR,
@@ -1692,7 +1664,7 @@ namespace SSPHH
 				Interface.ssphh.enableKs,
 				Interface.ssphh.REF_MaxRayDepth,
 				Interface.ssphh.REF_PassLimit);
-			CoronaJob job2(name, CoronaJob::Type::REF_CubeMap);
+			Uf::CoronaJob job2(name, Uf::CoronaJob::Type::REF_CubeMap);
 			if (Interface.ssphh.enableHQ)
 				job2.EnableHQ();
 			if (Interface.ssphh.enableHDR)
@@ -1710,10 +1682,9 @@ namespace SSPHH
 		}
 	}
 
-	void SSPHH_Application::imguiCoronaDeleteCache()
-	{
+	void SSPHH_Application::imguiCoronaDeleteCache() {
 		for (int i = 0; i < MaxSphlLights; i++) {
-			std::string base_filename = CoronaJob::MakeGENName(Interface.sceneName, i);
+			std::string base_filename = Fluxions::MakeGENName(Interface.sceneName, i);
 
 			//vector<string> files_to_delete = {};
 			// Delete sun-to-sphl light probe
@@ -1752,7 +1723,7 @@ namespace SSPHH
 
 			// we count one more for the sun-to-sphl files
 			for (int j = 0; j <= MaxSphlLights; j++) {
-				std::string viz_base_filename = CoronaJob::MakeVIZName(Interface.sceneName, i, j);
+				std::string viz_base_filename = Fluxions::MakeVIZName(Interface.sceneName, i, j);
 
 				// Delete sun-to-sphl light probe
 				DeleteFile((viz_base_filename + ".scn").c_str());
@@ -1772,10 +1743,10 @@ namespace SSPHH
 			}
 		}
 
-		const std::string &gt = CoronaJob::MakeREFName(Interface.sceneName, false);
-		const std::string &gt_cm = CoronaJob::MakeREFName(Interface.sceneName, true);
-		const std::string &gt_mrdpl = CoronaJob::MakeREFName(Interface.sceneName, false, Interface.ssphh.enableHDR, false, Interface.ssphh.REF_MaxRayDepth, Interface.ssphh.REF_PassLimit);
-		const std::string &gt_cm_mrdpl = CoronaJob::MakeREFName(Interface.sceneName, true, Interface.ssphh.enableHDR, false, Interface.ssphh.REF_MaxRayDepth, Interface.ssphh.REF_PassLimit);
+		const std::string& gt = Fluxions::MakeREFName(Interface.sceneName, false);
+		const std::string& gt_cm = Fluxions::MakeREFName(Interface.sceneName, true);
+		const std::string& gt_mrdpl = Fluxions::MakeREFName(Interface.sceneName, false, Interface.ssphh.enableHDR, false, Interface.ssphh.REF_MaxRayDepth, Interface.ssphh.REF_PassLimit);
+		const std::string& gt_cm_mrdpl = Fluxions::MakeREFName(Interface.sceneName, true, Interface.ssphh.enableHDR, false, Interface.ssphh.REF_MaxRayDepth, Interface.ssphh.REF_PassLimit);
 		std::vector<std::string> products = {
 			"ssphh_ground_truth",
 			"ssphh_ground_truth_hq"
@@ -1792,7 +1763,7 @@ namespace SSPHH
 			gt_mrdpl,
 			gt_cm_mrdpl };
 
-		for (auto &product : products) {
+		for (auto& product : products) {
 			DeleteFile((product + ".scn").c_str());
 			DeleteFile((product + ".exr").c_str());
 			DeleteFile((product + ".ppm").c_str());
@@ -1806,8 +1777,7 @@ namespace SSPHH
 
 	using TestProduct = std::tuple<bool, int, int, int, std::string>;
 
-	void SSPHH_Application::imguiCoronaGenerateTestProducts()
-	{
+	void SSPHH_Application::imguiCoronaGenerateTestProducts() {
 		std::vector<int> maxRayDepths = { 25, 3, 1, 0 };
 		std::vector<int> passes = { 1, 3, 25 };
 		std::vector<int> degrees = { 9, 2 };
@@ -1841,8 +1811,8 @@ namespace SSPHH
 		coronaScene.ClearCache();
 		coronaScene.enableKs = true;
 		coronaScene.WriteCache(ssg);
-		for (auto &mrd : maxRayDepths) {
-			for (auto &pl : passes) {
+		for (auto& mrd : maxRayDepths) {
+			for (auto& pl : passes) {
 				Interface.ssphh.REF_MaxRayDepth = mrd;
 				Interface.ssphh.REF_PassLimit = pl;
 				Interface.ssphh.REF_IgnoreCache = Interface.ssphh.genProductsIgnoreCache;
@@ -1860,12 +1830,12 @@ namespace SSPHH
 			}
 		}
 
-		for (auto &ks : specular) {
+		for (auto& ks : specular) {
 			coronaScene.ClearCache();
 			coronaScene.enableKs = ks != 0;
 			coronaScene.WriteCache(ssg);
-			for (auto &mrd : maxRayDepths) {
-				for (auto &pl : passes) {
+			for (auto& mrd : maxRayDepths) {
+				for (auto& pl : passes) {
 					Interface.ssphh.GEN_MaxRayDepth = mrd;
 					Interface.ssphh.GEN_PassLimit = pl;
 					Interface.ssphh.GEN_IgnoreCache = Interface.ssphh.genProductsIgnoreCache;
@@ -1922,25 +1892,25 @@ namespace SSPHH
 						float progress = (float)((double)count / (double)totalProducts);
 						std::string pname = GetPathTracerSphlRenderName(Interface.sceneName, ks, mrd, pl, d);
 						Hf::Log.infofn(__FUNCTION__, "%4d/%4d (%3.2f%% done) products -- finished %s", count, totalProducts, progress,
-							pname.c_str());
+									   pname.c_str());
 					}
 				}
 			}
 		}
 
 		std::ofstream fout(Interface.sceneName + "_stats.csv",
-			Interface.ssphh.genProductsIgnoreCache ? std::ios::out : std::ios::app);
+						   Interface.ssphh.genProductsIgnoreCache ? std::ios::out : std::ios::app);
 		auto dtg = Hf::Log.makeDTG();
 		fout << dtg << std::endl;
 		fout << "name,dtg,ks,mrd,pl,md,time,ptE,sphlE,d1E,d2E" << std::endl;
-		for (auto &product : times) {
-			auto &t = product.first;
+		for (auto& product : times) {
+			auto& t = product.first;
 			auto time = product.second;
 			std::string ks = std::get<0>(t) ? "Ks" : "None";
-			auto &mrd = std::get<1>(t);
-			auto &pl = std::get<2>(t);
-			auto &md = std::get<3>(t);
-			auto &name = std::get<4>(t);
+			auto& mrd = std::get<1>(t);
+			auto& pl = std::get<2>(t);
+			auto& md = std::get<3>(t);
+			auto& name = std::get<4>(t);
 			fout << name << "," << dtg << "," << ks << ", " << mrd << "," << pl << "," << md << "," << time << ",";
 			fout << Interface.ssphh.lastPathTracerTotalEnergy << ",";
 			fout << Interface.ssphh.lastSphlRenderTotalEnergy << ",";
@@ -1961,8 +1931,7 @@ namespace SSPHH
 		Interface.ssphh.MaxDegrees = lastDegrees;
 	}
 
-	void SSPHH_Application::imguiCoronaGenerateCompareProduct(bool ks, int mrd, int pl, int md)
-	{
+	void SSPHH_Application::imguiCoronaGenerateCompareProduct(bool ks, int mrd, int pl, int md) {
 		std::string pathtracer_name = GetPathTracerName(Interface.sceneName, ks, mrd, pl);
 		std::string sphlrender_name = GetPathTracerSphlRenderName(Interface.sceneName, ks, mrd, pl, md);
 		std::string stats_name = GetStatsName(Interface.sceneName, ks, mrd, pl, md);
@@ -1977,8 +1946,8 @@ namespace SSPHH
 		ppmcompare.Init(ks, mrd, pl, md);
 		ppmcompare.Compare(image1, image2);
 		ppmcompare.SaveResults(Interface.sceneName, pathtracer_name,
-			Interface.ssphh.ppmcompareGenPPMs,
-			Interface.ssphh.ppmcompareIgnoreCache);
+							   Interface.ssphh.ppmcompareGenPPMs,
+							   Interface.ssphh.ppmcompareIgnoreCache);
 
 		Interface.ssphh.lastPathTracerTotalEnergy = ppmcompare.image1stat.sumI;
 		Interface.ssphh.lastSphlRenderTotalEnergy = ppmcompare.image2stat.sumI;
@@ -2031,12 +2000,9 @@ namespace SSPHH
 		Interface.ssphh.ppmcompareIgnoreCache = false;
 	}
 
-	void SSPHH_Application::imguiCoronaDeleteTestProducts()
-	{
-	}
+	void SSPHH_Application::imguiCoronaDeleteTestProducts() {}
 
-	void SSPHH_Application::imguiShowUfWindow()
-	{
+	void SSPHH_Application::imguiShowUfWindow() {
 		if (!Interface.tools.showUnicornfishWindow)
 			return;
 		if (!Interface.uf.windowInit) {
@@ -2100,8 +2066,7 @@ namespace SSPHH
 		ImGui::End();
 	}
 
-	void SSPHH_Application::imguiShowSSPHHWindow()
-	{
+	void SSPHH_Application::imguiShowSSPHHWindow() {
 		if (!Interface.tools.showSSPHHWindow)
 			return;
 		static bool init = false;
@@ -2155,14 +2120,16 @@ namespace SSPHH
 
 		if (ImGui::Button("SPHLGEN")) {
 			imguiCoronaGenerateSphlGEN();
-			ssg.MakeSphlsUnclean();
+			DirtySPHLs();
+			//ssg.MakeSphlsUnclean();
 		}
 		ImGui::SameLine();
 		ImGui::Text("Generate GI solution (%.3lf sec)", Interface.ssphh.lastGENTime);
 
 		if (ImGui::Button("HIERGEN")) {
 			imguiCoronaGenerateSphlHIER();
-			ssg.MakeSphlsUnclean();
+			DirtySPHLs();
+			//ssg.MakeSphlsUnclean();
 		}
 		ImGui::SameLine();
 		ImGui::Text("Generate Hierarchies (%.3lf sec)", Interface.ssphh.lastHIERTime);
@@ -2199,22 +2166,23 @@ namespace SSPHH
 		}
 		ImGui::SameLine();
 		if (ImGui::SmallButton("Unclean!")) {
-			ssg.MakeSphlsUnclean();
+			DirtySPHLs();
+			//ssg.MakeSphlsUnclean();
 		}
 		ImGui::SameLine();
 		if (ImGui::SmallButton("Dump Hier")) {
-			for (size_t i = 0; i < ssg.ssphhLights.size(); i++) {
-				auto &sphl = ssg.ssphhLights[i];
+			for (size_t i = 0; i < ssgUserData->ssphhLights.size(); i++) {
+				auto& sphl = ssgUserData->ssphhLights[i];
 				sphl.SetHierarchyDescription();
 				Hf::Log.info("%s(): hierarchy %02d %s", __FUNCTION__, sphl.index, sphl.hier_description.c_str());
 			}
 		}
 
 		// do a little visualization on the current enabled status
-		int size = (int)ssg.ssphhLights.size();
-		std::string bits(ssg.ssphhLights.size(), 'n');
+		int size = (int)ssgUserData->ssphhLights.size();
+		std::string bits(ssgUserData->ssphhLights.size(), 'n');
 		for (int i = 0; i < size; i++)
-			if (ssg.ssphhLights[i].enabled)
+			if (ssgUserData->ssphhLights[i].enabled)
 				bits[i] = 'y';
 		ImGui::SameLine();
 		ImGui::Text("%d %s", size, bits.c_str());
@@ -2238,9 +2206,9 @@ namespace SSPHH
 		ImGui::SameLine();
 		ImGui::Checkbox("Ks", &Interface.ssphh.enableKs);
 		ImGui::SameLine();
-		ImGui::Checkbox("PPMs", &ssg.ssphh.savePPMs);
+		ImGui::Checkbox("PPMs", &ssphh.savePPMs);
 		ImGui::SameLine();
-		ImGui::Checkbox("JSONs", &ssg.ssphh.saveJSONs);
+		ImGui::Checkbox("JSONs", &ssphh.saveJSONs);
 
 		ImGui::PushItemWidth(100);
 		ImGui::PushID(1);
@@ -2297,7 +2265,8 @@ namespace SSPHH
 		ImGui::Checkbox("Hierarchies", &Interface.ssphh.enableShowHierarchies);
 		ImGui::SameLine();
 		if (ImGui::Button("GO!")) {
-			ssg.MakeSphlsUnclean();
+			DirtySPHLs();
+			//ssg.MakeSphlsUnclean();
 		}
 		ImGui::PopItemWidth();
 
@@ -2320,15 +2289,14 @@ namespace SSPHH
 		ImGui::Separator();
 
 		// show sorted list of hierarchies
-		for (size_t i = 0; i < ssg.ssphhLights.size(); i++) {
-			ImGui::Text("%s", ssg.ssphhLights[i].hier_description.c_str());
+		for (size_t i = 0; i < ssgUserData->ssphhLights.size(); i++) {
+			ImGui::Text("%s", ssgUserData->ssphhLights[i].hier_description.c_str());
 		}
 
 		ImGui::End();
 	}
 
-	void SSPHH_Application::imgui2NSizeSlider(const char *desc, int *choice, int *size, int minvalue, int maxvalue)
-	{
+	void SSPHH_Application::imgui2NSizeSlider(const char* desc, int* choice, int* size, int minvalue, int maxvalue) {
 		ImGui::SliderInt(desc, choice, minvalue, maxvalue);
 		ImGui::SameLine();
 		ImGui::Text("= %d", 2 << *choice);

@@ -138,17 +138,11 @@
   <ItemGroup>
     <ClInclude Include="include\Damselfish.hpp" />
     <ClInclude Include="include\DragDrop.hpp" />
-    <ClInclude Include="include\fluxions_simple_ssphh.hpp" />
-    <ClInclude Include="include\fluxions_simple_ssphh_light.hpp" />
-    <ClInclude Include="include\fluxions_sphl.hpp" />
-    <ClInclude Include="include\fluxions_sphl_sampler.hpp" />
-    <ClInclude Include="include\fluxions_ssg_ssphh.hpp" />
-    <ClInclude Include="include\fluxions_ssphh.hpp" />
     <ClInclude Include="include\GLFW_template.hpp" />
     <ClInclude Include="include\GLUT_template.hpp" />
     <ClInclude Include="include\jellyfish.hpp" />
     <ClInclude Include="include\SphlJob.hpp" />
-    <ClInclude Include="include\ssphh.hpp" />
+    <ClInclude Include="include\ssphhapp.hpp" />
     <ClInclude Include="include\ssphh_ppmcompare.hpp" />
     <ClInclude Include="include\ssphh_unicornfish.hpp" />
     <ClInclude Include="src\pch.hpp" />
@@ -159,17 +153,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="src\DragDrop.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="src\fluxions_simple_ssphh_light.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="src\fluxions_sphl.cpp" />
-    <ClCompile Include="src\fluxions_sphl_sampler.cpp" />
-    <ClCompile Include="src\fluxions_ssg_ssphh.cpp" />
-    <ClCompile Include="src\fluxions_ssphh.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
@@ -191,16 +174,27 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="src\opengl_utilities.cpp" />
+    <ClCompile Include="src\sphhapp_ssphh.cpp" />
     <ClCompile Include="src\SphlJob.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="src\ssphh.cpp">
+    <ClCompile Include="src\ssphhapp.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="src\ssphhapp_render.cpp" />
+    <ClCompile Include="src\ssphhapp_renderconfigs.cpp" />
+    <ClCompile Include="src\ssphhapp_render_gl11.cpp" />
+    <ClCompile Include="src\ssphhapp_render_gles30.cpp" />
+    <ClCompile Include="src\ssphhapp_render_shadows.cpp" />
+    <ClCompile Include="src\ssphhapp_scenegraph.cpp" />
+    <ClCompile Include="src\ssphhapp_unicornfish.cpp" />
+    <ClCompile Include="src\ssphhapp_update.cpp" />
+    <ClCompile Include="src\ssphhapp_usercontrols.cpp" />
     <ClCompile Include="src\ssphh_imgui_tests.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>

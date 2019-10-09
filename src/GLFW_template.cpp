@@ -209,16 +209,26 @@ void GlfwTemplateSetParameters(const std::string &windowTitle, int width, int he
 
 bool GlfwTemplateInit(int argc, char **argv)
 {
+	HFLOGINFO("Initializing GLFW");
 	// Initialize GLFW
 	if (!glfwInit()) {
-		HFLOGERROR("GLFW cannot be initialized");
+		HFLOGERROR("GLFW cannot be initialized!");
 		return false;
 	}
 
 	// monitor is set to NULL
 	// share is set to NULL
+	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwt::pGlfwWindow = glfwCreateWindow(glfwt::screenWidth, glfwt::screenHeight, glfwt::windowTitle.c_str(), NULL, NULL);
-
+	if (!glfwt::pGlfwWindow) {
+		HFLOGWARN("Unable to use OpenGL Core Profile!");
+		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+		glfwt::pGlfwWindow = glfwCreateWindow(glfwt::screenWidth, glfwt::screenHeight, glfwt::windowTitle.c_str(), NULL, NULL);
+	}
+	if (!glfwt::pGlfwWindow) {
+		HFLOGWARN("Unable to use OpenGL Compatibility Profile!");
+		return false;
+	}
 	glfwMakeContextCurrent(glfwt::pGlfwWindow);
 
 	glfwSetKeyCallback(glfwt::pGlfwWindow, glfwt::key_callback);

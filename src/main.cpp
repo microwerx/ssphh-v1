@@ -36,7 +36,10 @@
 #pragma comment(lib, "fluxions-deps.lib")
 #pragma comment(lib, "fluxions-gte.lib")
 
-#pragma comment(lib, "glew32.lib")
+#pragma comment(lib, "viperfish.lib")
+#pragma comment(lib, "unicornfish.lib")
+#pragma comment(lib, "damselfish.lib")
+
 #ifndef FLUXIONS_NO_OPENEXR
 #pragma comment(lib, "Half-2_3.lib")
 //#pragma comment(lib, "Iex-2_3")
@@ -67,7 +70,7 @@
 #include <regex>
 #include <viperfish.hpp>
 #include <unicornfish.hpp>
-#include "ssphh.hpp"
+#include <ssphhapp.hpp>
 
 #include <DragDrop.hpp>
 #include <GLFW_template.hpp>
@@ -104,7 +107,7 @@ int main(int argc, char **argv)
 {
 	do_tests();
 
-	curl_global_init(CURL_GLOBAL_ALL);
+	Uf::Init();
 
 	std::map<std::string, std::string> options = Fluxions::MakeOptionsFromArgs(argc, (const char **)argv);
 
@@ -143,7 +146,7 @@ int main(int argc, char **argv)
 	KillApp();
 	dragDrop.Kill();
 
-	curl_global_cleanup();
+	Uf::Kill();
 
 	return 0;
 }
