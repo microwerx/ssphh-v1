@@ -869,8 +869,8 @@ namespace SSPHH
 		///////////////////////////////////////////////////////////
 
 		static bool init = false;
-		static int w = 512;
-		static int h = 256;
+		static float w = 512.0f;
+		static float h = 256.0f;
 
 		if (Interface.tools.showSphlEditor) {
 			if (!init) {
