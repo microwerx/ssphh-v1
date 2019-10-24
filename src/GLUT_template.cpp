@@ -602,7 +602,7 @@ void Set2DViewport()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	Fluxions::Matrix4f ortho2d;
-	ortho2d.Ortho2D(0, gt_screenWidth, gt_screenHeight, 0);
+	ortho2d.Ortho2D(0.0f, (float)gt_screenWidth, (float)gt_screenHeight, 0.0f);
 	glMultMatrixf(ortho2d.const_ptr());
 	glMatrixMode(GL_MODELVIEW);
 }
@@ -612,7 +612,7 @@ void Set3DViewport()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	Fluxions::Matrix4f perspective;
-	perspective.PerspectiveY(gt_Fov, gt_aspectRatio, gt_zNear, gt_zFar);
+	perspective.PerspectiveY((float)gt_Fov, (float)gt_aspectRatio, (float)gt_zNear, (float)gt_zFar);
 	glMultMatrixf(perspective.const_ptr());
 	glMatrixMode(GL_MODELVIEW);
 }
