@@ -329,9 +329,7 @@ namespace SSPHH
 			}
 
 			if (key == "F12") {
-				renderMode++;
-				if (renderMode >= MAX_RENDER_MODES)
-					renderMode = 0;
+				incr_wrap(renderMode, MAX_RENDER_MODES - 1);
 			}
 		}
 	}

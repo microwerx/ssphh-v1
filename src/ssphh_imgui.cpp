@@ -109,7 +109,7 @@ namespace SSPHH
 		imguiShowSSPHHWindow();
 		imguiShowRenderConfigWindow();
 		imguiShowTestWindow();
-		vcPbsky.show();
+		vcPbsky->show();
 
 		//ImGui::ShowUserGuide();
 	}
