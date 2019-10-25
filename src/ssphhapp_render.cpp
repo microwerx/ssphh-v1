@@ -44,12 +44,10 @@ namespace SSPHH
 		}
 		my_hud_info.totalRenderTime = Hf::Log.getSecondsElapsed() - renderT0;
 
-		static double t0 = 0.0;
-		double t1 = Hf::Log.getMillisecondsElapsed();
-		double dt = t1 - t0;
+		double renderT1 = Hf::Log.getMillisecondsElapsed();
+		double dt = renderT1 - renderT0;
 		if (dt < 1000.0)
 			Hf::Log.takeStat("frametime", dt);
-		t0 = t1;
 		SaveScreenshot();
 	}
 

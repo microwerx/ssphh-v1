@@ -1023,7 +1023,7 @@ namespace SSPHH
 									int lm = (int)sspl.msph[j].getCoefficientIndex(l, m);
 									float oldValue = sspl.msph[j].getCoefficient(l, m);
 									ImGui::PushID(i * 100000 + j * 10000 + lm * 100);
-									auto offset = sspl.msph[j].getCoefficientIndex(l, m);
+									unsigned offset = sspl.msph[j].getCoefficientIndex(l, m);
 									std::ostringstream label;
 									label << "l = " << l << ", m = " << m << " (" << offset << ")"
 										<< "##" << std::setw(2) << std::setfill('0') << i << j;

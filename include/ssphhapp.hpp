@@ -520,7 +520,7 @@ namespace SSPHH
 		HUDInfo my_hud_info;
 		//Df::PythonInterpreter python;
 
-		std::vector<std::string> args; // to pull in the argc, argv from main()
+		std::vector<std::string> cmd_args; // to pull in the argc, argv from main()
 
 		using SharedPtr = std::shared_ptr<SSPHH_Application>;
 		using UniquePtr = std::unique_ptr<SSPHH_Application>;

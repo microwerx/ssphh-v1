@@ -183,7 +183,7 @@ private:
 		// Enumerate available items:
 		if (pDataObject->EnumFormatEtc(DATADIR_GET, &ef) == S_OK) {
 			ef->Next(10, formats, &fetched);
-			for (int i = 0; i < fetched; i++) {
+			for (unsigned i = 0; i < fetched; i++) {
 				if (formats[i].cfFormat < CF_MAX) {
 					HFLOGINFO("CF[%i] (cfFormat, Aspect, Index, Tymed) => (%i, %i, %i %i)",
 						i,

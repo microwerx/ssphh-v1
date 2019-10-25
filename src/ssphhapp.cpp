@@ -211,11 +211,11 @@ namespace SSPHH
 
 		Interface.preCameraMatrix.LoadIdentity();
 
-		const char* renderer = (const char*)glGetString(GL_RENDERER);
+		const char* glrenderer = (const char*)glGetString(GL_RENDERER);
 		const char* glvendor = (const char*)glGetString(GL_VENDOR);
 		const char* glversion = (const char*)glGetString(GL_VERSION);
 
-		my_hud_info.glRendererString = renderer ? renderer : "Unknown Renderer";
+		my_hud_info.glRendererString = glrenderer ? glrenderer : "Unknown Renderer";
 		my_hud_info.glVendorString = glvendor ? glvendor : "Unknown Vendor";
 		my_hud_info.glVersionString = glversion ? glversion : "Unknown Version";
 
