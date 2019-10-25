@@ -109,6 +109,7 @@ namespace SSPHH
 		imguiShowSSPHHWindow();
 		imguiShowRenderConfigWindow();
 		imguiShowTestWindow();
+		vcPbsky.show();
 
 		//ImGui::ShowUserGuide();
 	}
@@ -1583,41 +1584,6 @@ namespace SSPHH
 		Interface.ssphh.lastGENTime = Hf::Log.getSecondsElapsed() - gen_t0;
 	}
 
-	void SSPHH_Application::imguiCoronaGenerateSky() {
-		Uf::CoronaJob job("ssphh_sky", Uf::CoronaJob::Type::Sky);
-
-		if (Interface.ssphh.enableHQ)
-			job.EnableHQ();
-		if (Interface.ssphh.enableHDR)
-			job.EnableHDR();
-
-		job.Start(coronaScene, ssg);
-
-		bool loadEXR = true;
-		FilePathInfo fpi(job.GetOutputPath(loadEXR));
-		if (fpi.Exists()) {
-			Image4f lightProbe;
-			if (loadEXR) {
-				lightProbe.loadEXR(fpi.path);
-			}
-			else {
-				lightProbe.loadPPM(fpi.path);
-				//lightProbe.scaleColors(1.0f / (2.5f * powf(2.0f, ssg.environment.toneMapExposure)));
-				lightProbe.ReverseSRGB().ReverseToneMap(ssg.environment.toneMapExposure);
-			}
-			lightProbe.convertRectToCubeMap();
-			FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, ssg.environment.pbskyColorMapId);
-			for (int i = 0; i < 6; i++) {
-				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA32F, (GLsizei)lightProbe.width(), (GLsizei)lightProbe.height(), 0, GL_RGBA, GL_FLOAT, lightProbe.getImageData(i));
-			}
-			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-			FxDebugBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		}
-		else {
-			Hf::Log.errorfn(__FUNCTION__, "Could not generate %s", fpi.path.c_str());
-		}
-	}
-
 	void SSPHH_Application::imguiCoronaCheckCache() {
 		if (coronaScene.enableKs != Interface.ssphh.enableKs) {
 			coronaScene.enableKs = Interface.ssphh.enableKs;
@@ -2089,7 +2055,7 @@ namespace SSPHH
 			imguiCoronaGenerateSCN();
 		}
 		if (ImGui::Button("HOSEK-WILKIE")) {
-			imguiCoronaGenerateSky();
+			RegenCoronaSky();
 		}
 		ImGui::SameLine();
 		ImGui::Text("Create/use Corona Hosek-Wilkie sky.");

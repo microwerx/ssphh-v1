@@ -77,7 +77,7 @@ namespace SSPHH
 		pbsky_timeOffsetInSeconds = 0.0;
 		Interface.recomputeSky = true;
 		AdvanceSunClock(0.0, true);
-		ssg.environment.ComputePBSky();
+		RegenHosekWilkieSky();
 	}
 
 	void SSPHH_Application::UseCurrentTime() {
@@ -87,7 +87,7 @@ namespace SSPHH
 		ssg.environment.pbsky.SetTime(time(NULL), 0.0);
 		ssg.environment.pbsky.ComputeSunFromLocale();
 		Interface.recomputeSky = true;
-		ssg.environment.ComputePBSky();
+		RegenHosekWilkieSky();
 	}
 
 
@@ -226,6 +226,7 @@ namespace SSPHH
 			Hf::Log.info("Loaded enviroCubeTexture3...loaded export_cubemap.png");
 		}
 
+		vcPbsky = new PbskyViewController(this);
 		PBSkyCubeMap.Create();
 		PBSkyCubeMap.SetTextureCubeMap(GL_RGB, GL_FLOAT, 64, 64, nullptr, true);
 		PBSkyCubeMap.samplerObject.Create();
@@ -390,22 +391,6 @@ namespace SSPHH
 			FxBindTextureAndSampler(0, GL_TEXTURE_CUBE_MAP, 0, 0);
 			glUseProgram(0);
 		}
-	}
-
-	void SSPHH_Application::SavePbskyTextures() {
-		// Save PB Sky PPMs
-		Hf::Log.info("%s(): saving pbsky ppm texture maps", __FUNCTION__);
-
-		Hf::StopWatch stopwatch;
-		ssg.environment.pbsky.generatedCylMap.savePPMRaw("pbsky_cylmap.ppm");
-		ssg.environment.pbsky.generatedCubeMap.savePPMRaw("pbsky_cubemap_0.ppm", 0);
-		ssg.environment.pbsky.generatedCubeMap.savePPMRaw("pbsky_cubemap_1.ppm", 1);
-		ssg.environment.pbsky.generatedCubeMap.savePPMRaw("pbsky_cubemap_2.ppm", 2);
-		ssg.environment.pbsky.generatedCubeMap.savePPMRaw("pbsky_cubemap_3.ppm", 3);
-		ssg.environment.pbsky.generatedCubeMap.savePPMRaw("pbsky_cubemap_4.ppm", 4);
-		ssg.environment.pbsky.generatedCubeMap.savePPMRaw("pbsky_cubemap_5.ppm", 5);
-		stopwatch.Stop();
-		Hf::Log.info("%s(): saving pbsky ppm texture maps took %4.2f seconds", __FUNCTION__, stopwatch.GetSecondsElapsed());
 	}
 
 	void SSPHH_Application::RenderSkyBox() {

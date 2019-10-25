@@ -141,6 +141,7 @@
     <ClInclude Include="include\GLFW_template.hpp" />
     <ClInclude Include="include\GLUT_template.hpp" />
     <ClInclude Include="include\jellyfish.hpp" />
+    <ClInclude Include="include\PbskyViewController.hpp" />
     <ClInclude Include="include\SphlJob.hpp" />
     <ClInclude Include="include\ssphhapp.hpp" />
     <ClInclude Include="include\ssphh_ppmcompare.hpp" />
@@ -175,6 +176,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="src\opengl_utilities.cpp" />
+    <ClCompile Include="src\PbskyViewController.cpp" />
     <ClCompile Include="src\sphhapp_ssphh.cpp" />
     <ClCompile Include="src\SphlJob.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
@@ -186,6 +188,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pch.hpp</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="src\ssphhapp_pbsky.cpp" />
     <ClCompile Include="src\ssphhapp_render.cpp" />
     <ClCompile Include="src\ssphhapp_renderconfigs.cpp" />
     <ClCompile Include="src\ssphhapp_render_gl11.cpp" />

@@ -48,6 +48,9 @@
     <ClInclude Include="include\ssphhapp.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PbskyViewController.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -138,6 +141,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\opengl_utilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PbskyViewController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ssphhapp_pbsky.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

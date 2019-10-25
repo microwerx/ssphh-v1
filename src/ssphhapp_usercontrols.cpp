@@ -257,7 +257,7 @@ namespace SSPHH
 
 			if (key == "i" || key == "I") {
 				imguiCoronaGenerateSphlINIT();
-				imguiCoronaGenerateSky();
+				RegenCoronaSky();
 			}
 
 			if (key == "v" || key == "V") {
@@ -314,7 +314,7 @@ namespace SSPHH
 			if (key == "F5")
 				Interface.recomputeSky = !Interface.recomputeSky;
 			if (key == "F6")
-				imguiCoronaGenerateSky();
+				RegenCoronaSky();
 			if (key == "F7")
 				Interface.ssphh.enableShowSPHLs = !Interface.ssphh.enableShowSPHLs;
 			if (key == "F8")
@@ -325,7 +325,7 @@ namespace SSPHH
 			}
 
 			if (key == "F11") {
-				SavePbskyTextures();
+				SaveHosekWilkieSky();
 			}
 
 			if (key == "F12") {

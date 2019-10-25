@@ -32,6 +32,7 @@
 #include <ssphh_unicornfish.hpp>
 #include <fluxions_ssg_ssphh_renderer_plugin.hpp>
 #include <fluxions_simple_ssphh.hpp>
+#include <PbskyViewController.hpp>
 
 //#define SSPHH_RENDER_CLASSIC_OPENGL 1
 #ifdef SSPHH_RENDER_CLASSIC_OPENGL
@@ -64,6 +65,7 @@ namespace SSPHH
 		void RenderSkyBox();
 		////////////////////////
 
+	public:
 		GLfloat aspect = 1.0f;
 		GLfloat fovy = 45.0f;
 		// GLfloat nearVal = 0.001f;
@@ -112,7 +114,7 @@ namespace SSPHH
 		//Uf::CoronaDatabase sceneDB;
 		Fluxions::SimpleSceneGraph ssg;
 		Fluxions::SimpleSSPHH ssphh;
-		Fluxions::SSG_SSPHHRendererPlugin *ssgUserData = nullptr;
+		Fluxions::SSG_SSPHHRendererPlugin* ssgUserData = nullptr;
 		Uf::CoronaSceneFile coronaScene;
 		std::vector<Uf::CoronaJob> coronaJobs;
 		Fluxions::SimpleGLES30Renderer gles30;
@@ -197,7 +199,7 @@ namespace SSPHH
 				int shaderDebugSphl = -1;
 				int shaderDebugChoices[4] = { 0, 0, 0, 0 };
 				std::vector<std::string> gl_extensions;
-				std::vector<const char *> gl_extensions_cstr;
+				std::vector<const char*> gl_extensions_cstr;
 				int gl_extensions_curitem = 0;
 				std::string gl_version;
 				std::string gl_renderer;
@@ -231,26 +233,26 @@ namespace SSPHH
 			{
 				struct MtlValuePtrs
 				{
-					float *PBm = nullptr;
-					float *PBk = nullptr;
-					float *PBior = nullptr;
-					float *PBKdm = nullptr;
-					float *PBKsm = nullptr;
-					float *PBGGXgamma = nullptr;
-					float *Kd = nullptr;
-					float *Ks = nullptr;
-					float *Ke = nullptr;
-					float *Ka = nullptr;
-					const char *map_Kd = nullptr;
-					const char *map_Ks = nullptr;
-					const char *map_normal = nullptr;
-					const char *map_bump = nullptr;
+					float* PBm = nullptr;
+					float* PBk = nullptr;
+					float* PBior = nullptr;
+					float* PBKdm = nullptr;
+					float* PBKsm = nullptr;
+					float* PBGGXgamma = nullptr;
+					float* Kd = nullptr;
+					float* Ks = nullptr;
+					float* Ke = nullptr;
+					float* Ka = nullptr;
+					const char* map_Kd = nullptr;
+					const char* map_Ks = nullptr;
+					const char* map_normal = nullptr;
+					const char* map_bump = nullptr;
 				};
 				bool showMaps = false;
 				bool showMtls = true;
 				std::map<std::string, bool> mtllibsCollapsed;
 				std::map<std::string, bool> mtlsCollapsed;
-				std::map<std::string, SimpleMaterial *> mtls;
+				std::map<std::string, SimpleMaterial*> mtls;
 				std::map<std::string, MtlValuePtrs> mtls_ptrs;
 				//vector<pair<bool, vector<int, bool>>> mtlsCollapsed;
 			} mtls;
@@ -325,12 +327,12 @@ namespace SSPHH
 			{
 				// Uf read from variables / UI write to variables
 				std::vector<std::string> send_queue;
-				std::vector<const char *> send_queue_items;
+				std::vector<const char*> send_queue_items;
 				int send_queue_item = 0;
 
 				// Uf write to variables / UI read from variables
 				std::vector<std::string> recv_queue;
-				std::vector<const char *> recv_queue_items;
+				std::vector<const char*> recv_queue_items;
 				int recv_queue_item = 0;
 
 				bool uf_isinit = false; // one time flag to tell service if it has started or not
@@ -401,8 +403,6 @@ namespace SSPHH
 			std::vector<std::string> glLastDebugMessages;
 		};
 
-		void SavePbskyTextures();
-
 		void AdvanceSunClock(double numSeconds, bool recomputeSky = false);
 
 		void InitImGui();
@@ -432,7 +432,6 @@ namespace SSPHH
 		void imguiCoronaGenerateSphlINIT();
 		void imguiCoronaGenerateSphlHIER();
 		void imguiCoronaGenerateSphlGEN();
-		void imguiCoronaGenerateSky();
 		void imguiCoronaCheckCache();
 		void imguiCoronaGenerateREF();
 		void imguiCoronaDeleteCache();
@@ -440,7 +439,7 @@ namespace SSPHH
 		void imguiCoronaGenerateCompareProduct(bool ks, int mrd, int pl, int md);
 		void imguiCoronaDeleteTestProducts();
 
-		void imgui2NSizeSlider(const char *desc, int *choice, int *size, int minvalue, int maxvalue);
+		void imgui2NSizeSlider(const char* desc, int* choice, int* size, int minvalue, int maxvalue);
 
 		void imguiShowUfWindow();
 		void imguiShowSSPHHWindow();
@@ -452,7 +451,18 @@ namespace SSPHH
 		void imguiUfClientGLES20Controls();
 		void imguiUfClientGLES30Controls();
 
-		void imguiMatrix4fEditControl(int id, Matrix4f &m);
+		void imguiMatrix4fEditControl(int id, Matrix4f& m);
+
+		// PBSKY ModelViewController
+
+	private:
+		PbskyViewController* vcPbsky = nullptr;
+	public:
+		void RegenHosekWilkieSky();
+		void SaveHosekWilkieSky();
+		void RegenCoronaSky();
+		void LoadCoronaSky(bool loadEXR, const std::string& path);
+
 
 		// TESTS
 
@@ -472,10 +482,10 @@ namespace SSPHH
 		void SaveScreenshot();
 		void ProcessScenegraphTasks();
 
-		static std::string GetPathTracerName(const std::string &sceneName, bool ks, int mrd, int pl);
-		static std::string GetSphlRenderName(const std::string &sceneName, int md);
-		static std::string GetPathTracerSphlRenderName(const std::string &sceneName, bool ks, int mrd, int pl, int md);
-		static std::string GetStatsName(const std::string &sceneName, bool ks, int mrd, int pl, int md);
+		static std::string GetPathTracerName(const std::string& sceneName, bool ks, int mrd, int pl);
+		static std::string GetSphlRenderName(const std::string& sceneName, int md);
+		static std::string GetPathTracerSphlRenderName(const std::string& sceneName, bool ks, int mrd, int pl, int md);
+		static std::string GetStatsName(const std::string& sceneName, bool ks, int mrd, int pl, int md);
 
 		void SetupRenderGLES30();
 
@@ -497,14 +507,14 @@ namespace SSPHH
 		void RenderTest2SphereCubeMap();
 		void RenderTest3EnviroCubeMap();
 
-		void ParseCommandArguments(const std::vector<std::string> &args);
+		void ParseCommandArguments(const std::vector<std::string>& args);
 		void InitUnicornfish();
 		void KillUnicornfish();
 
 		void GI_ScatterJobs();
 		int GI_GatherJobs();
-		bool GI_ProcessJob(Uf::CoronaJob &job);
-		bool GI_ProcessGatherJob(Uf::CoronaJob &job);
+		bool GI_ProcessJob(Uf::CoronaJob& job);
+		bool GI_ProcessGatherJob(Uf::CoronaJob& job);
 
 	public:
 		HUDInfo my_hud_info;
@@ -516,22 +526,22 @@ namespace SSPHH
 		using UniquePtr = std::unique_ptr<SSPHH_Application>;
 
 		template <class... _Types>
-		static SharedPtr MakeShared(_Types &&... _Args) { return SharedPtr(new SSPHH_Application(std::forward<_Types>(_Args)...)); }
+		static SharedPtr MakeShared(_Types&&... _Args) { return SharedPtr(new SSPHH_Application(std::forward<_Types>(_Args)...)); }
 		template <class... _Types>
-		static UniquePtr MakeUnique(_Types &&... _Args) { return UniquePtr(new SSPHH_Application(std::forward<_Types>(_Args)...)); }
+		static UniquePtr MakeUnique(_Types&&... _Args) { return UniquePtr(new SSPHH_Application(std::forward<_Types>(_Args)...)); }
 
 		SSPHH_Application();
-		SSPHH_Application(const std::string &name);
+		SSPHH_Application(const std::string& name);
 		~SSPHH_Application();
 
-		void OnInit(const std::vector<std::string> &args) override;
+		void OnInit(const std::vector<std::string>& args) override;
 		void OnKill() override;
 
 		virtual void OnUpdate(double timeStamp) override;
 		virtual void DoInterfaceUpdate(double deltaTime);
-		const Matrix4f &GetCameraMatrix() const;
+		const Matrix4f& GetCameraMatrix() const;
 
-		const std::string &GetSceneName() const { return Interface.sceneName; }
+		const std::string& GetSceneName() const { return Interface.sceneName; }
 
 		InterfaceInfo Interface;
 		int counter = 0;
@@ -541,8 +551,8 @@ namespace SSPHH
 		//virtual void OnSpecialKeyDown(int key);
 		//virtual void OnSpecialKeyUp(int key);
 
-		virtual void OnKeyDown(const std::string &key, int modifiers) override;
-		virtual void OnKeyUp(const std::string &key, int modifiers) override;
+		virtual void OnKeyDown(const std::string& key, int modifiers) override;
+		virtual void OnKeyUp(const std::string& key, int modifiers) override;
 
 		//virtual void OnMouseMove(int X, int y, int dx, int dy);
 		//virtual void OnMouseButtonDown(int X, int y, int button);
@@ -551,9 +561,9 @@ namespace SSPHH
 		virtual void OnMouseMove(int x, int y) override;
 		virtual void OnMouseButtonDown(int button) override;
 		virtual void OnMouseButtonUp(int button) override;
-		virtual void OnMouseClick(int button, const MouseClickState &mcs) override;
-		virtual void OnMouseDoubleClick(int button, const MouseDoubleClickState &mdcs) override;
-		virtual void OnMouseDrag(int button, const MouseDragState &mds) override;
+		virtual void OnMouseClick(int button, const MouseClickState& mcs) override;
+		virtual void OnMouseDoubleClick(int button, const MouseDoubleClickState& mdcs) override;
+		virtual void OnMouseDrag(int button, const MouseDragState& mds) override;
 
 		void OnPreRender() override;
 		void OnRender3D() override;
@@ -569,7 +579,7 @@ namespace SSPHH
 
 		virtual void OnReshape(int width, int height) override;
 
-		void RunJob(Uf::CoronaJob &job);
+		void RunJob(Uf::CoronaJob& job);
 
 	private:
 		void OptimizeClippingPlanes();
