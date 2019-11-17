@@ -19,7 +19,7 @@ namespace SSPHH
 		ssg.environment.pbsky.generatedCubeMap.savePPMRaw("pbsky_cubemap_3.ppm", 3);
 		ssg.environment.pbsky.generatedCubeMap.savePPMRaw("pbsky_cubemap_4.ppm", 4);
 		ssg.environment.pbsky.generatedCubeMap.savePPMRaw("pbsky_cubemap_5.ppm", 5);
-		ssg.environment.pbsky.generatedCubeMap.savePPMCube("pbsky_cubemap.ppm");
+		ssg.environment.pbsky.generatedCubeMap.saveCubePPM("pbsky_cubemap.ppm");
 		stopwatch.Stop();
 		HFLOGINFO("Saving pbsky ppm texture maps took %4.2f seconds", stopwatch.GetSecondsElapsed());
 	}
