@@ -167,8 +167,8 @@ namespace SSPHH
 				blockstat += color;
 				blockbwstat += bwcolor;
 
-				bcMaxValue = std::max(bcMaxValue, color.Max());
-				bcMaxValueBW = std::max(bcMaxValue, bwcolor.Max());
+				bcMaxValue = std::max<double>(bcMaxValue, color.maxrgb());
+				bcMaxValueBW = std::max<double>(bcMaxValue, bwcolor.maxrgb());
 
 				Color3f average = std::get<AverageIndex>(blockcounts[addr]);
 				Color3f mindiff = std::get<MinIndex>(blockcounts[addr]);
